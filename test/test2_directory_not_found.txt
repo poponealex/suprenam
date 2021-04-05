@@ -21,7 +21,7 @@ CREATE A NEW DIRECTORY WITH AN EXISTING FILE'S NAME
 
 # output #
 
-/bin/bash ? exists ? -> False
+/bin/bash ? exists ? -> True
 /bin/bash ? isDir ? -> False
 /bin/bashAUX ? exists ? -> False
 /bin/bash -> /bin/bashAUX
