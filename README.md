@@ -16,7 +16,7 @@ __Edit the files/folders names (or don't)__
 > __`DO NOT MODIFY THE NUMBER ON THE LEFT OF THE FILE'S NAME.`__
 > ![TempFileEditedNames](/misc/temp_edited_names.png)
 
-__Save [and close] the temporary file then click on OK in the opened dialog box.__
+__Save [and close] the temporary file and then click on OK in the opened dialog box.__
 > ![DialogBox](/misc/dialog_box.png)
 
 __You're good to go!__
