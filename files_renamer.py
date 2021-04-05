@@ -31,7 +31,9 @@ def main(
             if file_path and file_path.name != new_name:
                 file_path.rename(file_path.parent / new_name)
                 print(f"{Color.TITLE}{file_path.name}{Color.INFO} renamed as {Color.TITLE}{new_name}{Color.END}")
-    os.system(f"rm {temp_file.name}")
+    else:
+        print(f"{Color.FAIL}Renaming aborted, no changes occured.{Color.END}")
+    return os.system(f"rm {temp_file.name}")
 
 
 if __name__ == "__main__":

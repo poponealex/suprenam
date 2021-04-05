@@ -6,6 +6,7 @@ _Currently under early stages of development._
 
 ## Prerequisites
 - Python 3.6+
+- MacOS, Linux
 
 ## Run the program
 __`python3 files_renamer.py <files, folders...>`__
