@@ -1,0 +1,17 @@
+# input #
+
+/usr/share/man -> /usr/share/superman
+/usr/share/man/man1 -> /usr/share/superman/man2
+/usr/share/man/man2 -> /usr/share/superman/man1
+
+# output #
+
+/usr/share/superman ? exists ? -> False
+/usr/share/man -> /usr/share/superman
+
+/usr/share/superman/man2 ? exists ? -> True
+/usr/share/superman/man1 -> /usr/share/superman/man1aux
+/usr/share/superman/man2 -> /usr/share/superman/man1
+
+/usr/share/superman/man2 ? exists ? -> False
+/usr/share/superman/man1aux -> /usr/share/superman/man2
