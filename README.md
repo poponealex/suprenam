@@ -2,7 +2,7 @@
 
 ## Introduction
 This program is designed to help out renaming files and folders.  
-_Currently under early stages development._
+_Currently under early stages of development._
 
 ## Prerequisites
 - Python 3.6+
