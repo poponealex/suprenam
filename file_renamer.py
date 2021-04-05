@@ -16,7 +16,7 @@ def main(
     strip_line: Callable = re.compile(r"#(\d+)#[ ]*([\w\W]+)").findall,
 ):
     if len(sys.argv) < 2:
-        return
+        return print(f"{Color.FAIL}No path was provided.{Color.FAIL}")
     population = {str(Path(x).stat().st_ino): Path(x) for x in sys.argv[1:]}
     temp_file = NamedTemporaryFile(mode="w+", delete=False)
     Path(temp_file.name).write_text("\n".join(f"#{inode}# {path.name}" for inode, path in population.items()))
@@ -28,7 +28,7 @@ def main(
                 file_path = population.get(inode)
             except:
                 continue
-            if file_path and file_path.name != new_name:
+            if file_path and file_path.name != new_name and not (file_path.parent / new_name).exists():
                 file_path.rename(file_path.parent / new_name)
                 print(f"{Color.TITLE}{file_path.name}{Color.INFO} renamed as {Color.TITLE}{new_name}{Color.END}")
     else:
