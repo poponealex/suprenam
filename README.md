@@ -9,7 +9,7 @@ _Currently under early stages of development._
 - MacOS, Linux
 
 ## Run the program
-__`python3 files_renamer.py <files, folders...>`__
+__`python3 file_renamer.py <files, folders...>`__
 
 __A temporary file will open in your system's default text editor.__
 > ![TempFileOriginalNames](/misc/temp_original_names.png)
