@@ -1,7 +1,7 @@
 ![Logo](/misc/logo.png)
 
 ## Introduction
-This program is designed to help out renaming files and folders.
+This program is designed to help out renaming files and folders.  
 _Currently under early stages development._
 
 ## Prerequisites
