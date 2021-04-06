@@ -1,0 +1,192 @@
+# Examples
+
+This text documents the result of the renaming of one or more nodes (leaf: either a file or a folder; internal node: a folder) of `fhs.txt` in a variety of normal cases and edge cases.
+
+Moreover, it is parsed by `test_examples.py`, which runs the renaming algorithm on every example and checks the expected results. When an example consists in several renaming clauses, since their order is not important, all permutations of these clauses are automatically tested.
+
+Note: to ensure formatting consistency, this file is updated by `reformat_examples.py` each time `test_examples.py` is launched.
+
+## Null renaming
+
+### (Not) renaming a leaf
+
+#### Example
+
+original path | new name
+---|---
+/usr/share/man/man1 | man1
+
+#### Result
+
+original path | new path
+---|---
+
+### (Not) renaming a folder
+
+#### Example
+
+original path | new name
+---|---
+/usr/share/man | man
+
+#### Result
+
+original path | new path
+---|---
+
+## Trivial renaming
+
+### Trivial renaming of a leaf
+
+#### Example
+
+original path | new name
+---|---
+/usr/libexec | foobar
+
+#### Result
+
+original path | new path
+---|---
+/usr/libexec | /usr/foobar
+
+### Trivial renaming of a folder
+
+#### Example
+
+original path | new name
+---|---
+/usr/lib | foobar
+
+#### Result
+
+original path | new path
+---|---
+/usr/lib | /usr/foobar
+/usr/lib/X11 | /usr/foobar/X11
+/usr/lib/games | /usr/foobar/games
+/usr/lib/gcc-lib | /usr/foobar/gcc-lib
+/usr/lib/locale | /usr/foobar/locale
+/usr/lib/tls | /usr/foobar/tls
+
+## Swapping
+
+### Swapping the names of two leaves
+
+#### Example
+
+original path | new name
+---|---
+/usr/share/man/man1 | man2
+/usr/share/man/man2 | man1
+
+#### Result
+
+original path | new path
+---|---
+/usr/share/man/man1 | /usr/share/man/man2
+/usr/share/man/man2 | /usr/share/man/man1
+
+### Swapping the names of a leaf and a folder
+
+#### Example
+
+original path | new name
+---|---
+/usr/include | lib
+/usr/lib | include
+
+#### Result
+
+original path | new path
+---|---
+/usr/include | /usr/lib
+/usr/lib | /usr/include
+/usr/lib/X11 | /usr/include/X11
+/usr/lib/games | /usr/include/games
+/usr/lib/gcc-lib | /usr/include/gcc-lib
+/usr/lib/locale | /usr/include/locale
+/usr/lib/tls | /usr/include/tls
+
+### Swapping the names of two folders
+
+#### Example
+
+original path | new name
+---|---
+/etc | lib
+/lib | etc
+
+#### Result
+
+original path | new path
+---|---
+/etc | /lib
+/etc/X11 | /lib/X11
+/etc/X11/applnk | /lib/X11/applnk
+/etc/X11/serverconfig | /lib/X11/serverconfig
+/etc/X11/starthere | /lib/X11/starthere
+/etc/X11/sysconfig | /lib/X11/sysconfig
+/etc/opt | /lib/opt
+/etc/skel | /lib/skel
+/etc/sysconfig | /lib/sysconfig
+/etc/xinetd.d | /lib/xinetd.d
+/lib | /etc
+/lib/modules | /etc/modules
+/lib/tls | /etc/tls
+
+## Rolling (TODO)
+
+### Rolling the names of three leaves
+
+#### Example
+
+original path | new name
+---|---
+
+#### Result
+
+original path | new path
+---|---
+
+### Rolling the names of two leaves and a folder
+
+#### Example
+
+original path | new name
+---|---
+
+#### Result
+
+original path | new path
+---|---
+
+
+### Rolling the names of one leaf and two folders
+
+#### Example
+
+original path | new name
+---|---
+
+#### Result
+
+original path | new path
+---|---
+
+
+### Rolling the names of three folders
+
+#### Example
+
+original path | new name
+---|---
+
+#### Result
+
+original path | new path
+---|---
+
+## Permuting (TODO)
+
+Enumerate all permutations of four nodes.
