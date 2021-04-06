@@ -14,7 +14,6 @@
     - [Rolling the names of two leaves and a folder](#rolling-the-names-of-two-leaves-and-a-folder)
     - [Rolling the names of one leaf and two folders](#rolling-the-names-of-one-leaf-and-two-folders)
     - [Rolling the names of three folders](#rolling-the-names-of-three-folders)
-  - [Permuting (TODO)](#permuting-todo)
 
 # Examples
 
@@ -177,17 +176,17 @@ original path | new path
 
 original path | new name
 ---|---
-/usr/share/man/man1 | 1man
-/usr/share/man/man2 | 2man
-/usr/share/man/man3 | 3man
+/usr/share/man/man1 | man2
+/usr/share/man/man2 | man3
+/usr/share/man/man3 | man1
 
 #### Result
 
 original path | new path
 ---|---
-/usr/share/man/man1 | /usr/share/man/1man
-/usr/share/man/man2 | /usr/share/man/2man
-/usr/share/man/man3 | /usr/share/man/3man
+/usr/share/man/man1 | /usr/share/man/man2
+/usr/share/man/man2 | /usr/share/man/man3
+/usr/share/man/man3 | /usr/share/man/man1
 
 --------------------------------------------------------------------------------
 
@@ -197,17 +196,18 @@ original path | new path
 
 original path | new name
 ---|---
-/usr/share/man | nma
-/usr/share/man/man1 | 1man
-/usr/share/man/man2 | 2man
+/usr/bin | games
+/usr/etc | bin
+/usr/games | etc
 
 #### Result
 
 original path | new path
 ---|---
-/usr/share/man | /usr/share/nma
-/usr/share/man/man1 | /usr/share/nma/1man 
-/usr/share/man/man2 | /usr/share/nma/2man
+/usr/bin | /usr/games
+/usr/bin/X11 | /usr/games/X11
+/usr/etc | /usr/bin
+/usr/games | /usr/etc
 
 --------------------------------------------------------------------------------
 
@@ -217,17 +217,24 @@ original path | new path
 
 original path | new name
 ---|---
-/usr/share/ | eshar
-/usr/share/man/ | nma
-/usr/share/man/man1 | 1man
+/usr/X11R6 | games
+/usr/bin | X11R6
+/usr/games | bin
 
 #### Result
 
 original path | new path
 ---|---
-/usr/share/ | /usr/eshar
-/usr/share/man/ | /usr/eshar/nma
-/usr/share/man/man1 | /usr/eshar/nma/1man
+/usr/X11R6 | /usr/games
+/usr/X11R6/bin | /usr/games/bin
+/usr/X11R6/include | /usr/games/include
+/usr/X11R6/lib | /usr/games/lib
+/usr/X11R6/lib/tls | /usr/games/lib/tls
+/usr/X11R6/man | /usr/games/man
+/usr/X11R6/share | /usr/games/share
+/usr/bin | /usr/X11R6
+/usr/bin/X11 | /usr/X11R6/X11
+/usr/games | /usr/bin
 
 --------------------------------------------------------------------------------
 
@@ -237,18 +244,26 @@ original path | new path
 
 original path | new name
 ---|---
-/usr/ | rus
-/usr/share/ | eshar
-/usr/share/man/ | nma
+/usr/X11R6 | lib
+/usr/bin | X11R6
+/usr/lib | bin
 
 #### Result
 
 original path | new path
 ---|---
-/usr/ | /rus
-/usr/share/ | /rus/eshar
-/usr/share/man/ | /rus/eshar/nma
-
-## Permuting (TODO)
-
-Enumerate all permutations of four nodes.
+/usr/X11R6 | /usr/lib
+/usr/X11R6/bin | /usr/lib/bin
+/usr/X11R6/include | /usr/lib/include
+/usr/X11R6/lib | /usr/lib/lib
+/usr/X11R6/lib/tls | /usr/lib/lib/tls
+/usr/X11R6/man | /usr/lib/man
+/usr/X11R6/share | /usr/lib/share
+/usr/bin | /usr/X11R6
+/usr/bin/X11 | /usr/X11R6/X11
+/usr/lib | /usr/bin
+/usr/lib/X11 | /usr/bin/X11
+/usr/lib/games | /usr/bin/games
+/usr/lib/gcc-lib | /usr/bin/gcc-lib
+/usr/lib/locale | /usr/bin/locale
+/usr/lib/tls | /usr/bin/tls
