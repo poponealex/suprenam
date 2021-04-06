@@ -1,3 +1,21 @@
+- [Examples](#examples)
+  - [Null renaming](#null-renaming)
+    - [(Not) renaming a leaf](#not-renaming-a-leaf)
+    - [(Not) renaming a folder](#not-renaming-a-folder)
+  - [Trivial renaming](#trivial-renaming)
+    - [Trivial renaming of a leaf](#trivial-renaming-of-a-leaf)
+    - [Trivial renaming of a folder](#trivial-renaming-of-a-folder)
+  - [Swapping](#swapping)
+    - [Swapping the names of two leaves](#swapping-the-names-of-two-leaves)
+    - [Swapping the names of a leaf and a folder](#swapping-the-names-of-a-leaf-and-a-folder)
+    - [Swapping the names of two folders](#swapping-the-names-of-two-folders)
+  - [Rolling (TODO)](#rolling-todo)
+    - [Rolling the names of three leaves](#rolling-the-names-of-three-leaves)
+    - [Rolling the names of two leaves and a folder](#rolling-the-names-of-two-leaves-and-a-folder)
+    - [Rolling the names of one leaf and two folders](#rolling-the-names-of-one-leaf-and-two-folders)
+    - [Rolling the names of three folders](#rolling-the-names-of-three-folders)
+  - [Permuting (TODO)](#permuting-todo)
+
 # Examples
 
 This text documents the result of the renaming of one or more nodes (leaf: either a file or a folder; internal node: a folder) of `fhs.txt` in a variety of normal cases and edge cases.
@@ -7,6 +25,8 @@ Moreover, it is parsed by `test_examples.py`, which runs the renaming algorithm 
 Note: to ensure formatting consistency, this file is updated by `reformat_examples.py` each time `test_examples.py` is launched.
 
 ## Null renaming
+
+--------------------------------------------------------------------------------
 
 ### (Not) renaming a leaf
 
@@ -20,6 +40,8 @@ original path | new name
 
 original path | new path
 ---|---
+
+--------------------------------------------------------------------------------
 
 ### (Not) renaming a folder
 
@@ -36,6 +58,8 @@ original path | new path
 
 ## Trivial renaming
 
+--------------------------------------------------------------------------------
+
 ### Trivial renaming of a leaf
 
 #### Example
@@ -49,6 +73,8 @@ original path | new name
 original path | new path
 ---|---
 /usr/libexec | /usr/foobar
+
+--------------------------------------------------------------------------------
 
 ### Trivial renaming of a folder
 
@@ -71,6 +97,8 @@ original path | new path
 
 ## Swapping
 
+--------------------------------------------------------------------------------
+
 ### Swapping the names of two leaves
 
 #### Example
@@ -86,6 +114,8 @@ original path | new path
 ---|---
 /usr/share/man/man1 | /usr/share/man/man2
 /usr/share/man/man2 | /usr/share/man/man1
+
+--------------------------------------------------------------------------------
 
 ### Swapping the names of a leaf and a folder
 
@@ -107,6 +137,8 @@ original path | new path
 /usr/lib/gcc-lib | /usr/include/gcc-lib
 /usr/lib/locale | /usr/include/locale
 /usr/lib/tls | /usr/include/tls
+
+--------------------------------------------------------------------------------
 
 ### Swapping the names of two folders
 
@@ -137,6 +169,8 @@ original path | new path
 
 ## Rolling (TODO)
 
+--------------------------------------------------------------------------------
+
 ### Rolling the names of three leaves
 
 #### Example
@@ -148,6 +182,8 @@ original path | new name
 
 original path | new path
 ---|---
+
+--------------------------------------------------------------------------------
 
 ### Rolling the names of two leaves and a folder
 
@@ -161,6 +197,7 @@ original path | new name
 original path | new path
 ---|---
 
+--------------------------------------------------------------------------------
 
 ### Rolling the names of one leaf and two folders
 
@@ -174,6 +211,7 @@ original path | new name
 original path | new path
 ---|---
 
+--------------------------------------------------------------------------------
 
 ### Rolling the names of three folders
 
