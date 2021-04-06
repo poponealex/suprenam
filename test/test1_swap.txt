@@ -1,9 +1,0 @@
-# input #
-
-/usr/share/man/man1 -> man2
-/usr/share/man/man2 -> man1
-
-# output #
-
-/usr/share/man/man1 -> /usr/share/man/man2
-/usr/share/man/man2 -> /usr/share/man/man1
