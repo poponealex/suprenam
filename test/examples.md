@@ -9,7 +9,7 @@
     - [Swapping the names of two leaves](#swapping-the-names-of-two-leaves)
     - [Swapping the names of a leaf and a folder](#swapping-the-names-of-a-leaf-and-a-folder)
     - [Swapping the names of two folders](#swapping-the-names-of-two-folders)
-  - [Rolling (TODO)](#rolling-todo)
+  - [Rolling](#rolling)
     - [Rolling the names of three leaves](#rolling-the-names-of-three-leaves)
     - [Rolling the names of two leaves and a folder](#rolling-the-names-of-two-leaves-and-a-folder)
     - [Rolling the names of one leaf and two folders](#rolling-the-names-of-one-leaf-and-two-folders)
@@ -167,7 +167,7 @@ original path | new path
 /lib/modules | /etc/modules
 /lib/tls | /etc/tls
 
-## Rolling (TODO)
+## Rolling
 
 --------------------------------------------------------------------------------
 
@@ -177,11 +177,17 @@ original path | new path
 
 original path | new name
 ---|---
+/usr/share/man/man1 | 1man
+/usr/share/man/man2 | 2man
+/usr/share/man/man3 | 3man
 
 #### Result
 
 original path | new path
 ---|---
+/usr/share/man/man1 | /usr/share/man/1man
+/usr/share/man/man2 | /usr/share/man/2man
+/usr/share/man/man3 | /usr/share/man/3man
 
 --------------------------------------------------------------------------------
 
@@ -191,11 +197,17 @@ original path | new path
 
 original path | new name
 ---|---
+/usr/share/man | nma
+/usr/share/man/man1 | 1man
+/usr/share/man/man2 | 2man
 
 #### Result
 
 original path | new path
 ---|---
+/usr/share/man | /usr/share/nma
+/usr/share/man/man1 | /usr/share/nma/1man 
+/usr/share/man/man2 | /usr/share/nma/2man
 
 --------------------------------------------------------------------------------
 
@@ -205,11 +217,17 @@ original path | new path
 
 original path | new name
 ---|---
+/usr/share/ | eshar
+/usr/share/man/ | nma
+/usr/share/man/man1 | 1man
 
 #### Result
 
 original path | new path
 ---|---
+/usr/share/ | /usr/eshar
+/usr/share/man/ | /usr/eshar/nma
+/usr/share/man/man1 | /usr/eshar/nma/1man
 
 --------------------------------------------------------------------------------
 
@@ -219,11 +237,17 @@ original path | new path
 
 original path | new name
 ---|---
+/usr/ | rus
+/usr/share/ | eshar
+/usr/share/man/ | nma
 
 #### Result
 
 original path | new path
 ---|---
+/usr/ | /rus
+/usr/share/ | /rus/eshar
+/usr/share/man/ | /rus/eshar/nma
 
 ## Permuting (TODO)
 
