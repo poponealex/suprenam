@@ -5,6 +5,11 @@
   - [Trivial renaming](#trivial-renaming)
     - [Trivial renaming of a leaf](#trivial-renaming-of-a-leaf)
     - [Trivial renaming of a folder](#trivial-renaming-of-a-folder)
+  - [Simple shifting](#simple-shifting)
+    - [Simple shifting the names of two leaves](#simple-shifting-the-names-of-two-leaves)
+    - [Simple shifting the names of one leaf and one folder](#simple-shifting-the-names-of-one-leaf-and-one-folder)
+    - [Simple shifting the names of one folder and one leaf](#simple-shifting-the-names-of-one-folder-and-one-leaf)
+    - [Simple shifting the names of two folders](#simple-shifting-the-names-of-two-folders)
   - [Swapping](#swapping)
     - [Swapping the names of two leaves](#swapping-the-names-of-two-leaves)
     - [Swapping the names of a leaf and a folder](#swapping-the-names-of-a-leaf-and-a-folder)
@@ -93,6 +98,82 @@ original path | new path
 /usr/lib/gcc-lib | /usr/foobar/gcc-lib
 /usr/lib/locale | /usr/foobar/locale
 /usr/lib/tls | /usr/foobar/tls
+
+## Simple shifting
+
+--------------------------------------------------------------------------------
+
+### Simple shifting the names of two leaves
+
+#### Example
+
+original path | new name
+---|---
+/usr/local/share/man/man1 | man0
+/usr/local/share/man/man2 | man1
+
+#### Result
+
+original path | new path
+---|---
+/usr/local/share/man/man1 | /usr/local/share/man/man0
+/usr/local/share/man/man2 | /usr/local/share/man/man1
+
+--------------------------------------------------------------------------------
+
+### Simple shifting the names of one leaf and one folder
+
+original path | new name
+---|---
+/usr/local/share/man/man1 | man0
+/usr/local/share/man | man1
+
+#### Result
+
+original path | new path
+---|---
+/usr/local/share/man/man1 | /usr/local/share/man1/man0
+/usr/local/share/man | /usr/local/share/man1
+
+--------------------------------------------------------------------------------
+
+### Simple shifting the names of one folder and one leaf
+
+#### Example
+
+original path | new name
+---|---
+/usr/local/share/man | superman
+/usr/local/share/man/man1 | man
+
+#### Result
+
+original path | new path
+---|---
+/usr/local/share/man | /usr/local/share/superman
+/usr/local/share/man/man1 | /usr/local/share/superman/man
+
+--------------------------------------------------------------------------------
+
+### Simple shifting the names of two folders
+
+original path | new name
+---|---
+/usr/bin | spam
+/usr/lib | bin
+
+#### Result
+
+original path | new path
+---|---
+/usr/bin | /usr/spam 
+/usr/bin/X11 | /usr/spam/X11 
+/usr/lib | /usr/bin
+/usr/lib/X11 | /usr/bin/X11 
+/usr/lib/games | /usr/bin/games 
+/usr/lib/gcc-lib | /usr/bin/gcc-lib 
+/usr/lib/locale | /usr/bin/locale 
+/usr/lib/tls | /usr/bin/tls
 
 ## Swapping
 
@@ -267,3 +348,7 @@ original path | new path
 /usr/lib/gcc-lib | /usr/bin/gcc-lib
 /usr/lib/locale | /usr/bin/locale
 /usr/lib/tls | /usr/bin/tls
+
+
+
+
