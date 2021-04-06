@@ -125,15 +125,25 @@ original path | new path
 
 original path | new name
 ---|---
-/usr/local/share/man/man1 | man0
-/usr/local/share/man | man1
+/usr/local/share/info | spam
+/usr/local/share/man | info
 
 #### Result
 
 original path | new path
 ---|---
-/usr/local/share/man/man1 | /usr/local/share/man1/man0
-/usr/local/share/man | /usr/local/share/man1
+/usr/local/share/info | /usr/local/share/spam
+/usr/local/share/man | /usr/local/share/info
+/usr/local/share/man/man1 | /usr/local/share/info/man1
+/usr/local/share/man/man2 | /usr/local/share/info/man2
+/usr/local/share/man/man3 | /usr/local/share/info/man3
+/usr/local/share/man/man4 | /usr/local/share/info/man4
+/usr/local/share/man/man5 | /usr/local/share/info/man5
+/usr/local/share/man/man6 | /usr/local/share/info/man6
+/usr/local/share/man/man7 | /usr/local/share/info/man7
+/usr/local/share/man/man8 | /usr/local/share/info/man8
+/usr/local/share/man/man9 | /usr/local/share/info/man9
+/usr/local/share/man/mann | /usr/local/share/info/mann
 
 --------------------------------------------------------------------------------
 
@@ -143,15 +153,25 @@ original path | new path
 
 original path | new name
 ---|---
-/usr/local/share/man | superman
-/usr/local/share/man/man1 | man
+/usr/local/share/man | spam
+/usr/local/share/info | man
 
 #### Result
 
 original path | new path
 ---|---
-/usr/local/share/man | /usr/local/share/superman
-/usr/local/share/man/man1 | /usr/local/share/superman/man
+/usr/local/share/man | /usr/local/share/spam
+/usr/local/share/man/man1 | /usr/local/share/spam/man1
+/usr/local/share/man/man2 | /usr/local/share/spam/man2
+/usr/local/share/man/man3 | /usr/local/share/spam/man3
+/usr/local/share/man/man4 | /usr/local/share/spam/man4
+/usr/local/share/man/man5 | /usr/local/share/spam/man5
+/usr/local/share/man/man6 | /usr/local/share/spam/man6
+/usr/local/share/man/man7 | /usr/local/share/spam/man7
+/usr/local/share/man/man8 | /usr/local/share/spam/man8
+/usr/local/share/man/man9 | /usr/local/share/spam/man9
+/usr/local/share/man/mann | /usr/local/share/spam/mann
+/usr/local/share/info | /usr/local/share/man
 
 --------------------------------------------------------------------------------
 
@@ -348,7 +368,3 @@ original path | new path
 /usr/lib/gcc-lib | /usr/bin/gcc-lib
 /usr/lib/locale | /usr/bin/locale
 /usr/lib/tls | /usr/bin/tls
-
-
-
-
