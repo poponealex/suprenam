@@ -19,6 +19,9 @@
     - [Rolling the names of two leaves and a folder](#rolling-the-names-of-two-leaves-and-a-folder)
     - [Rolling the names of one leaf and two folders](#rolling-the-names-of-one-leaf-and-two-folders)
     - [Rolling the names of three folders](#rolling-the-names-of-three-folders)
+  - [Illegal renaming](#illegal-renaming)
+    - [Renaming the same leaf twice or more](#renaming-the-same-leaf-twice-or-more)
+    - [Renaming the same node twice or more](#renaming-the-same-node-twice-or-more)
 
 # Examples
 
@@ -368,3 +371,37 @@ original path | new path
 /usr/lib/gcc-lib | /usr/bin/gcc-lib
 /usr/lib/locale | /usr/bin/locale
 /usr/lib/tls | /usr/bin/tls
+
+## Illegal renaming
+
+--------------------------------------------------------------------------------
+
+### Renaming the same leaf twice or more
+
+#### Example
+
+original path | new name
+---|---
+/bin | /trash
+/bin | /boom
+
+#### Result
+
+original path | new path
+---|---
+
+--------------------------------------------------------------------------------
+
+### Renaming the same node twice or more
+
+#### Example
+
+original path | new name
+---|---
+/etc | /etera
+/etc | /esc
+
+#### Result
+
+original path | new path
+---|---
