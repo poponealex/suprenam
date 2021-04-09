@@ -1,15 +1,19 @@
-- [Examples](#examples)
+- [Foreword](#foreword)
+- [Accepted schemes](#accepted-schemes)
   - [Null renaming](#null-renaming)
     - [(Not) renaming a leaf](#not-renaming-a-leaf)
     - [(Not) renaming a folder](#not-renaming-a-folder)
   - [Trivial renaming](#trivial-renaming)
     - [Trivial renaming of a leaf](#trivial-renaming-of-a-leaf)
     - [Trivial renaming of a folder](#trivial-renaming-of-a-folder)
-  - [Simple shifting](#simple-shifting)
-    - [Simple shifting the names of two leaves](#simple-shifting-the-names-of-two-leaves)
-    - [Simple shifting the names of one leaf and one folder](#simple-shifting-the-names-of-one-leaf-and-one-folder)
-    - [Simple shifting the names of one folder and one leaf](#simple-shifting-the-names-of-one-folder-and-one-leaf)
-    - [Simple shifting the names of two folders](#simple-shifting-the-names-of-two-folders)
+  - [Redundant renaming](#redundant-renaming)
+    - [Redundant renaming of a leaf](#redundant-renaming-of-a-leaf)
+    - [Redundant renaming of a folder](#redundant-renaming-of-a-folder)
+  - [Shifting](#shifting)
+    - [Shifting the names of two leaves](#shifting-the-names-of-two-leaves)
+    - [Shifting the names of one leaf and one folder](#shifting-the-names-of-one-leaf-and-one-folder)
+    - [Shifting the names of one folder and one leaf](#shifting-the-names-of-one-folder-and-one-leaf)
+    - [Shifting the names of two folders](#shifting-the-names-of-two-folders)
   - [Swapping](#swapping)
     - [Swapping the names of two leaves](#swapping-the-names-of-two-leaves)
     - [Swapping the names of a leaf and a folder](#swapping-the-names-of-a-leaf-and-a-folder)
@@ -19,17 +23,28 @@
     - [Rolling the names of two leaves and a folder](#rolling-the-names-of-two-leaves-and-a-folder)
     - [Rolling the names of one leaf and two folders](#rolling-the-names-of-one-leaf-and-two-folders)
     - [Rolling the names of three folders](#rolling-the-names-of-three-folders)
-  - [Illegal renaming](#illegal-renaming)
-    - [Renaming the same leaf twice or more](#renaming-the-same-leaf-twice-or-more)
-    - [Renaming the same node twice or more](#renaming-the-same-node-twice-or-more)
+- [Rejected schemes](#rejected-schemes)
+  - [Name clash among renaming clauses](#name-clash-among-renaming-clauses)
+    - [Giving the same leaf at least two distinct names](#giving-the-same-leaf-at-least-two-distinct-names)
+    - [Giving the same folder at least two distinct names](#giving-the-same-folder-at-least-two-distinct-names)
+    - [Giving two distinct sibling leaves the same name](#giving-two-distinct-sibling-leaves-the-same-name)
+    - [Giving two distinct sibling leaf and folder the same name](#giving-two-distinct-sibling-leaf-and-folder-the-same-name)
+    - [Giving two distinct sibling folders the same name](#giving-two-distinct-sibling-folders-the-same-name)
+  - [Name clash outside renaming clauses](#name-clash-outside-renaming-clauses)
+    - [Giving a leaf the name of an existing leaf](#giving-a-leaf-the-name-of-an-existing-leaf)
+    - [Giving a leaf the name of an existing folder](#giving-a-leaf-the-name-of-an-existing-folder)
+    - [Giving a folder the name of an existing leaf](#giving-a-folder-the-name-of-an-existing-leaf)
+    - [Giving a folder the name of an existing folder](#giving-a-folder-the-name-of-an-existing-folder)
 
-# Examples
+# Foreword
 
 This text documents the result of the renaming of one or more nodes (leaf: either a file or a folder; internal node: a folder) of `fhs.txt` in a variety of normal cases and edge cases.
 
 Moreover, it is parsed by `test_examples.py`, which runs the renaming algorithm on every example and checks the expected results. When an example consists in several renaming clauses, since their order is not important, all permutations of these clauses are automatically tested.
 
 Note: to ensure formatting consistency, this file is updated by `reformat_examples.py` each time `test_examples.py` is launched.
+
+# Accepted schemes
 
 ## Null renaming
 
@@ -102,11 +117,52 @@ original path | new path
 /usr/lib/locale | /usr/foobar/locale
 /usr/lib/tls | /usr/foobar/tls
 
-## Simple shifting
+## Redundant renaming
 
 --------------------------------------------------------------------------------
 
-### Simple shifting the names of two leaves
+### Redundant renaming of a leaf
+
+#### Example
+
+original path | new name
+---|---
+/usr/libexec | foobar
+/usr/libexec | foobar
+
+#### Result
+
+original path | new path
+---|---
+/usr/libexec | /usr/foobar
+
+--------------------------------------------------------------------------------
+
+### Redundant renaming of a folder
+
+#### Example
+
+original path | new name
+---|---
+/usr/lib | foobar
+/usr/lib | foobar
+
+#### Result
+
+original path | new path
+---|---
+/usr/lib | /usr/foobar
+/usr/lib/X11 | /usr/foobar/X11
+/usr/lib/games | /usr/foobar/games
+/usr/lib/gcc-lib | /usr/foobar/gcc-lib
+/usr/lib/locale | /usr/foobar/locale
+/usr/lib/tls | /usr/foobar/tls
+
+## Shifting
+
+--------------------------------------------------------------------------------
+
+### Shifting the names of two leaves
 
 #### Example
 
@@ -124,7 +180,7 @@ original path | new path
 
 --------------------------------------------------------------------------------
 
-### Simple shifting the names of one leaf and one folder
+### Shifting the names of one leaf and one folder
 
 original path | new name
 ---|---
@@ -150,7 +206,7 @@ original path | new path
 
 --------------------------------------------------------------------------------
 
-### Simple shifting the names of one folder and one leaf
+### Shifting the names of one folder and one leaf
 
 #### Example
 
@@ -178,7 +234,7 @@ original path | new path
 
 --------------------------------------------------------------------------------
 
-### Simple shifting the names of two folders
+### Shifting the names of two folders
 
 original path | new name
 ---|---
@@ -372,18 +428,20 @@ original path | new path
 /usr/lib/locale | /usr/bin/locale
 /usr/lib/tls | /usr/bin/tls
 
-## Illegal renaming
+# Rejected schemes
+
+## Name clash among renaming clauses
 
 --------------------------------------------------------------------------------
 
-### Renaming the same leaf twice or more
+### Giving the same leaf at least two distinct names
 
 #### Example
 
 original path | new name
 ---|---
-/bin | /trash
-/bin | /boom
+/bin | trash
+/bin | boom
 
 #### Result
 
@@ -392,14 +450,124 @@ original path | new path
 
 --------------------------------------------------------------------------------
 
-### Renaming the same node twice or more
+### Giving the same folder at least two distinct names
 
 #### Example
 
 original path | new name
 ---|---
-/etc | /etera
-/etc | /esc
+/etc | etera
+/etc | esc
+
+#### Result
+
+original path | new path
+---|---
+
+--------------------------------------------------------------------------------
+
+### Giving two distinct sibling leaves the same name
+
+#### Example
+
+original path | new name
+---|---
+/usr/lib/X11 | foobar
+/usr/lib/games | foobar
+
+#### Result
+
+original path | new path
+---|---
+
+--------------------------------------------------------------------------------
+
+### Giving two distinct sibling leaf and folder the same name
+
+#### Example
+
+original path | new name
+---|---
+/usr/include | foobar
+/usr/lib | foobar
+
+#### Result
+
+original path | new path
+---|---
+
+--------------------------------------------------------------------------------
+
+### Giving two distinct sibling folders the same name
+
+#### Example
+
+original path | new name
+---|---
+/usr/bin | foobar
+/usr/lib | foobar
+
+#### Result
+
+original path | new path
+---|---
+
+## Name clash outside renaming clauses
+
+--------------------------------------------------------------------------------
+
+### Giving a leaf the name of an existing leaf
+
+#### Example
+
+original path | new name
+---|---
+/usr/share/man/man1 | man2
+
+#### Result
+
+original path | new path
+---|---
+
+--------------------------------------------------------------------------------
+
+### Giving a leaf the name of an existing folder
+
+#### Example
+
+original path | new name
+---|---
+/opt | mnt
+
+#### Result
+
+original path | new path
+---|---
+
+--------------------------------------------------------------------------------
+
+### Giving a folder the name of an existing leaf
+
+#### Example
+
+original path | new name
+---|---
+/mnt | opt
+
+#### Result
+
+original path | new path
+---|---
+
+--------------------------------------------------------------------------------
+
+### Giving a folder the name of an existing folder
+
+#### Example
+
+original path | new name
+---|---
+/lib | mnt
 
 #### Result
 
