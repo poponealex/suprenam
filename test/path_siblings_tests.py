@@ -1,8 +1,10 @@
 from create_fhs import create_fhs
-from src.path_siblings import get_path_siblings
+from path_siblings import get_path_siblings
 from pathlib import Path
 
+
 create_fhs()
+
 
 assert get_path_siblings(set([Path("FHS/bin")])) == get_path_siblings(set([Path("FHS/boot")])) == get_path_siblings(set([Path("FHS/lib")])) == get_path_siblings(set([Path("FHS/var")])) 
 assert get_path_siblings(set([Path("FHS/etc/X11/applnk")])) == get_path_siblings(set([Path("FHS/etc/X11/sysconfig")])) == get_path_siblings(set([Path("FHS/etc/X11/starthere")]))
