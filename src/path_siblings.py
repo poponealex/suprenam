@@ -2,9 +2,9 @@ from pathlib import Path
 
 
 def get_path_siblings(paths: set[Path]) -> set[Path]:
-    acc = set()
+    result = set()
     for path in paths:
-        if path not in acc:
+        if path not in result:
             for p in Path(path.parent).glob("*"):
-                acc.add(p)
-    return paths.union(acc)
+                result.add(p)
+    return result
