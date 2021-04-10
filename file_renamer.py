@@ -1,9 +1,8 @@
 import re, sys, os
 from pathlib import Path, PurePath
-from typing import NamedTuple, Union, Set
+from typing import NamedTuple, Union, Set, Generator, Callable
 from itertools import count
 from tempfile import NamedTemporaryFile
-from collections.abc import Callable
 from tkinter import messagebox
 
 
@@ -29,16 +28,23 @@ class Edges(NamedTuple):
     final_edges: list[Edge]
 
 
+Population = dict[str, Path]
+
+Arborescence = set[Union[Path, PurePath]]
+
+Clauses = list[list[Clause]]
+
+
 def confirm_with_dialog() -> bool:
     return messagebox.askokcancel("Confirm changes", "Rename the files?")
 
 
-def get_siblings(paths: set[Path]) -> set[Path]:
+def get_siblings(paths: Arborescence) -> Generator:
     for path in paths:
         yield from Path(path.parent).glob("*")
 
 
-def parse_file_paths() -> dict[str, Path]:
+def parse_file_paths() -> Population:
     """Raises an error if an invalid path is provided."""
     if len(sys.argv) < 2:
         raise ValueError("No path was provided.")
@@ -50,15 +56,15 @@ def parse_file_paths() -> dict[str, Path]:
     return population
 
 
-def create_temporary_file(paths: dict[int, Path]) -> Path:
+def create_temporary_file(paths: Population) -> Path:
     temp_file = NamedTemporaryFile(mode="w+", delete=False)
     Path(temp_file.name).write_text("\n".join(f"#{inode}# {path.name}" for inode, path in paths.items()))
     return Path(temp_file.name)
 
 
 def parse_new_names(
-    population: dict[str, Path],
-    arborescence: set[Union[Path, PurePath]],
+    population: Population,
+    arborescence: Arborescence,
     temp_file: Path,
     strip_line: Callable = re.compile(r"#(\d+)#[ ]*([\w\W]+)").findall,
 ) -> list[Clause]:
@@ -82,8 +88,8 @@ def parse_new_names(
 
 def create_temporary_filename(
     file_name: str,
-    arborescence: set[Union[Path, PurePath]],
-    aux_arborescence: set[Union[Path, PurePath]] = set(),
+    arborescence: Arborescence,
+    aux_arborescence: Arborescence = set(),
 ):
     for i in count():
         result = f"{i}{hash(file_name)}"
@@ -91,7 +97,7 @@ def create_temporary_filename(
             return result
 
 
-def sort_clauses(clauses: list[Clause]) -> list[list[Clause]]:
+def sort_clauses(clauses: list[Clause]) -> Clauses:
     result = []
     paths_lengths = sorted([(clause, len(str(clause.path).split("/"))) for clause in clauses], key=lambda x: x[1])
     acc = [paths_lengths[-1][0]]
@@ -105,7 +111,7 @@ def sort_clauses(clauses: list[Clause]) -> list[list[Clause]]:
     return result
 
 
-def create_edges(clauses: list[Clause], arborescence: set[Union[Path, PurePath]]) -> Edges:
+def create_edges(clauses: list[Clause], arborescence: Arborescence) -> Edges:
     final_edges = []
     temporary_edges = []
     acc = set()
@@ -121,7 +127,7 @@ def create_edges(clauses: list[Clause], arborescence: set[Union[Path, PurePath]]
     return Edges(temporary_edges, final_edges)
 
 
-def renamer(clauses_list: list[list[Clause]], arborescence: set[Union[Path, PurePath]]):
+def renamer(clauses_list: Clauses, arborescence: Arborescence):
     for clauses in clauses_list:
         edges = create_edges(clauses, arborescence)
         for edge in edges.temporary_edges:
@@ -150,5 +156,5 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        print(f"{Color.FAIL}{e}{Color.END}")
+        print(f"{Color.FAIL}{e}{Color.END}", file=sys.stderr)
     sys.exit()
