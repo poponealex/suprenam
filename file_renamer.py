@@ -45,13 +45,12 @@ def get_siblings(paths: Arborescence) -> Generator:
 
 
 def parse_file_paths() -> Population:
-    """Raises an error if an invalid path is provided."""
     if len(sys.argv) < 2:
         raise ValueError("No path was provided.")
     population = {}
     for x in sys.argv[1:]:
         if not Path(x).exists():
-            raise ValueError(f"< {x} > is not a valid path.")
+            raise FileNotFoundError(f"< {x} > is not a valid path.")
         population[str(Path(x).stat().st_ino)] = Path(x)
     return population
 
@@ -68,14 +67,17 @@ def parse_new_names(
     temp_file: Path,
     strip_line: Callable = re.compile(r"#(\d+)#[ ]*([\w\W]+)").findall,
 ) -> list[Clause]:
+
     result = []
     population_paths = set(population.values())
     destinations = set()
     for line in temp_file.read_text().split("\n"):
         inode, new_name = strip_line(line.strip())[0]
+        if "/" in new_name:
+            raise ValueError(f"< {new_name} > : Illegal caracter '/'.")
         file_path = population.pop(inode, None)
         if not file_path:
-            raise ValueError("Illegal file path.")
+            raise ValueError("Illegal file path or trying to rename the same file twice+.")
         destination_path = Path(file_path.parent / new_name)
         if destination_path in destinations:
             raise ValueError("Trying to rename two siblings with the same name.")
@@ -87,13 +89,14 @@ def parse_new_names(
 
 
 def create_temporary_filename(
-    file_name: str,
+    path: Path,
     arborescence: Arborescence,
     aux_arborescence: Arborescence = set(),
 ):
     for i in count():
-        result = f"{i}{hash(file_name)}"
-        if result not in arborescence and result not in aux_arborescence:
+        result = f"{i}{hash(path.name)}"
+        resulting_path = Path(path.parent / result)
+        if resulting_path not in arborescence and resulting_path not in aux_arborescence:
             return result
 
 
@@ -120,7 +123,7 @@ def create_edges(clauses: list[Clause], arborescence: Arborescence) -> Edges:
             continue
         destination_path = Path(f"{clause.path.parent}/{clause.new_name}")
         acc.add(destination_path)
-        temp_path = Path(f"{clause.path.parent}/{create_temporary_filename(clause.path.name, arborescence, acc)}")
+        temp_path = Path(f"{clause.path.parent}/{create_temporary_filename(clause.path, arborescence, acc)}")
         acc.add(temp_path)
         temporary_edges.append(Edge(clause.path, temp_path))
         final_edges.append(Edge(temp_path, destination_path))
@@ -135,9 +138,7 @@ def renamer(clauses_list: Clauses, arborescence: Arborescence):
         for edge in edges.final_edges:
             edge.original_path.rename(edge.destination_path)
         for clause in clauses:
-            print(
-                f"{Color.TITLE}{str(clause.path)}{Color.INFO} renamed as {Color.TITLE}{str(Path(clause.path.parent / clause.new_name))}{Color.END}"
-            )
+            print(f"{Color.TITLE}{clause.path}{Color.INFO} renamed as {Color.TITLE}{Path(clause.path.parent / clause.new_name)}{Color.END}")
 
 
 def main():
