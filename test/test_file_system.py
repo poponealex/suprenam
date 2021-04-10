@@ -10,6 +10,10 @@ def test_pure():
     paths = Path("test/fhs.txt").read_text().strip().split("\n")
     file_system = FileSystem(paths, is_pure=True)
     assert file_system.exists(Path("/usr/local"))
+    assert file_system.index(Path("/usr/local")) == 48
+    assert file_system.index(Path("/usr/local/a")) == 48
+    file_system.add(Path("/usr/local/a"))
+    assert file_system.index(Path("/usr/local/a")) == 49
     assert not file_system.exists(Path("/usr/non_existing_node"))
     result = list(map(str, file_system.siblings(Path("/usr/local"))))
     expected = [
@@ -27,7 +31,6 @@ def test_pure():
     ]
     assert result == expected
     file_system.add(Path("/usr/foo.bar"))
-    assert file_system.exists(Path("/usr/foo.bar"))
     new_path = file_system.uncollide(Path("/usr/foo.bar"))
     assert file_system.exists(Path("/usr/foo.bar"))
     assert file_system.exists(Path("/usr/2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae-0.bar"))

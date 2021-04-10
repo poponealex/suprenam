@@ -21,10 +21,14 @@ class FileSystem:
 
     def exists(self, path):
         return path in self.as_set
+    
+    def index(self, path):
+        """Return the index at/after which the given path is/should be stored."""
+        return bisect(self.as_list, path)
 
     def siblings(self, path):
         parent = path.parent
-        for candidate in self.as_list[bisect(self.as_list, parent) :]:
+        for candidate in self.as_list[self.index(parent) :]:
             if not str(candidate).startswith(f"{parent}/"):
                 break
             if candidate.match(f"{parent}/*") and candidate != path:
@@ -35,7 +39,7 @@ class FileSystem:
         self.as_set.add(path)
 
     def uncollide(self, path):
-        """Calculate and add to the file system a non-colliding new name for path."""
+        """Calculate and add a non-colliding new name for path."""
         digest = sha256(path.stem.encode("utf8")).hexdigest()
         for suffix in count():
             new_path = path.with_stem(f"{digest}-{suffix}")
