@@ -1,6 +1,6 @@
 import re, sys, os
 from pathlib import Path, PurePath
-from typing import NamedTuple, Union, Set, Generator, Callable
+from typing import NamedTuple, Union, Generator, Callable
 from itertools import count
 from tempfile import NamedTemporaryFile
 from tkinter import messagebox
@@ -93,8 +93,9 @@ def create_temporary_filename(
     arborescence: Arborescence,
     aux_arborescence: Arborescence = set(),
 ):
+    hashed_name = hash(path.name)
     for i in count():
-        result = f"{i}{hash(path.name)}"
+        result = f"{i}{hashed_name}"
         resulting_path = Path(path.parent / result)
         if resulting_path not in arborescence and resulting_path not in aux_arborescence:
             return result
