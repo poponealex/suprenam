@@ -26,6 +26,11 @@ def test_pure():
         "/usr/tmp",
     ]
     assert result == expected
+    file_system.add(Path("/usr/foo.bar"))
+    assert file_system.exists(Path("/usr/foo.bar"))
+    new_path = file_system.uncollide(Path("/usr/foo.bar"))
+    assert file_system.exists(Path("/usr/foo.bar"))
+    assert file_system.exists(Path("/usr/2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae-0.bar"))
 
 
 def test_actual():

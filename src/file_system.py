@@ -1,5 +1,7 @@
 from pathlib import Path
-from bisect import bisect
+from bisect import bisect, insort
+from hashlib import sha256
+from itertools import count
 
 
 class FileSystem:
@@ -22,8 +24,21 @@ class FileSystem:
 
     def siblings(self, path):
         parent = path.parent
-        for candidate in self.as_list[bisect(self.as_list, parent):]:
+        for candidate in self.as_list[bisect(self.as_list, parent) :]:
             if not str(candidate).startswith(f"{parent}/"):
                 break
             if candidate.match(f"{parent}/*") and candidate != path:
                 yield candidate
+
+    def add(self, path):
+        insort(self.as_list, path)
+        self.as_set.add(path)
+
+    def uncollide(self, path):
+        """Calculate and add to the file system a non-colliding new name for path."""
+        digest = sha256(path.stem.encode("utf8")).hexdigest()
+        for suffix in count():
+            new_path = path.with_stem(f"{digest}-{suffix}")
+            if not self.exists(new_path):
+                self.add(new_path)
+                return new_path
