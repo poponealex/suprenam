@@ -4,7 +4,7 @@ from typing import NamedTuple, Union, Generator, Callable
 from itertools import count
 from tempfile import NamedTemporaryFile
 from tkinter import messagebox
-from src.file_system import FileSystem
+from file_system import FileSystem
 
 
 class Color:
