@@ -275,7 +275,7 @@ def test_renamer_system():
     clauses = sort_clauses(parse_new_names(file_system, new_names))
     renamer(clauses, file_system)
 
-    check_exists = [
+    expected = [
         Path("test/FHS/etcetera"),
         Path("test/FHS/library"),
         Path("test/FHS/etcetera/X"),
@@ -295,7 +295,27 @@ def test_renamer_system():
         Path("test/FHS/usr/share/superman/man4"),
     ]
 
-    assert all(x.exists() for x in check_exists)
+    not_expected = [
+        Path("test/FHS/etc"),
+        Path("test/FHS/lib"),
+        Path("test/FHS/etc/X11"),
+        Path("test/FHS/etc/X11/applnk"),
+        Path("test/FHS/etc/X11/serverconfig"),
+        Path("test/FHS/etc/X11/starthere"),
+        Path("test/FHS/etc/X11/sysconfig"),
+        Path("test/FHS/var/lib/games"),
+        Path("test/FHS/var/lib/misc"),
+        Path("test/FHS/var/mail"),
+        Path("test/FHS/usr/share/man"),
+        Path("test/FHS/usr/share/man/man1"),
+        Path("test/FHS/usr/share/man/man2"),
+        Path("test/FHS/usr/share/man/man3"),
+        Path("test/FHS/usr/share/man/man4"),
+    ]
+
+    assert all(x.exists() for x in expected)
+    assert not all(x.exists() for x in not_expected)
+
     os.system("rm -rf test/FHS")
 
 
