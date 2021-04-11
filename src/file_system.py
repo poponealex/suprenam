@@ -37,6 +37,13 @@ class FileSystem:
             if candidate.match(f"{parent}/*") and candidate != path:
                 yield candidate
 
+    def childs(self, path):
+        for candidate in self.as_list[self.index(path) :]:
+            if not str(candidate).startswith(f"{path}/"):
+                break
+            if candidate.match(f"{path}/*") and candidate != path:
+                yield candidate
+
     def add(self, path):
         insort(self.as_list, path)
         self.as_set.add(path)
@@ -57,5 +64,8 @@ class FileSystem:
 
     def rename(self, original_path, new_path):
         """Virtually rename a path in the FileSystem object as_set and as_list instances."""
+        for path in self.childs(original_path):
+            self.remove(path)
+            self.add(Path(new_path / path.name))
         self.remove(original_path)
         self.add(new_path)
