@@ -50,7 +50,10 @@ class FileSystem:
 
     def remove(self, path):
         if self.exists(path):
-            del self.as_list[self.index(path)]
+            index = self.index(path)
+            if self.as_list[index] != path:
+                index -= 1
+            del self.as_list[index]
             self.as_set.remove(path)
 
     def uncollide(self, path):
