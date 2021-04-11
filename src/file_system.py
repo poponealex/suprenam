@@ -24,7 +24,7 @@ class FileSystem:
 
     def exists(self, path):
         return path in self.as_set
-    
+
     def index(self, path):
         """Return the index at/after which the given path is/should be stored."""
         return bisect(self.as_list, path)
