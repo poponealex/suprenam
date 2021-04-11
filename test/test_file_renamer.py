@@ -1,5 +1,6 @@
+__import__("sys").path[0:0] = ["."]
 from pathlib import Path, PosixPath
-import context
+from test.create_fhs import create_fhs
 from src.file_renamer import *
 import pytest
 
@@ -170,7 +171,7 @@ def test_create_edges():
     assert create_edges(clauses2, FILE_SYSTEM) == expected2
 
 
-def test_renamer():
+def test_renamer_pure():
     new_names = [
         "#1# reboot",
         "#2# etcetera",
@@ -182,36 +183,120 @@ def test_renamer():
         "#103# miel",
     ]
 
+    expected = [
+        Path("/reboot"),
+        Path("/etcetera"),
+        Path("/etcetera/X11"),
+        Path("/etcetera/opt"),
+        Path("/etcetera/skel"),
+        Path("/etcetera/sysconfig"),
+        Path("/etcetera/xinetd.d"),
+        Path("/var/library"),
+        Path("/var/library/games"),
+        Path("/var/library/misc"),
+        Path("/usr/share/superman"),
+        Path("/usr/share/superman/man1"),
+        Path("/usr/share/superman/man2"),
+        Path("/usr/share/superman/man3"),
+        Path("/usr/share/superman/man4"),
+        Path("/usr/share/superman/man5"),
+        Path("/usr/share/superman/man6"),
+        Path("/usr/share/superman/man7"),
+        Path("/usr/share/superman/man8"),
+        Path("/usr/share/superman/man9"),
+        Path("/usr/share/superman/mann"),
+        Path("/var/miel"),
+    ]
+
+    not_expected = [
+        Path("/boot"),
+        Path("/etc"),
+        Path("/etc/X11"),
+        Path("/etc/opt"),
+        Path("/etc/skel"),
+        Path("/etc/sysconfig"),
+        Path("/etc/xinetd.d"),
+        Path("/var/lib"),
+        Path("/var/lib/games"),
+        Path("/var/lib/misc"),
+        Path("/var/mail"),
+        Path("/usr/share/man"),
+        Path("/usr/share/man/man1"),
+        Path("/usr/share/man/man2"),
+        Path("/usr/share/man/man3"),
+        Path("/usr/share/man/man4"),
+        Path("/usr/share/man/man5"),
+        Path("/usr/share/man/man6"),
+        Path("/usr/share/man/man7"),
+        Path("/usr/share/man/man8"),
+        Path("/usr/share/man/man9"),
+        Path("/usr/share/man/mann"),
+    ]
+
     clauses = sort_clauses(parse_new_names(FILE_SYSTEM, new_names))
     renamer(clauses, FILE_SYSTEM, is_pure=True)
 
-    assert not FILE_SYSTEM.exists(Path("/boot"))
-    assert FILE_SYSTEM.exists(Path("/reboot"))
-    assert not FILE_SYSTEM.exists(Path("/etc"))
-    assert FILE_SYSTEM.exists(Path("/etcetera"))
-    assert FILE_SYSTEM.exists(Path("/etcetera/X11"))
-    assert FILE_SYSTEM.exists(Path("/etcetera/opt"))
-    assert FILE_SYSTEM.exists(Path("/etcetera/skel"))
-    assert FILE_SYSTEM.exists(Path("/etcetera/sysconfig"))
-    assert FILE_SYSTEM.exists(Path("/etcetera/xinetd.d"))
-    assert not FILE_SYSTEM.exists(Path("/var/lib"))
-    assert FILE_SYSTEM.exists(Path("/var/library"))
-    assert FILE_SYSTEM.exists(Path("/var/library/games"))
-    assert FILE_SYSTEM.exists(Path("/var/library/misc"))
-    assert not FILE_SYSTEM.exists(Path("/usr/share/man"))
-    assert FILE_SYSTEM.exists(Path("/usr/share/superman"))
-    assert FILE_SYSTEM.exists(Path("/usr/share/superman/man1"))
-    assert FILE_SYSTEM.exists(Path("/usr/share/superman/man2"))
-    assert FILE_SYSTEM.exists(Path("/usr/share/superman/man3"))
-    assert FILE_SYSTEM.exists(Path("/usr/share/superman/man4"))
-    assert FILE_SYSTEM.exists(Path("/usr/share/superman/man5"))
-    assert FILE_SYSTEM.exists(Path("/usr/share/superman/man6"))
-    assert FILE_SYSTEM.exists(Path("/usr/share/superman/man7"))
-    assert FILE_SYSTEM.exists(Path("/usr/share/superman/man8"))
-    assert FILE_SYSTEM.exists(Path("/usr/share/superman/man9"))
-    assert FILE_SYSTEM.exists(Path("/usr/share/superman/mann"))
-    assert not FILE_SYSTEM.exists(Path("/var/mail"))
-    assert FILE_SYSTEM.exists(Path("/var/miel"))
+    assert all(map(FILE_SYSTEM.exists, expected))
+    assert not all(map(FILE_SYSTEM.exists, not_expected))
+
+
+def test_renamer_system():
+    create_fhs()
+    file_system = FileSystem(
+        [
+            Path("test/FHS/etc"),
+            Path("test/FHS/lib"),
+            Path("test/FHS/etc/X11"),
+            Path("test/FHS/var/lib"),
+            Path("test/FHS/var/log"),
+            Path("test/FHS/var/mail"),
+            Path("test/FHS/usr/share/man"),
+            Path("test/FHS/usr/share/man/man1"),
+            Path("test/FHS/usr/share/man/man2"),
+            Path("test/FHS/usr/share/man/man3"),
+            Path("test/FHS/usr/share/man/man4"),
+        ]
+    )
+
+    new_names = [
+        f"#{Path('test/FHS/etc').stat().st_ino}# etcetera",
+        f"#{Path('test/FHS/lib').stat().st_ino}# library",
+        f"#{Path('test/FHS/etc/X11').stat().st_ino}# X",
+        f"#{Path('test/FHS/var/lib').stat().st_ino}# log",
+        f"#{Path('test/FHS/var/log').stat().st_ino}# lib",
+        f"#{Path('test/FHS/var/mail').stat().st_ino}# spam",
+        f"#{Path('test/FHS/usr/share/man').stat().st_ino}# superman",
+        f"#{Path('test/FHS/usr/share/man/man1').stat().st_ino}# man3",
+        f"#{Path('test/FHS/usr/share/man/man2').stat().st_ino}# man1",
+        f"#{Path('test/FHS/usr/share/man/man3').stat().st_ino}# man2",
+        f"#{Path('test/FHS/usr/share/man/man4').stat().st_ino}# man4",
+    ]
+
+    clauses = sort_clauses(parse_new_names(file_system, new_names))
+    renamer(clauses, file_system)
+
+    check_exists = [
+        Path("test/FHS/etcetera"),
+        Path("test/FHS/library"),
+        Path("test/FHS/etcetera/X"),
+        Path("test/FHS/etcetera/X/applnk"),
+        Path("test/FHS/etcetera/X/serverconfig"),
+        Path("test/FHS/etcetera/X/starthere"),
+        Path("test/FHS/etcetera/X/sysconfig"),
+        Path("test/FHS/var/lib"),
+        Path("test/FHS/var/log"),
+        Path("test/FHS/var/log/games"),
+        Path("test/FHS/var/log/misc"),
+        Path("test/FHS/var/spam"),
+        Path("test/FHS/usr/share/superman"),
+        Path("test/FHS/usr/share/superman/man1"),
+        Path("test/FHS/usr/share/superman/man2"),
+        Path("test/FHS/usr/share/superman/man3"),
+        Path("test/FHS/usr/share/superman/man4"),
+    ]
+
+    assert all(x.exists() for x in check_exists)
+    os.system("rm -rf test/FHS")
 
 
 if __name__ == "__main__":
