@@ -66,7 +66,7 @@ class FileSystem:
                 return new_path
 
     def rename(self, original_path, new_path):
-        """Virtually rename a path in the FileSystem object as_set and as_list instances."""
+        """Virtually rename a path in the FileSystem object's as_set and as_list instances."""
         for path in self.childs(original_path):
             self.remove(path)
             self.add(Path(new_path / path.name))
