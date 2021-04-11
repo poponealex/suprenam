@@ -94,7 +94,7 @@ def create_edges(clauses: list[Clause], file_system: FileSystem) -> Edges:
     final_edges = []
     temporary_edges = []
     for clause in clauses:
-        destination_path = Path(f"{clause.path.parent}/{clause.new_name}")
+        destination_path = Path(clause.path.parent / clause.new_name)
         temp_path = file_system.uncollide(clause.path)
         temporary_edges.append(Edge(clause.path, temp_path))
         final_edges.append(Edge(temp_path, destination_path))
