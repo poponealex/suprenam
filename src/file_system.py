@@ -10,12 +10,14 @@ class FileSystem:
             self.as_set = set(map(Path, path_strings))
         else:
             self.as_set = set()
+            self.as_population = {}
             for path_string in path_strings:
                 path = Path(path_string)
+                self.as_population[str(path.stat().st_ino)] = path
                 if path in self.as_set:
                     continue
                 if not path.exists():
-                    raise FileNotFoundError
+                    raise FileNotFoundError(f"< {path} > is not a valid path.")
                 self.as_set.update(path.parent.glob("*"))
         self.as_list = sorted(self.as_set)
 
