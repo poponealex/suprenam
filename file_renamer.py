@@ -4,6 +4,7 @@ from typing import NamedTuple, Union, Generator, Callable
 from itertools import count
 from tempfile import NamedTemporaryFile
 from tkinter import messagebox
+from src.file_system import FileSystem
 
 
 class Color:
@@ -30,29 +31,12 @@ class Edges(NamedTuple):
 
 Population = dict[str, Path]
 
-Arborescence = set[Union[Path, PurePath]]
 
 Clauses = list[list[Clause]]
 
 
 def confirm_with_dialog() -> bool:
     return messagebox.askokcancel("Confirm changes", "Rename the files?")
-
-
-def get_siblings(paths: Arborescence) -> Generator:
-    for path in paths:
-        yield from Path(path.parent).glob("*")
-
-
-def parse_file_paths() -> Population:
-    if len(sys.argv) < 2:
-        raise ValueError("No path was provided.")
-    population = {}
-    for x in sys.argv[1:]:
-        if not Path(x).exists():
-            raise FileNotFoundError(f"< {x} > is not a valid path.")
-        population[str(Path(x).stat().st_ino)] = Path(x)
-    return population
 
 
 def create_temporary_file(paths: Population) -> Path:
@@ -63,7 +47,7 @@ def create_temporary_file(paths: Population) -> Path:
 
 def parse_new_names(
     population: Population,
-    arborescence: Arborescence,
+    file_system: FileSystem,
     temp_file: Path,
     strip_line: Callable = re.compile(r"#(\d+)#[ ]*([\w\W]+)").findall,
 ) -> list[Clause]:
@@ -81,24 +65,12 @@ def parse_new_names(
         destination_path = Path(file_path.parent / new_name)
         if destination_path in destinations:
             raise ValueError("Trying to rename two siblings with the same name.")
-        if destination_path in arborescence and destination_path not in population_paths:
+        if destination_path in file_system.as_set and destination_path not in population_paths:
             raise ValueError("Trying to rename a file with the name of an existing file.")
         destinations.add(destination_path)
-        result.append(Clause(file_path, new_name))
+        if not file_path.name == new_name:
+            result.append(Clause(file_path, new_name))
     return result
-
-
-def create_temporary_filename(
-    path: Path,
-    arborescence: Arborescence,
-    aux_arborescence: Arborescence = set(),
-):
-    hashed_name = hash(path.name)
-    for i in count():
-        result = f"{i}{hashed_name}"
-        resulting_path = Path(path.parent / result)
-        if resulting_path not in arborescence and resulting_path not in aux_arborescence:
-            return result
 
 
 def sort_clauses(clauses: list[Clause]) -> Clauses:
@@ -115,25 +87,20 @@ def sort_clauses(clauses: list[Clause]) -> Clauses:
     return result
 
 
-def create_edges(clauses: list[Clause], arborescence: Arborescence) -> Edges:
+def create_edges(clauses: list[Clause], file_system: FileSystem) -> Edges:
     final_edges = []
     temporary_edges = []
-    acc = set()
     for clause in clauses:
-        if clause.path.name == clause.new_name:
-            continue
         destination_path = Path(f"{clause.path.parent}/{clause.new_name}")
-        acc.add(destination_path)
-        temp_path = Path(f"{clause.path.parent}/{create_temporary_filename(clause.path, arborescence, acc)}")
-        acc.add(temp_path)
+        temp_path = file_system.uncollide(clause.path)
         temporary_edges.append(Edge(clause.path, temp_path))
         final_edges.append(Edge(temp_path, destination_path))
     return Edges(temporary_edges, final_edges)
 
 
-def renamer(clauses_list: Clauses, arborescence: Arborescence):
+def renamer(clauses_list: Clauses, file_system: FileSystem):
     for clauses in clauses_list:
-        edges = create_edges(clauses, arborescence)
+        edges = create_edges(clauses, file_system)
         for edge in edges.temporary_edges:
             edge.original_path.rename(edge.destination_path)
         for edge in edges.final_edges:
@@ -143,14 +110,15 @@ def renamer(clauses_list: Clauses, arborescence: Arborescence):
 
 
 def main():
-    population = parse_file_paths()
-    arborescence = {path for path in get_siblings(population.values())}
-    temporary_file = create_temporary_file(population)
+    if len(sys.argv) < 2:
+        raise ValueError("No path was provided.")
+    fs = FileSystem(sys.argv[1:])
+    temporary_file = create_temporary_file(fs.as_population)
     os.system(f"open {temporary_file}")
     if not confirm_with_dialog():
         return print(f"{Color.FAIL}Aborting, no changes were made.{Color.END}")
-    clauses = sort_clauses(parse_new_names(population, arborescence, temporary_file))
-    renamer(clauses, arborescence)
+    clauses = sort_clauses(parse_new_names(fs.as_population, fs, temporary_file))
+    renamer(clauses, fs)
     os.system(f"rm {temporary_file}")
 
 
