@@ -46,20 +46,23 @@ def create_temporary_file(paths: Population) -> Path:
 
 
 def parse_new_names(
-    population: Population,
     file_system: FileSystem,
-    temp_file: Path,
-    strip_line: Callable = re.compile(r"#(\d+)#[ ]*([\w\W]+)").findall,
+    new_names: list,
+    strip_name: Callable = re.compile(r"#(\d+)#[ ]*([\w\W]+)").findall,
 ) -> list[Clause]:
+    """new_names is a list of strings in the format: #inode# new_name"""
 
     result = []
-    population_paths = set(population.values())
+    population_paths = set(file_system.as_population.values())
     destinations = set()
-    for line in temp_file.read_text().split("\n"):
-        inode, new_name = strip_line(line.strip())[0]
+    for name in new_names:
+        try:
+            inode, new_name = strip_name(name.strip())[0]
+        except:
+            continue
         if "/" in new_name:
             raise ValueError(f"< {new_name} > : Illegal caracter '/'.")
-        file_path = population.pop(inode, None)
+        file_path = file_system.as_population.pop(inode, None)
         if not file_path:
             raise ValueError("Illegal file path or trying to rename the same file twice+.")
         destination_path = Path(file_path.parent / new_name)
@@ -68,11 +71,11 @@ def parse_new_names(
         if destination_path in file_system.as_set and destination_path not in population_paths:
             raise ValueError("Trying to rename a file with the name of an existing file.")
         destinations.add(destination_path)
-        if not file_path.name == new_name:
+        if file_path.name != new_name:
             result.append(Clause(file_path, new_name))
     return result
 
-
+s
 def sort_clauses(clauses: list[Clause]) -> Clauses:
     result = []
     paths_lengths = sorted([(clause, len(str(clause.path).split("/"))) for clause in clauses], key=lambda x: x[1])
@@ -117,7 +120,7 @@ def main():
     os.system(f"open {temporary_file}")
     if not confirm_with_dialog():
         return print(f"{Color.FAIL}Aborting, no changes were made.{Color.END}")
-    clauses = sort_clauses(parse_new_names(fs.as_population, fs, temporary_file))
+    clauses = sort_clauses(parse_new_names(fs, temporary_file.read_text().split("\n")))
     renamer(clauses, fs)
     os.system(f"rm {temporary_file}")
 
