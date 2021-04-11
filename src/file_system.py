@@ -41,6 +41,11 @@ class FileSystem:
         insort(self.as_list, path)
         self.as_set.add(path)
 
+    def remove(self, path):
+        if self.exists(path):
+            del self.as_list[self.index(path)]
+            self.as_set.remove(path)
+
     def uncollide(self, path):
         """Calculate and add a non-colliding new name for path."""
         digest = sha256(path.stem.encode("utf8")).hexdigest()
@@ -49,3 +54,8 @@ class FileSystem:
             if not self.exists(new_path):
                 self.add(new_path)
                 return new_path
+
+    def rename(self, original_path, new_path):
+        """Virtually rename a path in the FileSystem object as_set and as_list instances."""
+        self.remove(original_path)
+        self.add(new_path)
