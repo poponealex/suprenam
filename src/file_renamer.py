@@ -101,13 +101,21 @@ def create_edges(clauses: list[Clause], file_system: FileSystem) -> Edges:
     return Edges(temporary_edges, final_edges)
 
 
-def renamer(clauses_list: Clauses, file_system: FileSystem):
+def renamer(clauses_list: Clauses, file_system: FileSystem, is_pure=False):
     for clauses in clauses_list:
         edges = create_edges(clauses, file_system)
         for edge in edges.temporary_edges:
-            edge.original_path.rename(edge.destination_path)
+            (
+                edge.original_path.rename(edge.destination_path)
+                if not is_pure
+                else file_system.rename(edge.original_path, edge.destination_path)
+            )
         for edge in edges.final_edges:
-            edge.original_path.rename(edge.destination_path)
+            (
+                edge.original_path.rename(edge.destination_path)
+                if not is_pure
+                else file_system.rename(edge.original_path, edge.destination_path)
+            )
         for clause in clauses:
             print(f"{Color.TITLE}{clause.path}{Color.INFO} renamed as {Color.TITLE}{Path(clause.path.parent / clause.new_name)}{Color.END}")
 
