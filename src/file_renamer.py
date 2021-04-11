@@ -1,10 +1,11 @@
+__import__("sys").path[0:0] = ["."]
 import re, sys, os
 from pathlib import Path, PurePath
 from typing import NamedTuple, Union, Generator, Callable
 from itertools import count
 from tempfile import NamedTemporaryFile
 from tkinter import messagebox
-from file_system import FileSystem
+from src.file_system import FileSystem
 
 
 class Color:
