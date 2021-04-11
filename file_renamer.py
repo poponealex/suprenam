@@ -61,7 +61,7 @@ def parse_new_names(
         except:
             continue
         if "/" in new_name:
-            raise ValueError(f"< {new_name} > : Illegal caracter '/'.")
+            raise ValueError(f"< {new_name} > : Illegal character '/'.")
         file_path = file_system.as_population.pop(inode, None)
         if not file_path:
             raise ValueError("Illegal file path or trying to rename the same file twice+.")
@@ -75,7 +75,7 @@ def parse_new_names(
             result.append(Clause(file_path, new_name))
     return result
 
-s
+
 def sort_clauses(clauses: list[Clause]) -> Clauses:
     result = []
     paths_lengths = sorted([(clause, len(str(clause.path).split("/"))) for clause in clauses], key=lambda x: x[1])
@@ -122,7 +122,7 @@ def main():
         return print(f"{Color.FAIL}Aborting, no changes were made.{Color.END}")
     clauses = sort_clauses(parse_new_names(fs, temporary_file.read_text().split("\n")))
     renamer(clauses, fs)
-    os.system(f"rm {temporary_file}")
+    return os.system(f"rm {temporary_file}")
 
 
 if __name__ == "__main__":
