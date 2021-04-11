@@ -29,11 +29,28 @@ def test_pure():
         "/usr/src",
         "/usr/tmp",
     ]
+    assert set(map(str, file_system.childs(Path("/usr")))) == set(expected + ["/usr/local"])
     assert result == expected
     file_system.add(Path("/usr/foo.bar"))
     new_path = file_system.uncollide(Path("/usr/foo.bar"))
     assert file_system.exists(Path("/usr/foo.bar"))
     assert file_system.exists(Path("/usr/2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae-0.bar"))
+    file_system.remove(Path("/usr/2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae-0.bar"))
+    assert not file_system.exists(Path("/usr/2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae-0.bar"))
+    file_system.rename(Path("/etc"), Path("/etcetera"))
+    assert not file_system.exists(Path("/etc"))
+    expected = [
+        Path("/etcetera"),
+        Path("/etcetera/X11"),
+        Path("/etcetera/X11"),
+        Path("/etcetera/opt"),
+        Path("/etcetera/skel"),
+        Path("/etcetera/skel"),
+        Path("/etcetera/sysconfig"),
+        Path("/etcetera/sysconfig"),
+        Path("/etcetera/xinetd.d"),
+    ]
+    assert all(map(file_system.exists, expected))
 
 
 def test_actual():
