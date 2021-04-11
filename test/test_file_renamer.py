@@ -242,6 +242,7 @@ def test_renamer_pure():
 
 def test_renamer_system():
     create_fhs()
+
     file_system = FileSystem(
         [
             Path("test/FHS/etc"),
@@ -271,9 +272,6 @@ def test_renamer_system():
         f"#{Path('test/FHS/usr/share/man/man3').stat().st_ino}# man2",
         f"#{Path('test/FHS/usr/share/man/man4').stat().st_ino}# man4",
     ]
-
-    clauses = sort_clauses(parse_new_names(file_system, new_names))
-    renamer(clauses, file_system)
 
     expected = [
         Path("test/FHS/etcetera"),
@@ -312,6 +310,9 @@ def test_renamer_system():
         Path("test/FHS/usr/share/man/man3"),
         Path("test/FHS/usr/share/man/man4"),
     ]
+
+    clauses = sort_clauses(parse_new_names(file_system, new_names))
+    renamer(clauses, file_system)
 
     assert all(x.exists() for x in expected)
     assert not all(x.exists() for x in not_expected)
