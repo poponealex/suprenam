@@ -240,7 +240,7 @@ def test_renamer_pure():
     ]
 
     clauses = sort_clauses(parse_new_names(FILE_SYSTEM, new_names))
-    renamer(clauses, FILE_SYSTEM, is_pure=True)
+    renamer(clauses, FILE_SYSTEM)
 
     assert all(map(FILE_SYSTEM.exists, expected))
     assert not all(map(FILE_SYSTEM.exists, not_expected))
