@@ -4,6 +4,7 @@ import sys
 OK = "\033[92m"
 WARNING = "\033[1m\033[38;5;166m"
 FAIL = "\033[1m\033[91m"
+INFO = "\033[1;96m"
 RESET = "\033[0m"
 
 
@@ -26,3 +27,7 @@ def print_fail(message: str):
 def print_exit(message: str):
     """Print the given message on `sys.stderr` and exit."""
     sys.exit(f"{FAIL}Error: {message}{RESET}")
+
+
+def print_rename(original_path: str, destination_path: str):
+    print(f"{INFO}{original_path} {OK}renamed as {INFO}{destination_path}{RESET}")
