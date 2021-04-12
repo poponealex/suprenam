@@ -9,13 +9,13 @@ FILE_SYSTEM = FileSystem(Path("test/fhs.txt").read_text().strip().split("\n"), i
 
 
 def test_parse_new_names():
-    new_names_ok = [
-        "#0# boom",
-        "#58# bam1",
-        "#59# bam2",
-        "#60# bam3",
-        "#92# bar",
-        "#105# optic",
+    new_names_ok = [    # path -> new_name
+        "#0# boom",     # /bin -> boom
+        "#58# bam1",    # /usr/local/share/man/man1 -> bam1
+        "#59# bam2",    # /usr/local/share/man/man2 -> bam2
+        "#60# bam3",    # /usr/local/share/man/man3 -> bam3
+        "#92# bar",     # /var -> bar
+        "#105# optic",  # /var/opt -> optic
     ]
 
     expected = [
@@ -175,17 +175,17 @@ def test_create_edges():
 
 
 def test_renamer_pure():
-    new_names = [
-        "#1# reboot",
-        "#2# etcetera",
-        "#96# library",
-        "#76# superman",
-        "#77# man3",
-        "#78# man1",
-        "#79# man2",
-        "#80# man5",
-        "#81# man55",
-        "#103# miel",
+    new_names = [           # path -> new_name
+        "#1# reboot",       # /boot -> reboot
+        "#2# etcetera",     # /etc -> etcetera
+        "#96# library",     # /var/lib -> library
+        "#76# superman",    # /usr/share/man -> superman
+        "#77# man3",        # /usr/share/man/man1 -> man3
+        "#78# man1",        # /usr/share/man/man2 -> man1
+        "#79# man2",        # /usr/share/man/man3 -> man2
+        "#80# man5",        # /usr/share/man/man4 -> man5
+        "#81# man55",       # /usr/share/man/man5 -> man55
+        "#103# miel",       # /var/mail -> miel
     ]
 
     expected = [
