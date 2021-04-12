@@ -6,7 +6,7 @@ from itertools import count
 from tempfile import NamedTemporaryFile
 from tkinter import messagebox
 from src.file_system import FileSystem
-
+from src.goodies import print_fail
 
 class Color:
     FAIL = "\033[1;91m"
@@ -105,21 +105,13 @@ def create_edges(clauses: list[Clause], file_system: FileSystem) -> Edges:
     return Edges(temporary_edges, final_edges)
 
 
-def renamer(levels: Levels, file_system: FileSystem, is_pure=False):
+def renamer(levels: Levels, file_system: FileSystem):
     for level in levels:
         edges = create_edges(level, file_system)
         for edge in edges.temporary_edges:
-            (
-                edge.original_path.rename(edge.destination_path)
-                if not is_pure
-                else file_system.rename(edge.original_path, edge.destination_path)
-            )
+            file_system.rename(edge.original_path, edge.destination_path)
         for edge in edges.final_edges:
-            (
-                edge.original_path.rename(edge.destination_path)
-                if not is_pure
-                else file_system.rename(edge.original_path, edge.destination_path)
-            )
+            file_system.rename(edge.original_path, edge.destination_path)
         for clause in level:
             print(f"{Color.TITLE}{clause.path}{Color.INFO} renamed as {Color.TITLE}{Path(clause.path.parent / clause.new_name)}{Color.END}")
 
@@ -141,5 +133,5 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        print(f"{Color.FAIL}{e}{Color.END}", file=sys.stderr)
+        print_fail(e)
     sys.exit()
