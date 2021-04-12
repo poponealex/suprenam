@@ -117,25 +117,12 @@ def test_create_edges():
         Clause(Path("/usr/share/man/man3"), "sausage"),
     ]
 
-    clauses1_hashes = [
-        FILE_SYSTEM.uncollide(clauses1[0].path),
-        FILE_SYSTEM.uncollide(clauses1[1].path),
-        FILE_SYSTEM.uncollide(clauses1[2].path),
-    ]
-
-    for h in clauses1_hashes:
-        FILE_SYSTEM.as_set.remove(h)
-
     expected1 = Edges(
+        [],
         [
-            Edge(Path("/usr/share/man/man1"), clauses1_hashes[0]),
-            Edge(Path("/usr/share/man/man2"), clauses1_hashes[1]),
-            Edge(Path("/usr/share/man/man3"), clauses1_hashes[2]),
-        ],
-        [
-            Edge(clauses1_hashes[0], Path("/usr/share/man/spam")),
-            Edge(clauses1_hashes[1], Path("/usr/share/man/eggs")),
-            Edge(clauses1_hashes[2], Path("/usr/share/man/sausage")),
+            Edge(Path("/usr/share/man/man1"), Path("/usr/share/man/spam")),
+            Edge(Path("/usr/share/man/man2"), Path("/usr/share/man/eggs")),
+            Edge(Path("/usr/share/man/man3"), Path("/usr/share/man/sausage")),
         ],
     )
 
@@ -145,30 +132,46 @@ def test_create_edges():
         Clause(Path("/usr/share/man/mann"), "sausage"),
     ]
 
-    clauses2_hashes = [
-        FILE_SYSTEM.uncollide(clauses2[0].path),
-        FILE_SYSTEM.uncollide(clauses2[1].path),
-        FILE_SYSTEM.uncollide(clauses2[2].path),
+    expected2 = Edges(
+        [],
+        [
+            Edge(Path("/usr/share/"), Path("/usr/spam")),
+            Edge(Path("/usr/share/man"), Path("/usr/share/eggs")),
+            Edge(Path("/usr/share/man/mann"), Path("/usr/share/man/sausage")),
+        ],
+    )
+
+    clauses3 = [
+        Clause(Path("/usr/share/man/man1"), "man3"),
+        Clause(Path("/usr/share/man/man2"), "man1"),
+        Clause(Path("/usr/share/man/man3"), "man2"),
     ]
 
-    for h in clauses2_hashes:
+    clauses3_hashes = [
+        FILE_SYSTEM.uncollide(clauses3[0].path),
+        FILE_SYSTEM.uncollide(clauses3[1].path),
+        FILE_SYSTEM.uncollide(clauses3[2].path),
+    ]
+
+    for h in clauses3_hashes:
         FILE_SYSTEM.as_set.remove(h)
 
-    expected2 = Edges(
+    expected3 = Edges(
         [
-            Edge(Path("/usr/share/"), clauses2_hashes[0]),
-            Edge(Path("/usr/share/man"), clauses2_hashes[1]),
-            Edge(Path("/usr/share/man/mann"), clauses2_hashes[2]),
+            Edge(Path("/usr/share/man/man1"), clauses3_hashes[0]),
+            Edge(Path("/usr/share/man/man2"), clauses3_hashes[1]),
+            Edge(Path("/usr/share/man/man3"), clauses3_hashes[2]),
         ],
         [
-            Edge(clauses2_hashes[0], Path("/usr/spam")),
-            Edge(clauses2_hashes[1], Path("/usr/share/eggs")),
-            Edge(clauses2_hashes[2], Path("/usr/share/man/sausage")),
+            Edge(clauses3_hashes[0], Path("/usr/share/man/man3")),
+            Edge(clauses3_hashes[1], Path("/usr/share/man/man1")),
+            Edge(clauses3_hashes[2], Path("/usr/share/man/man2")),
         ],
     )
 
     assert create_edges(clauses1, FILE_SYSTEM) == expected1
     assert create_edges(clauses2, FILE_SYSTEM) == expected2
+    assert create_edges(clauses3, FILE_SYSTEM) == expected3
 
 
 def test_renamer_pure():
@@ -180,6 +183,8 @@ def test_renamer_pure():
         "#77# man3",
         "#78# man1",
         "#79# man2",
+        "#80# man5",
+        "#81# man55",
         "#103# miel",
     ]
 
@@ -198,8 +203,8 @@ def test_renamer_pure():
         Path("/usr/share/superman/man1"),
         Path("/usr/share/superman/man2"),
         Path("/usr/share/superman/man3"),
-        Path("/usr/share/superman/man4"),
         Path("/usr/share/superman/man5"),
+        Path("/usr/share/superman/man55"),
         Path("/usr/share/superman/man6"),
         Path("/usr/share/superman/man7"),
         Path("/usr/share/superman/man8"),
@@ -231,6 +236,7 @@ def test_renamer_pure():
         Path("/usr/share/man/man8"),
         Path("/usr/share/man/man9"),
         Path("/usr/share/man/mann"),
+        Path("/usr/share/superman/man4"),
     ]
 
     clauses = sort_clauses(parse_new_names(FILE_SYSTEM, new_names))
@@ -242,7 +248,6 @@ def test_renamer_pure():
 
 def test_renamer_system():
     create_fhs()
-
     file_system = FileSystem(
         [
             Path("test/FHS/etc"),
@@ -256,6 +261,8 @@ def test_renamer_system():
             Path("test/FHS/usr/share/man/man2"),
             Path("test/FHS/usr/share/man/man3"),
             Path("test/FHS/usr/share/man/man4"),
+            Path("test/FHS/usr/share/man/man5"),
+            Path("test/FHS/usr/share/man/man6"),
         ]
     )
 
@@ -271,7 +278,12 @@ def test_renamer_system():
         f"#{Path('test/FHS/usr/share/man/man2').stat().st_ino}# man1",
         f"#{Path('test/FHS/usr/share/man/man3').stat().st_ino}# man2",
         f"#{Path('test/FHS/usr/share/man/man4').stat().st_ino}# man4",
+        f"#{Path('test/FHS/usr/share/man/man5').stat().st_ino}# man6",
+        f"#{Path('test/FHS/usr/share/man/man6').stat().st_ino}# man66",
     ]
+
+    clauses = sort_clauses(parse_new_names(file_system, new_names))
+    renamer(clauses, file_system)
 
     expected = [
         Path("test/FHS/etcetera"),
@@ -291,6 +303,8 @@ def test_renamer_system():
         Path("test/FHS/usr/share/superman/man2"),
         Path("test/FHS/usr/share/superman/man3"),
         Path("test/FHS/usr/share/superman/man4"),
+        Path("test/FHS/usr/share/superman/man6"),
+        Path("test/FHS/usr/share/superman/man66"),
     ]
 
     not_expected = [
@@ -309,10 +323,8 @@ def test_renamer_system():
         Path("test/FHS/usr/share/man/man2"),
         Path("test/FHS/usr/share/man/man3"),
         Path("test/FHS/usr/share/man/man4"),
+        Path("test/FHS/usr/share/superman/man5"),
     ]
-
-    clauses = sort_clauses(parse_new_names(file_system, new_names))
-    renamer(clauses, file_system)
 
     assert all(x.exists() for x in expected)
     assert not all(x.exists() for x in not_expected)
