@@ -6,14 +6,10 @@ from itertools import count
 from tempfile import NamedTemporaryFile
 from tkinter import messagebox
 from src.file_system import FileSystem
-from src.goodies import print_fail
+from src.goodies import print_fail, print_rename
 
-class Color:
-    FAIL = "\033[1;91m"
-    INFO = "\033[1;94m"
-    TITLE = "\033[1;96m"
-    END = "\033[0m"
 
+################## TYPES ##################
 
 class Clause(NamedTuple):
     path: Union[Path, PurePath]
@@ -34,6 +30,8 @@ Population = dict[str, Path]
 
 
 Levels = list[list[Clause]]
+
+###########################################
 
 
 def confirm_with_dialog() -> bool:
@@ -68,9 +66,9 @@ def parse_new_names(
             raise ValueError("Illegal file path or trying to rename the same file twice+.")
         destination_path = Path(file_path.parent / new_name)
         if destination_path in destinations:
-            raise ValueError("Trying to rename two siblings with the same name.")
+            raise ValueError(f"Trying to rename two siblings with the same name ({file_path} -> {destination_path}).")
         if destination_path in file_system.as_set and destination_path not in population_paths:
-            raise ValueError("Trying to rename a file with the name of an existing file.")
+            raise ValueError(f"Trying to rename a file with the name of an existing file ({file_path} -> {destination_path}).")
         destinations.add(destination_path)
         if file_path.name != new_name:
             result.append(Clause(file_path, new_name))
@@ -113,7 +111,7 @@ def renamer(levels: Levels, file_system: FileSystem):
         for edge in edges.final_edges:
             file_system.rename(edge.original_path, edge.destination_path)
         for clause in level:
-            print(f"{Color.TITLE}{clause.path}{Color.INFO} renamed as {Color.TITLE}{Path(clause.path.parent / clause.new_name)}{Color.END}")
+            print_rename(clause.path, Path(clause.path.parent / clause.new_name))
 
 
 def main():
@@ -134,4 +132,4 @@ if __name__ == "__main__":
         main()
     except Exception as e:
         print_fail(e)
-    sys.exit()
+    sys.exit(0)
