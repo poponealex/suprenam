@@ -26,12 +26,16 @@ class FileSystem:
         """Return the index at/after which the given path is/should be stored."""
         return bisect(self.as_list, path)
 
-    def siblings(self, path):
-        parent = path.parent
-        for candidate in self.as_list[self.index(parent) :]:
-            if not str(candidate).startswith(f"{parent}/"):
+    def children(self, path):
+        for candidate in self.as_list[self.index(path) :]:
+            if not str(candidate).startswith(f"{path}/"):
                 break
-            if candidate.match(f"{parent}/*") and candidate != path:
+            if candidate.match(f"{path}/*"):
+                yield candidate
+
+    def siblings(self, path):
+        for candidate in self.children(path.parent):
+            if path != candidate:
                 yield candidate
 
     def add(self, path):
