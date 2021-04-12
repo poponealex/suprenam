@@ -33,7 +33,7 @@ class Edges(NamedTuple):
 Population = dict[str, Path]
 
 
-Clauses = list[list[Clause]]
+Levels = list[list[Clause]]
 
 
 def confirm_with_dialog() -> bool:
@@ -77,7 +77,7 @@ def parse_new_names(
     return result
 
 
-def sort_clauses(clauses: list[Clause]) -> Clauses:
+def sort_clauses(clauses: list[Clause]) -> Levels:
     result = []
     paths_lengths = sorted([(clause, len(str(clause.path).split("/"))) for clause in clauses], key=lambda x: x[1])
     acc = [paths_lengths[-1][0]]
@@ -96,15 +96,18 @@ def create_edges(clauses: list[Clause], file_system: FileSystem) -> Edges:
     temporary_edges = []
     for clause in clauses:
         destination_path = Path(clause.path.parent / clause.new_name)
-        temp_path = file_system.uncollide(clause.path)
-        temporary_edges.append(Edge(clause.path, temp_path))
-        final_edges.append(Edge(temp_path, destination_path))
+        if destination_path not in file_system.as_set:
+            final_edges.append(Edge(clause.path, destination_path))
+        else:
+            temp_path = file_system.uncollide(clause.path)
+            temporary_edges.append(Edge(clause.path, temp_path))
+            final_edges.append(Edge(temp_path, destination_path))
     return Edges(temporary_edges, final_edges)
 
 
-def renamer(clauses_list: Clauses, file_system: FileSystem, is_pure=False):
-    for clauses in clauses_list:
-        edges = create_edges(clauses, file_system)
+def renamer(levels: Levels, file_system: FileSystem, is_pure=False):
+    for level in levels:
+        edges = create_edges(level, file_system)
         for edge in edges.temporary_edges:
             (
                 edge.original_path.rename(edge.destination_path)
@@ -117,7 +120,7 @@ def renamer(clauses_list: Clauses, file_system: FileSystem, is_pure=False):
                 if not is_pure
                 else file_system.rename(edge.original_path, edge.destination_path)
             )
-        for clause in clauses:
+        for clause in level:
             print(f"{Color.TITLE}{clause.path}{Color.INFO} renamed as {Color.TITLE}{Path(clause.path.parent / clause.new_name)}{Color.END}")
 
 
