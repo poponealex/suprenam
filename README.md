@@ -2,7 +2,7 @@
 
 ## Introduction
 This program is designed to help out renaming files and folders.  
-_Beta available: `src/file_ranamer.py`._
+_Beta available: run `python3 src/file_ranamer.py <files, folders...>`._
 
 ## Prerequisites
 - Python 3.8+
