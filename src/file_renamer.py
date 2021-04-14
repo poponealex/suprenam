@@ -1,12 +1,13 @@
-__import__("sys").path[0:0] = ["."]
-import re, sys, os
-from pathlib import Path, PurePath
-from typing import NamedTuple, Union, Generator, Callable
+__import__("sys").path.extend(["..", "."])
+import os, re, sys
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from itertools import count
+from pathlib import Path, PurePath
+from src.file_system import FileSystem
+from src.goodies import *
 from tempfile import NamedTemporaryFile
 from tkinter import messagebox
-from src.file_system import FileSystem
-from src.goodies import print_fail, print_rename
+from typing import Callable, Dict, Generator, List, NamedTuple, Union
 
 
 ################## TYPES ##################
@@ -22,20 +23,41 @@ class Edge(NamedTuple):
 
 
 class Edges(NamedTuple):
-    temporary_edges: list[Edge]
-    final_edges: list[Edge]
+    temporary_edges: List[Edge]
+    final_edges: List[Edge]
 
 
-Population = dict[str, Path]
+Population = Dict[str, Path]
 
 
-Levels = list[list[Clause]]
+Levels = List[List[Clause]]
 
 ###########################################
 
 
-def confirm_with_dialog() -> bool:
-    return messagebox.askokcancel("Confirm changes", "Rename the files?")
+def cli_arguments():
+    parser = ArgumentParser(
+        formatter_class=RawDescriptionHelpFormatter,
+        usage=f"\n{WARNING}file_renamer.py [-p paths] [-f file] [-h help]{RESET}",
+        description=f"{INFO}\nFILE RENAMER{RESET}",
+    )
+
+    parser.add_argument(
+        "-p",
+        "--paths",
+        nargs="+",
+        help=f"{INFO}The paths you want to rename.{RESET}",
+        action="store",
+    )
+
+    parser.add_argument(
+        "-f",
+        "--file",
+        help=f"{INFO}Parse paths stored in a file (newline separated).{RESET}",
+        action="store",
+    )
+
+    return parser.parse_args()
 
 
 def create_temporary_file(paths: Population) -> Path:
@@ -46,9 +68,9 @@ def create_temporary_file(paths: Population) -> Path:
 
 def parse_new_names(
     file_system: FileSystem,
-    new_names: list,
+    new_names: List,
     strip_name: Callable = re.compile(r"#(\d+)#[ ]*([\w\W]+)").findall,
-) -> list[Clause]:
+) -> List[Clause]:
     """new_names is a list of strings in the format: #inode# new_name"""
 
     result = []
@@ -75,7 +97,7 @@ def parse_new_names(
     return result
 
 
-def sort_clauses(clauses: list[Clause]) -> Levels:
+def sort_clauses(clauses: List[Clause]) -> Levels:
     result = []
     paths_lengths = sorted([(clause, len(str(clause.path).split("/"))) for clause in clauses], key=lambda x: x[1])
     acc = [paths_lengths[-1][0]]
@@ -89,7 +111,7 @@ def sort_clauses(clauses: list[Clause]) -> Levels:
     return result
 
 
-def create_edges(clauses: list[Clause], file_system: FileSystem) -> Edges:
+def create_edges(clauses: List[Clause], file_system: FileSystem) -> Edges:
     final_edges = []
     temporary_edges = []
     for clause in clauses:
@@ -115,15 +137,20 @@ def renamer(levels: Levels, file_system: FileSystem):
 
 
 def main():
-    if len(sys.argv) < 2:
-        raise ValueError("No path was provided.")
-    fs = FileSystem(sys.argv[1:])
+    args = cli_arguments()
+    if args.paths:
+        fs = FileSystem(args.paths)
+    elif args.file:
+        fs = FileSystem(Path(args.file).read_text().split("\n"))
+    else:
+        return print_warning("You didn't provide any path.")
     temporary_file = create_temporary_file(fs.as_population)
     os.system(f"open {temporary_file}")
-    if not confirm_with_dialog():
-        return print(f"{Color.FAIL}Aborting, no changes were made.{Color.END}")
-    clauses = sort_clauses(parse_new_names(fs, temporary_file.read_text().split("\n")))
-    renamer(clauses, fs)
+    if not messagebox.askokcancel("Confirm changes", "Rename the files?"):
+        return print_warning("Aborting, no changes were made.")
+    new_names = parse_new_names(fs, temporary_file.read_text().split("\n"))
+    if new_names:
+        renamer(sort_clauses(new_names), fs)
     return os.system(f"rm {temporary_file}")
 
 
