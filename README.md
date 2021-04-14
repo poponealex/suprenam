@@ -5,11 +5,11 @@ This program is designed to help out renaming files and folders.
 _Beta available: `src/file_ranamer.py`._
 
 ## Prerequisites
-- Python 3.8+
+- Python 3.6+
 - MacOS, Linux
 
 ## Run the program
-__`python3 file_renamer.py <files, folders...>`__
+__`python3 file_renamer.py -p <files, folders...> | -f <file containing paths>`__
 
 __A temporary file will open in your system's default text editor.__
 > ![TempFileOriginalNames](/misc/temp_original_names.png)
