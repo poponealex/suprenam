@@ -22,7 +22,7 @@ class FileSystem:
                 self.as_population[str(path.stat().st_ino)] = path
                 if path not in self.as_set:
                     path_parent = path
-                    while path_parent != Path(".") and path_parent != Path("."):
+                    while path_parent != Path("/") and path_parent != Path("."):
                         if Path(path_parent / ".git").exists():
                             self.git.update(path.parent.glob("*"))
                             break
