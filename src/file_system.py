@@ -1,4 +1,5 @@
 __import__("sys").path[0:0] = ["."]
+import os
 from pathlib import Path
 from bisect import bisect, insort
 from hashlib import sha256
@@ -15,12 +16,18 @@ class FileSystem:
             self.rename = self.rename_system
             self.as_set = set()
             self.as_population = {}
+            self.git = set()
             for path_string in path_strings:
                 path = Path(path_string)
                 self.as_population[str(path.stat().st_ino)] = path
-                if path in self.as_set:
-                    continue
-                self.as_set.update(path.parent.glob("*"))
+                if path not in self.as_set:
+                    path_parent = path
+                    while path_parent != Path(".") and path_parent != Path("."):
+                        if Path(path_parent / ".git").exists():
+                            self.git.update(path.parent.glob("*"))
+                            break
+                        path_parent = path_parent.parent
+                    self.as_set.update(path.parent.glob("*"))
         self.as_list = sorted(self.as_set)
 
     def exists(self, path):
@@ -70,6 +77,9 @@ class FileSystem:
             self.add(Path(new_path / path.name))
         self.remove(original_path)
         self.add(new_path)
-    
+
     def rename_system(self, original_path, new_path):
-        original_path.rename(new_path)
+        if original_path in self.git:
+            os.system(f"cd {original_path.parent} && git mv {original_path.name} {new_path.name}")
+        else:
+            original_path.rename(new_path)
