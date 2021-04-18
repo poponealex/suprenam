@@ -21,7 +21,7 @@ class FileSystem:
                 path = Path(path_string).resolve()
                 self.as_population[str(path.stat().st_ino)] = path
                 if not skip_git and path not in self.as_set:
-                    path_parent = path
+                    path_parent = path.parent
                     while path_parent != Path("/"):
                         if Path(path_parent / ".git").exists():
                             self.git.update(path.parent.glob("*"))
