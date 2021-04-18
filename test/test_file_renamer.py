@@ -1,20 +1,20 @@
 __import__("sys").path[0:0] = ["."]
+import os, pytest
 from pathlib import Path, PosixPath
-from test.create_fhs import create_fhs
 from src.file_renamer import *
-import pytest
+from test.create_fhs import create_fhs
 
 
 FILE_SYSTEM = FileSystem(Path("test/fhs.txt").read_text().strip().split("\n"), is_pure=True)
 
 
 def test_parse_new_names():
-    new_names_ok = [    # path -> new_name
-        "#0# boom",     # /bin -> boom
-        "#58# bam1",    # /usr/local/share/man/man1 -> bam1
-        "#59# bam2",    # /usr/local/share/man/man2 -> bam2
-        "#60# bam3",    # /usr/local/share/man/man3 -> bam3
-        "#92# bar",     # /var -> bar
+    new_names_ok = [  # path -> new_name
+        "#0# boom",  # /bin -> boom
+        "#58# bam1",  # /usr/local/share/man/man1 -> bam1
+        "#59# bam2",  # /usr/local/share/man/man2 -> bam2
+        "#60# bam3",  # /usr/local/share/man/man3 -> bam3
+        "#92# bar",  # /var -> bar
         "#105# optic",  # /var/opt -> optic
     ]
 
@@ -175,17 +175,17 @@ def test_create_edges():
 
 
 def test_renamer_pure():
-    new_names = [           # path -> new_name
-        "#1# reboot",       # /boot -> reboot
-        "#2# etcetera",     # /etc -> etcetera
-        "#96# library",     # /var/lib -> library
-        "#76# superman",    # /usr/share/man -> superman
-        "#77# man3",        # /usr/share/man/man1 -> man3
-        "#78# man1",        # /usr/share/man/man2 -> man1
-        "#79# man2",        # /usr/share/man/man3 -> man2
-        "#80# man5",        # /usr/share/man/man4 -> man5
-        "#81# man55",       # /usr/share/man/man5 -> man55
-        "#103# miel",       # /var/mail -> miel
+    new_names = [  # path -> new_name
+        "#1# reboot",  # /boot -> reboot
+        "#2# etcetera",  # /etc -> etcetera
+        "#96# library",  # /var/lib -> library
+        "#76# superman",  # /usr/share/man -> superman
+        "#77# man3",  # /usr/share/man/man1 -> man3
+        "#78# man1",  # /usr/share/man/man2 -> man1
+        "#79# man2",  # /usr/share/man/man3 -> man2
+        "#80# man5",  # /usr/share/man/man4 -> man5
+        "#81# man55",  # /usr/share/man/man5 -> man55
+        "#103# miel",  # /var/mail -> miel
     ]
 
     expected = [
@@ -360,7 +360,7 @@ def test_renamer_git():
     clauses = sort_clauses(parse_new_names(file_system, new_names))
     renamer(clauses, file_system)
 
-    expected =[
+    expected = [
         Path("test/dummy_files/hellow.txt"),
         Path("test/dummy_files/globe.txt"),
         Path("test/dummy_files/bar.txt"),
@@ -370,7 +370,7 @@ def test_renamer_git():
         Path("test/dummy_files/snake.txt"),
     ]
 
-    not_expected =[
+    not_expected = [
         Path("test/dummy_files/hello.txt"),
         Path("test/dummy_files/world.txt"),
         Path("test/dummy_files/eggs.txt"),
@@ -379,6 +379,9 @@ def test_renamer_git():
 
     assert all(x.exists() for x in expected)
     assert not all(x.exists() for x in not_expected)
+
+    os.system("git reset --hard")
+
 
 if __name__ == "__main__":
     pytest.main(["-qq", __import__("sys").argv[0]])
