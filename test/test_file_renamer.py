@@ -384,4 +384,4 @@ def test_renamer_git():
 if __name__ == "__main__":
     pytest.main(["-qq", __import__("sys").argv[0]])
     if input("hard reset repo? (y/n): ").lower() == "y":
-        os.system("git reset --hard")
+        os.system("git reset -q --hard")
