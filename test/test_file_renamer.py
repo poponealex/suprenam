@@ -263,7 +263,8 @@ def test_renamer_system():
             Path("test/FHS/usr/share/man/man4"),
             Path("test/FHS/usr/share/man/man5"),
             Path("test/FHS/usr/share/man/man6"),
-        ]
+        ],
+        skip_git=True,
     )
 
     new_names = [
