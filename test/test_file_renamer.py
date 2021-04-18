@@ -1,5 +1,5 @@
 __import__("sys").path[0:0] = ["."]
-import os, pytest
+import pytest, subprocess
 from pathlib import Path, PosixPath
 from src.file_renamer import *
 from test.create_fhs import create_fhs
@@ -330,7 +330,7 @@ def test_renamer_system():
     assert all(x.exists() for x in expected)
     assert not all(x.exists() for x in not_expected)
 
-    os.system("rm -rf test/FHS")
+    subprocess.run(["rm", "-rf", "test/FHS"])
 
 
 def test_renamer_git():
@@ -383,5 +383,3 @@ def test_renamer_git():
 
 if __name__ == "__main__":
     pytest.main(["-qq", __import__("sys").argv[0]])
-    if input("hard reset repo? (y/n): ").lower() == "y":
-        os.system("git reset -q --hard")
