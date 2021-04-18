@@ -7,7 +7,7 @@ from itertools import count
 
 
 class FileSystem:
-    def __init__(self, path_strings, is_pure=False):
+    def __init__(self, path_strings, is_pure=False, skip_git=False):
         if is_pure:
             self.as_set = set(map(Path, path_strings))
             self.as_population = {str(i): Path(path) for i, path in enumerate(path_strings)}
@@ -18,15 +18,16 @@ class FileSystem:
             self.as_population = {}
             self.git = set()
             for path_string in path_strings:
-                path = Path(path_string)
+                path = Path(path_string).resolve()
                 self.as_population[str(path.stat().st_ino)] = path
-                if path not in self.as_set:
+                if not skip_git and path not in self.as_set:
                     path_parent = path
-                    while path_parent != Path("/") and path_parent != Path("."):
+                    while path_parent != Path("/"):
                         if Path(path_parent / ".git").exists():
                             self.git.update(path.parent.glob("*"))
                             break
                         path_parent = path_parent.parent
+                if path not in self.as_set:
                     self.as_set.update(path.parent.glob("*"))
         self.as_list = sorted(self.as_set)
 
@@ -68,6 +69,8 @@ class FileSystem:
             new_path = path.with_stem(f"{digest}-{suffix}")
             if not self.exists(new_path):
                 self.add(new_path)
+                if self.rename != self.rename_pure and path in self.git:
+                    self.git.add(new_path)
                 return new_path
 
     def rename_pure(self, original_path, new_path):
