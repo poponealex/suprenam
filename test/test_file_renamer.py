@@ -333,5 +333,52 @@ def test_renamer_system():
     os.system("rm -rf test/FHS")
 
 
+def test_renamer_git():
+    file_system = FileSystem(
+        [
+            Path("test/dummy_files/hello.txt"),
+            Path("test/dummy_files/world.txt"),
+            Path("test/dummy_files/foo.txt"),
+            Path("test/dummy_files/bar.txt"),
+            Path("test/dummy_files/spam.txt"),
+            Path("test/dummy_files/eggs.txt"),
+            Path("test/dummy_files/yellow.txt"),
+        ],
+        skip_git=False,
+    )
+
+    new_names = [
+        f"#{Path('test/dummy_files/hello.txt').stat().st_ino}# hellow.txt",
+        f"#{Path('test/dummy_files/world.txt').stat().st_ino}# globe.txt",
+        f"#{Path('test/dummy_files/foo.txt').stat().st_ino}# bar.txt",
+        f"#{Path('test/dummy_files/bar.txt').stat().st_ino}# foo.txt",
+        f"#{Path('test/dummy_files/spam.txt').stat().st_ino}# eggs.txt",
+        f"#{Path('test/dummy_files/eggs.txt').stat().st_ino}# yellow.txt",
+        f"#{Path('test/dummy_files/yellow.txt').stat().st_ino}# snake.txt",
+    ]
+
+    clauses = sort_clauses(parse_new_names(file_system, new_names))
+    renamer(clauses, file_system)
+
+    expected =[
+        Path("test/dummy_files/hellow.txt"),
+        Path("test/dummy_files/globe.txt"),
+        Path("test/dummy_files/bar.txt"),
+        Path("test/dummy_files/foo.txt"),
+        Path("test/dummy_files/eggs.txt"),
+        Path("test/dummy_files/yellow.txt"),
+        Path("test/dummy_files/snake.txt"),
+    ]
+
+    not_expected =[
+        Path("test/dummy_files/hello.txt"),
+        Path("test/dummy_files/world.txt"),
+        Path("test/dummy_files/eggs.txt"),
+        Path("test/dummy_files/yellow.txt"),
+    ]
+
+    assert all(x.exists() for x in expected)
+    assert not all(x.exists() for x in not_expected)
+
 if __name__ == "__main__":
     pytest.main(["-qq", __import__("sys").argv[0]])
