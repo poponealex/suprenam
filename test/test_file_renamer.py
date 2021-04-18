@@ -380,8 +380,8 @@ def test_renamer_git():
     assert all(x.exists() for x in expected)
     assert not all(x.exists() for x in not_expected)
 
-    os.system("git reset --hard")
-
 
 if __name__ == "__main__":
     pytest.main(["-qq", __import__("sys").argv[0]])
+    if input("hard reset repo? (y/n): ").lower() == "y":
+        os.system("git reset --hard")
