@@ -1,5 +1,5 @@
 __import__("sys").path[0:0] = ["."]
-import os
+import subprocess
 from pathlib import Path
 from bisect import bisect, insort
 from hashlib import sha256
@@ -20,13 +20,6 @@ class FileSystem:
             for path_string in path_strings:
                 path = Path(path_string).resolve()
                 self.as_population[str(path.stat().st_ino)] = path
-                if not skip_git and path not in self.as_set:
-                    path_parent = path.parent
-                    while path_parent != Path("/"):
-                        if Path(path_parent / ".git").exists():
-                            self.git.update(path.parent.glob("*"))
-                            break
-                        path_parent = path_parent.parent
                 if path not in self.as_set:
                     self.as_set.update(path.parent.glob("*"))
         self.as_list = sorted(self.as_set)
@@ -69,8 +62,6 @@ class FileSystem:
             new_path = path.with_stem(f"{digest}-{suffix}")
             if not self.exists(new_path):
                 self.add(new_path)
-                if self.rename != self.rename_pure and path in self.git:
-                    self.git.add(new_path)
                 return new_path
 
     def rename_pure(self, original_path, new_path):
@@ -82,7 +73,12 @@ class FileSystem:
         self.add(new_path)
 
     def rename_system(self, original_path, new_path):
-        if original_path in self.git:
-            os.system(f"cd {original_path.parent} && git mv {original_path.name} {new_path.name}")
-        else:
+        try:
+            subprocess.run(["cd", original_path.parent])
+            subprocess.run(
+                ["git", "mv", original_path.name, new_path.name],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.STDOUT,
+            ).check_returncode()
+        except subprocess.CalledProcessError:
             original_path.rename(new_path)
