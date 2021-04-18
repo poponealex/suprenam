@@ -74,9 +74,9 @@ class FileSystem:
 
     def rename_system(self, original_path, new_path):
         try:
-            subprocess.run(["cd", original_path.parent])
             subprocess.run(
                 ["git", "mv", original_path.name, new_path.name],
+                cwd=original_path.parent,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.STDOUT,
             ).check_returncode()
