@@ -1,5 +1,10 @@
 import sys
 
+# logging
+LOGGING_FORMAT = "%(asctime)s\n%(levelname)s: %(message)s\n"
+LOGGING_DATE_FORMAT = "%d/%m/%Y - %I:%M:%S %p"
+
+
 # ANSI color codes
 OK = "\033[92m"
 WARNING = "\033[1m\033[38;5;166m"
