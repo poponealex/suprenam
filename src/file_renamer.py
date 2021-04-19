@@ -161,6 +161,7 @@ def main():
     start_logging()
     args = cli_arguments()
     if not (args.paths or args.file):
+        logging.info("No path provided.")
         return print_warning("You didn't provide any path.")
     paths = []
     if args.paths:
