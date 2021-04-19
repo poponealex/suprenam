@@ -18,6 +18,8 @@ class FileSystem:
             self.as_population = {}
             self.git = set()
             for path_string in path_strings:
+                if not path_string:
+                    continue
                 path = Path(path_string).resolve()
                 self.as_population[str(path.stat().st_ino)] = path
                 if path not in self.as_set:
