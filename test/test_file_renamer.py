@@ -263,8 +263,7 @@ def test_renamer_system():
             Path("test/FHS/usr/share/man/man4"),
             Path("test/FHS/usr/share/man/man5"),
             Path("test/FHS/usr/share/man/man6"),
-        ],
-        skip_git=True,
+        ]
     )
 
     new_names = [
@@ -333,52 +332,92 @@ def test_renamer_system():
     subprocess.run(["rm", "-rf", "test/FHS"])
 
 
-def test_renamer_git():
+def test_unrenamer():
+    create_fhs()
     file_system = FileSystem(
         [
-            Path("test/dummy_files/hello.txt"),
-            Path("test/dummy_files/world.txt"),
-            Path("test/dummy_files/foo.txt"),
-            Path("test/dummy_files/bar.txt"),
-            Path("test/dummy_files/spam.txt"),
-            Path("test/dummy_files/eggs.txt"),
-            Path("test/dummy_files/yellow.txt"),
-        ],
-        skip_git=False,
+            Path("test/FHS/etc"),
+            Path("test/FHS/lib"),
+            Path("test/FHS/etc/X11"),
+            Path("test/FHS/var/lib"),
+            Path("test/FHS/var/log"),
+            Path("test/FHS/var/mail"),
+            Path("test/FHS/usr/share/man"),
+            Path("test/FHS/usr/share/man/man1"),
+            Path("test/FHS/usr/share/man/man2"),
+            Path("test/FHS/usr/share/man/man3"),
+            Path("test/FHS/usr/share/man/man4"),
+            Path("test/FHS/usr/share/man/man5"),
+            Path("test/FHS/usr/share/man/man6"),
+        ]
     )
 
     new_names = [
-        f"#{Path('test/dummy_files/hello.txt').stat().st_ino}# hellow.txt",
-        f"#{Path('test/dummy_files/world.txt').stat().st_ino}# globe.txt",
-        f"#{Path('test/dummy_files/foo.txt').stat().st_ino}# bar.txt",
-        f"#{Path('test/dummy_files/bar.txt').stat().st_ino}# foo.txt",
-        f"#{Path('test/dummy_files/spam.txt').stat().st_ino}# eggs.txt",
-        f"#{Path('test/dummy_files/eggs.txt').stat().st_ino}# yellow.txt",
-        f"#{Path('test/dummy_files/yellow.txt').stat().st_ino}# snake.txt",
+        f"#{Path('test/FHS/etc').stat().st_ino}# etcetera",
+        f"#{Path('test/FHS/lib').stat().st_ino}# library",
+        f"#{Path('test/FHS/etc/X11').stat().st_ino}# X",
+        f"#{Path('test/FHS/var/lib').stat().st_ino}# log",
+        f"#{Path('test/FHS/var/log').stat().st_ino}# lib",
+        f"#{Path('test/FHS/var/mail').stat().st_ino}# spam",
+        f"#{Path('test/FHS/usr/share/man').stat().st_ino}# superman",
+        f"#{Path('test/FHS/usr/share/man/man1').stat().st_ino}# man3",
+        f"#{Path('test/FHS/usr/share/man/man2').stat().st_ino}# man1",
+        f"#{Path('test/FHS/usr/share/man/man3').stat().st_ino}# man2",
+        f"#{Path('test/FHS/usr/share/man/man4').stat().st_ino}# man4",
+        f"#{Path('test/FHS/usr/share/man/man5').stat().st_ino}# man6",
+        f"#{Path('test/FHS/usr/share/man/man6').stat().st_ino}# man66",
     ]
 
     clauses = sort_clauses(parse_new_names(file_system, new_names))
-    renamer(clauses, file_system)
+    completed_renames = []
+    renamer(clauses, file_system, completed_renames)
+    unrenamer(file_system, completed_renames)
 
     expected = [
-        Path("test/dummy_files/hellow.txt"),
-        Path("test/dummy_files/globe.txt"),
-        Path("test/dummy_files/bar.txt"),
-        Path("test/dummy_files/foo.txt"),
-        Path("test/dummy_files/eggs.txt"),
-        Path("test/dummy_files/yellow.txt"),
-        Path("test/dummy_files/snake.txt"),
+        Path("test/FHS/etc"),
+        Path("test/FHS/lib"),
+        Path("test/FHS/etc/X11"),
+        Path("test/FHS/etc/X11/applnk"),
+        Path("test/FHS/etc/X11/serverconfig"),
+        Path("test/FHS/etc/X11/starthere"),
+        Path("test/FHS/etc/X11/sysconfig"),
+        Path("test/FHS/var/lib/games"),
+        Path("test/FHS/var/lib/misc"),
+        Path("test/FHS/var/mail"),
+        Path("test/FHS/usr/share/man"),
+        Path("test/FHS/usr/share/man/man1"),
+        Path("test/FHS/usr/share/man/man2"),
+        Path("test/FHS/usr/share/man/man3"),
+        Path("test/FHS/usr/share/man/man4"),
+        Path("test/FHS/usr/share/man/man5"),
+        Path("test/FHS/var/lib/games"),
+        Path("test/FHS/var/lib/misc"),
     ]
 
     not_expected = [
-        Path("test/dummy_files/hello.txt"),
-        Path("test/dummy_files/world.txt"),
-        Path("test/dummy_files/eggs.txt"),
-        Path("test/dummy_files/yellow.txt"),
+        Path("test/FHS/etcetera"),
+        Path("test/FHS/library"),
+        Path("test/FHS/etcetera/X"),
+        Path("test/FHS/etcetera/X/applnk"),
+        Path("test/FHS/etcetera/X/serverconfig"),
+        Path("test/FHS/etcetera/X/starthere"),
+        Path("test/FHS/etcetera/X/sysconfig"),
+        Path("test/FHS/var/log/games"),
+        Path("test/FHS/var/log/misc"),
+        Path("test/FHS/var/spam"),
+        Path("test/FHS/usr/share/superman"),
+        Path("test/FHS/usr/share/superman/man1"),
+        Path("test/FHS/usr/share/superman/man2"),
+        Path("test/FHS/usr/share/superman/man3"),
+        Path("test/FHS/usr/share/superman/man4"),
+        Path("test/FHS/usr/share/superman/man6"),
+        Path("test/FHS/usr/share/superman/man66"),
     ]
 
     assert all(x.exists() for x in expected)
     assert not all(x.exists() for x in not_expected)
+
+    subprocess.run(["rm", "-rf", "test/FHS"])
 
 
 if __name__ == "__main__":
