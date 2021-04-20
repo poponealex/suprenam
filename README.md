@@ -32,4 +32,4 @@ __Right click on a `.txt` file and select `Get Info`.__
 > ![FileContextualMenuMac](/misc/text_file_contextual_menu_mac.png)
 
 __Select your favourite text editor and click on the `Change All...` button.__
-> ![GetInfor](/misc/get_info_window_mac.png)
+> ![GetInfoWindowMac](/misc/get_info_window_mac.png)
