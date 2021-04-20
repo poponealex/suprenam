@@ -28,7 +28,7 @@ __You're good to go!__
 
 ### MacOS
 
-__Rigth click on a `.txt` file and select `Get Info`.__
+__Right click on a `.txt` file and select `Get Info`.__
 > ![FileContextualMenuMac](/misc/text_file_contextual_menu_mac.png)
 
 __Select your favourite text editor and click on the `Change All...` button.__
