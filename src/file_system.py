@@ -7,7 +7,7 @@ from itertools import count
 
 
 class FileSystem:
-    def __init__(self, path_strings, is_pure=False, skip_git=False):
+    def __init__(self, path_strings, is_pure=False):
         if is_pure:
             self.as_set = set(map(Path, path_strings))
             self.as_population = {str(i): Path(path) for i, path in enumerate(path_strings)}
