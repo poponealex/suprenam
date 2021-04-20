@@ -182,17 +182,17 @@ def main():
     subprocess.run(["open", temporary_file]).check_returncode()
     if not messagebox.askokcancel("Confirm changes", "Rename the files?"):
         logging.info("Renaming aborted by user.")
-        return print_warning("Aborting, no changes were made.")
+        return print_warning("\nAborting, no changes were made. Bye!\n")
     new_names = parse_new_names(fs, temporary_file.read_text().split("\n"))
     if not new_names:
-        return print_success("\nYou didn't make any modication, no changes were made. Bye!\n")
+        return print_warning("\nYou didn't make any modication, no changes were made. Bye!\n")
     completed_renames = []
     try:
         renamer(sort_clauses(new_names), fs, completed_renames)
     except Exception as e:
         unrenamer(fs, completed_renames)
         raise e
-    return print_success("\nBYE!\n")
+    return print_success("\nAll good! BYE!\n")
 
 
 if __name__ == "__main__":
