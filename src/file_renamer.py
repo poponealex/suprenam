@@ -143,7 +143,7 @@ def create_edges(clauses: List[Clause], file_system: FileSystem) -> Edges:
     return Edges(temporary_edges, final_edges)
 
 
-def renamer(levels: Levels, file_system: FileSystem, completed_renames: list = []):
+def renamer(levels: Levels, file_system: FileSystem, completed_renames: List = []):
     for level in levels:
         edges = create_edges(level, file_system)
         logging.info(f"Create edges for {level}:\n{edges}")
@@ -159,7 +159,7 @@ def renamer(levels: Levels, file_system: FileSystem, completed_renames: list = [
             print_rename(str(clause.path), str(Path(clause.path.parent / clause.new_name)))
 
 
-def unrenamer(file_system: FileSystem, edges: list):
+def unrenamer(file_system: FileSystem, edges: List[Edge]):
     for edge in edges[::-1]:
         file_system.rename(edge.destination_path, edge.original_path)
         logging.info(f"UNRENAME: {edge.destination_path} -> {edge.original_path}")
