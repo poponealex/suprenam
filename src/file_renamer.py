@@ -184,13 +184,14 @@ def main():
         logging.info("Renaming aborted by user.")
         return print_warning("Aborting, no changes were made.")
     new_names = parse_new_names(fs, temporary_file.read_text().split("\n"))
-    if new_names:
-        completed_renames = []
-        try:
-            renamer(sort_clauses(new_names), fs, completed_renames)
-        except Exception as e:
-            unrenamer(fs, completed_renames)
-            raise e
+    if not new_names:
+        return print_success("\nYou didn't make any modication, no changes were made. Bye!\n")
+    completed_renames = []
+    try:
+        renamer(sort_clauses(new_names), fs, completed_renames)
+    except Exception as e:
+        unrenamer(fs, completed_renames)
+        raise e
     return print_success("\nBYE!\n")
 
 
