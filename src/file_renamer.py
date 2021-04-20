@@ -143,18 +143,26 @@ def create_edges(clauses: List[Clause], file_system: FileSystem) -> Edges:
     return Edges(temporary_edges, final_edges)
 
 
-def renamer(levels: Levels, file_system: FileSystem):
+def renamer(levels: Levels, file_system: FileSystem, completed_renames: list = []):
     for level in levels:
         edges = create_edges(level, file_system)
         logging.info(f"Create edges for {level}:\n{edges}")
         for edge in edges.temporary_edges:
             file_system.rename(edge.original_path, edge.destination_path)
             logging.info(f"RENAME: {edge.original_path} -> {edge.destination_path}")
+            completed_renames.append(edge)
         for edge in edges.final_edges:
             file_system.rename(edge.original_path, edge.destination_path)
             logging.info(f"RENAME: {edge.original_path} -> {edge.destination_path}")
+            completed_renames.append(edge)
         for clause in level:
             print_rename(str(clause.path), str(Path(clause.path.parent / clause.new_name)))
+
+
+def unrenamer(file_system: FileSystem, edges: list):
+    for edge in edges[::-1]:
+        file_system.rename(edge.destination_path, edge.original_path)
+        logging.info(f"UNRENAME: {edge.destination_path} -> {edge.original_path}")
 
 
 def main():
@@ -177,7 +185,12 @@ def main():
         return print_warning("Aborting, no changes were made.")
     new_names = parse_new_names(fs, temporary_file.read_text().split("\n"))
     if new_names:
-        renamer(sort_clauses(new_names), fs)
+        completed_renames = []
+        try:
+            renamer(sort_clauses(new_names), fs, completed_renames)
+        except Exception as e:
+            unrenamer(fs, completed_renames)
+            raise e
     return print_success("\nBYE!\n")
 
 
