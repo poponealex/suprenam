@@ -23,3 +23,13 @@ __Save [and close] the temporary file and then click on OK in the opened dialog 
 
 __You're good to go!__
 > ![CLI_Output](/misc/cli_output.png)
+
+## Set your system's default text editor
+
+### MacOS
+
+__Rigth click on a `.txt` file and select `Get Info`.__
+> ![FileContextualMenuMac](/misc/text_file_contextual_menu_mac.png)
+
+__Select your favourite text editor and click on the `Change All...` button.__
+> ![GetInfor](/misc/get_info_window_mac.png)
