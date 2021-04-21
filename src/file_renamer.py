@@ -2,7 +2,7 @@ __import__("sys").path.extend(["..", "."])
 import logging, re, subprocess, sys
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from datetime import datetime
-from itertools import count
+from itertools import count, groupby
 from pathlib import Path, PurePath
 from src.file_system import FileSystem
 from src.goodies import *
@@ -113,21 +113,14 @@ def parse_new_names(
             result.append(Clause(file_path, new_name))
     return result
 
+def level_of_path(path):
+    return str(path).count("/")
 
 def sort_clauses(clauses: List[Clause]) -> Levels:
-    result = []
-    paths_lengths = sorted([(clause, len(str(clause.path).split("/"))) for clause in clauses], key=lambda x: x[1])
-    acc = [paths_lengths[-1][0]]
-    for i in range(len(paths_lengths) - 2, -1, -1):
-        if paths_lengths[i][1] == paths_lengths[i + 1][1]:
-            acc.append(paths_lengths[i][0])
-        else:
-            result.append(acc)
-            acc = [paths_lengths[i][0]]
-    result.append(acc)
+    clauses = sorted(clauses, key=level_of_path, reverse=True)
+    result = [list(group) for (level, group) in groupby(clauses, key=level_of_path)]
     logging.info(f"Sorted clauses ready for renaming:\n{result}")
     return result
-
 
 def create_edges(clauses: List[Clause], file_system: FileSystem) -> Edges:
     final_edges = []

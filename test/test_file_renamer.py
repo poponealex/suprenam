@@ -83,30 +83,31 @@ def test_sort_clauses():
 
     expected = [
         [
-            Clause(Path("/usr/local/share/man/man4"), ""),
             Clause(Path("/usr/local/share/man/man1"), ""),
+            Clause(Path("/usr/local/share/man/man4"), ""),
         ],
         [
-            Clause(Path("/usr/share/man/man6"), ""),
-            Clause(Path("/usr/share/man/man3"), ""),
             Clause(Path("/usr/share/man/man1"), ""),
+            Clause(Path("/usr/share/man/man3"), ""),
+            Clause(Path("/usr/share/man/man6"), ""),
         ],
         [
-            Clause(Path("/usr/lib/tls"), ""),
-            Clause(Path("/usr/share/misc"), ""),
-            Clause(Path("/usr/share/man"), ""),
-            Clause(Path("/etc/X11/starthere"), ""),
             Clause(Path("/etc/X11/applnk"), ""),
+            Clause(Path("/etc/X11/starthere"), ""),
+            Clause(Path("/usr/share/man"), ""),
+            Clause(Path("/usr/share/misc"), ""),
+            Clause(Path("/usr/lib/tls"), ""),
         ],
         [
             Clause(Path("/usr/tmp"), ""),
         ],
         [
-            Clause(Path("/sys"), ""),
-            Clause(Path("/var"), ""),
             Clause(Path("/bin"), ""),
+            Clause(Path("/var"), ""),
+            Clause(Path("/sys"), ""),
         ],
     ]
+    print(expected)
 
     assert sort_clauses(clauses) == expected
 
