@@ -29,7 +29,7 @@ def test_pure():
         "/usr/src",
         "/usr/tmp",
     ]
-    assert set(map(str, file_system.childs(Path("/usr")))) == set(expected + ["/usr/local"])
+    assert set(map(str, file_system.children(Path("/usr")))) == set(expected + ["/usr/local"])
     assert result == expected
     file_system.add(Path("/usr/foo.bar"))
     new_path = file_system.uncollide(Path("/usr/foo.bar"))

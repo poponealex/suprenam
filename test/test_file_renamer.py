@@ -1,8 +1,9 @@
-__import__("sys").path[0:0] = ["."]
 import pytest, subprocess
 from pathlib import Path, PosixPath
+
+import context
 from src.file_renamer import *
-from test.create_fhs import create_fhs
+from create_fhs import create_fhs
 
 
 FILE_SYSTEM = FileSystem(Path("test/fhs.txt").read_text().strip().split("\n"), is_pure=True)
