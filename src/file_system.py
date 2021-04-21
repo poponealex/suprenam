@@ -22,3 +22,22 @@ class FileSystem(set):
             new_path = path.with_stem(f"{digest}-{suffix}")
             if new_path not in self:
                 return new_path
+    
+    def rename(self, path, new_path):
+        """
+        Rename a path into a new path, assuming the following preconditions:
+
+        1. `path` and `new_path` are siblings
+        2. `path` is in the file system
+        3. `new_path` is not yet in the file system
+
+        Results:
+            - `path` is replaced by `new_path` in the file system
+            - any descendant of `path` is replaced by the appropriate `path`
+        """
+        print(f"{path} -> {new_path}")
+        offset = len(str(path)) + 1
+        for candidate in list(self):
+            if candidate == path or str(candidate).startswith(f"{path}/"):
+                self.remove(candidate)
+                self.add(new_path / str(candidate)[offset:])

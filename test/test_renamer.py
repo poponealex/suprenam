@@ -3,7 +3,7 @@ import pytest
 from pathlib import Path
 
 import context
-from src.renamer import check_and_complete
+from src.renamer import check_and_complete, sorted_by_decreasing_level
 
 
 @pytest.fixture(scope="module")
@@ -31,7 +31,41 @@ def test_check_and_complete(base_path, paths):
 def test_check_and_complete_failed(base_path, paths):
     paths.append(Path(base_path / "non_existing_node"))
     with pytest.raises(FileNotFoundError):
-        result = check_and_complete(paths)
+        check_and_complete(paths)
+
+
+def test_sorted_by_decreasing_level():
+    _ = "whatever"
+    clauses = {
+        Path("/sys"): _,
+        Path("/tmp"): _,
+        Path("/usr"): _,
+        Path("/usr/X11R6"): _,
+        Path("/usr/X11R6/bin"): _,
+        Path("/usr/X11R6/include"): _,
+        Path("/usr/X11R6/lib"): _,
+        Path("/usr/X11R6/lib/tls"): _,
+        Path("/usr/X11R6/man"): _,
+        Path("/usr/X11R6/share"): _,
+        Path("/usr/bin"): _,
+        Path("/usr/bin/X11"): _,
+    }
+    expected = [
+        Path("/usr/X11R6/lib/tls"),
+        Path("/usr/X11R6/bin"),
+        Path("/usr/X11R6/include"),
+        Path("/usr/X11R6/lib"),
+        Path("/usr/X11R6/man"),
+        Path("/usr/X11R6/share"),
+        Path("/usr/bin/X11"),
+        Path("/usr/X11R6"),
+        Path("/usr/bin"),
+        Path("/sys"),
+        Path("/tmp"),
+        Path("/usr"),
+    ]
+    result = sorted_by_decreasing_level(clauses)
+    assert list(result) == expected
 
 
 if __name__ == "__main__":
