@@ -113,8 +113,10 @@ def parse_new_names(
             result.append(Clause(file_path, new_name))
     return result
 
+
 def level_of_path(path):
     return str(path).count("/")
+
 
 def sort_clauses(clauses: List[Clause]) -> Levels:
     clauses = sorted(clauses, key=level_of_path, reverse=True)
@@ -122,13 +124,14 @@ def sort_clauses(clauses: List[Clause]) -> Levels:
     logging.info(f"Sorted clauses ready for renaming:\n{result}")
     return result
 
+
 def create_edges(clauses: List[Clause], file_system: FileSystem) -> Edges:
     final_edges = []
     temporary_edges = []
     for clause in clauses:
         destination_path = Path(clause.path.parent / clause.new_name)
         if destination_path not in file_system.as_set:
-            final_edges.append(Edge(clause.path, destination_path))
+            final_edges.insert(0, Edge(clause.path, destination_path))
         else:
             temp_path = file_system.uncollide(clause.path)
             temporary_edges.append(Edge(clause.path, temp_path))
