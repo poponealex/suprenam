@@ -16,7 +16,6 @@ class FileSystem:
             self.rename = self.rename_system
             self.as_set = set()
             self.as_population = {}
-            self.git = set()
             for path_string in path_strings:
                 if not path_string:
                     continue
