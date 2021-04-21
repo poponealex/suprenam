@@ -1,35 +1,15 @@
 from pathlib import Path
-from bisect import bisect, insort
 from hashlib import sha256
 from itertools import count
 
 
-class FileSystem:
-    def __init__(self, path_strings, is_pure=False):
-        if is_pure:
-            self.as_set = set(map(Path, path_strings))
-        else:
-            self.as_set = set()
-            for path_string in path_strings:
-                path = Path(path_string)
-                if path in self.as_set:
-                    continue
-                if not path.exists():
-                    raise FileNotFoundError
-                self.as_set.update(path.parent.glob("*"))
-        self.as_list = sorted(self.as_set)
+class PureFileSystem(set):
 
-    def exists(self, path):
-        return path in self.as_set
+    def __init__(self, path_strings):
+        super().__init__(map(Path, path_strings))
     
-    def index(self, path):
-        """Return the index at/after which the given path is/should be stored."""
-        return bisect(self.as_list, path)
-
     def children(self, path):
-        for candidate in self.as_list[self.index(path) :]:
-            if not str(candidate).startswith(f"{path}/"):
-                break
+        for candidate in self:
             if candidate.match(f"{path}/*"):
                 yield candidate
 
@@ -38,15 +18,21 @@ class FileSystem:
             if path != candidate:
                 yield candidate
 
-    def add(self, path):
-        insort(self.as_list, path)
-        self.as_set.add(path)
-
-    def uncollide(self, path):
-        """Calculate and add a non-colliding new name for path."""
-        digest = sha256(path.stem.encode("utf8")).hexdigest()
+    def non_existing_sibling(self, path):
+        """Calculate the path of a non-existing sibling of a given path."""
+        digest = sha256(path.stem.encode("utf8")).hexdigest()[:32]
         for suffix in count():
             new_path = path.with_stem(f"{digest}-{suffix}")
-            if not self.exists(new_path):
-                self.add(new_path)
+            if new_path not in self:
                 return new_path
+
+
+class FileSystem(PureFileSystem):
+
+    def __init__(self, path_strings):
+        super().__init__([])
+        for path_string in path_strings:
+            path = Path(path_string)
+            if not path.exists():
+                raise FileNotFoundError
+            self.update(path.parent.glob("*"))
