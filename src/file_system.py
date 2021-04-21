@@ -3,10 +3,7 @@ from hashlib import sha256
 from itertools import count
 
 
-class PureFileSystem(set):
-
-    def __init__(self, path_strings):
-        super().__init__(map(Path, path_strings))
+class FileSystem(set):
     
     def children(self, path):
         for candidate in self:
@@ -25,14 +22,3 @@ class PureFileSystem(set):
             new_path = path.with_stem(f"{digest}-{suffix}")
             if new_path not in self:
                 return new_path
-
-
-class FileSystem(PureFileSystem):
-
-    def __init__(self, path_strings):
-        super().__init__([])
-        for path_string in path_strings:
-            path = Path(path_string)
-            if not path.exists():
-                raise FileNotFoundError
-            self.update(path.parent.glob("*"))

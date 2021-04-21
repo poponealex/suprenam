@@ -7,28 +7,74 @@ from src.file_system import FileSystem
 
 
 @pytest.fixture(scope="module")
-def base_path():
-    return Path(".").resolve()
+def paths():
+    return [Path(line) for line in Path("test/fhs.txt").read_text().strip().split("\n")]
+
 
 @pytest.fixture()
-def paths(base_path):
-    return [
-        str(base_path / "src" / "goodies.py"),
-        str(base_path / "src" / "goodies.py"), # duplicates don't matter
-        str(base_path / "test" / "context.py"),
-    ]
+def pfs(paths):
+    return FileSystem(paths)
 
-def test_constructor(base_path, paths):
-    fs = FileSystem(paths)
-    assert Path(base_path / "src" / "goodies.py") in fs
-    assert Path(base_path / "test" / "context.py") in fs
-    assert Path(base_path / "src" / "file_system.py") in fs
-    assert Path(base_path / "src") not in fs
 
-def test_failed_constructor(base_path, paths):
-    paths.append(Path(base_path / "non_existing_node"))
-    with pytest.raises(FileNotFoundError):
-        fs = FileSystem(paths)
+def test_constructor(pfs):
+    assert Path("/usr/local") in pfs
+
+
+def test_children(pfs):
+    expected = {
+        "/usr/X11R6",
+        "/usr/bin",
+        "/usr/etc",
+        "/usr/games",
+        "/usr/include",
+        "/usr/lib",
+        "/usr/libexec",
+        "/usr/local",
+        "/usr/sbin",
+        "/usr/share",
+        "/usr/src",
+        "/usr/tmp",
+    }
+    result = set(map(str, pfs.children(Path("/usr"))))
+    assert result == expected
+
+
+def test_siblings(pfs):
+    expected = {
+        "/usr/X11R6",
+        "/usr/bin",
+        "/usr/etc",
+        "/usr/games",
+        "/usr/include",
+        "/usr/lib",
+        "/usr/libexec",
+        "/usr/sbin",
+        "/usr/share",
+        "/usr/src",
+        "/usr/tmp",
+    }
+    result = set(map(str, pfs.siblings(Path("/usr/local"))))
+    assert result == expected
+
+
+def test_non_existing_sibling_folder(pfs):
+    expected = "/usr/25bf8e1a2393f1108d37029b3df55932-0"
+    result = str(pfs.non_existing_sibling(Path("/usr/local")))
+    assert result == expected
+
+
+def test_non_existing_sibling_file(pfs):
+    expected = "/etc/6184c2e07c47afbd767e35fe6e07b824-0.d"
+    result = str(pfs.non_existing_sibling(Path("/etc/xinetd.d")))
+    assert result == expected
+
+
+def test_non_existing_sibling_file_with_collision(pfs):
+    pfs.add(Path("/etc/6184c2e07c47afbd767e35fe6e07b824-0.d"))
+    expected = "/etc/6184c2e07c47afbd767e35fe6e07b824-1.d"
+    result = str(pfs.non_existing_sibling(Path("/etc/xinetd.d")))
+    assert result == expected
+
 
 if __name__ == "__main__":
     pytest.main(["-qq", __import__("sys").argv[0]])
