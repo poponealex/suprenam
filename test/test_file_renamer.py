@@ -122,9 +122,9 @@ def test_create_edges():
     expected1 = Edges(
         [],
         [
-            Edge(Path("/usr/share/man/man1"), Path("/usr/share/man/spam")),
-            Edge(Path("/usr/share/man/man2"), Path("/usr/share/man/eggs")),
             Edge(Path("/usr/share/man/man3"), Path("/usr/share/man/sausage")),
+            Edge(Path("/usr/share/man/man2"), Path("/usr/share/man/eggs")),
+            Edge(Path("/usr/share/man/man1"), Path("/usr/share/man/spam")),
         ],
     )
 
@@ -137,9 +137,9 @@ def test_create_edges():
     expected2 = Edges(
         [],
         [
-            Edge(Path("/usr/share/"), Path("/usr/spam")),
-            Edge(Path("/usr/share/man"), Path("/usr/share/eggs")),
             Edge(Path("/usr/share/man/mann"), Path("/usr/share/man/sausage")),
+            Edge(Path("/usr/share/man"), Path("/usr/share/eggs")),
+            Edge(Path("/usr/share/"), Path("/usr/spam")),
         ],
     )
 
