@@ -34,8 +34,11 @@ class FileSystem(set):
         Results:
             - `path` is replaced by `new_path` in the file system
             - any descendant of `path` is replaced by the appropriate `path`
+        
+        Note:
+            When working on a virtual file system, renaming a node before its
+            parent is not mandatory.
         """
-        print(f"{path} -> {new_path}")
         offset = len(str(path)) + 1
         for candidate in list(self):
             if candidate == path or str(candidate).startswith(f"{path}/"):

@@ -182,6 +182,8 @@ original path | new path
 
 ### Shifting the names of one leaf and one folder
 
+#### Example
+
 original path | new name
 ---|---
 /usr/local/share/info | spam
@@ -236,6 +238,8 @@ original path | new path
 
 ### Shifting the names of two folders
 
+#### Example
+
 original path | new name
 ---|---
 /usr/bin | spam
@@ -245,13 +249,13 @@ original path | new name
 
 original path | new path
 ---|---
-/usr/bin | /usr/spam 
-/usr/bin/X11 | /usr/spam/X11 
+/usr/bin | /usr/spam
+/usr/bin/X11 | /usr/spam/X11
 /usr/lib | /usr/bin
-/usr/lib/X11 | /usr/bin/X11 
-/usr/lib/games | /usr/bin/games 
-/usr/lib/gcc-lib | /usr/bin/gcc-lib 
-/usr/lib/locale | /usr/bin/locale 
+/usr/lib/X11 | /usr/bin/X11
+/usr/lib/games | /usr/bin/games
+/usr/lib/gcc-lib | /usr/bin/gcc-lib
+/usr/lib/locale | /usr/bin/locale
 /usr/lib/tls | /usr/bin/tls
 
 ## Swapping
@@ -538,6 +542,22 @@ original path | new path
 original path | new name
 ---|---
 /opt | mnt
+
+#### Result
+
+original path | new path
+---|---
+
+--------------------------------------------------------------------------------
+
+### Giving a leaf the name of an existing folder renamed into itself
+
+#### Example
+
+original path | new name
+---|---
+/opt | mnt
+/mnt | mnt
 
 #### Result
 

@@ -3,7 +3,7 @@ import pytest
 from pathlib import Path
 
 import context
-from src.renamer import check_and_complete, sorted_by_decreasing_level
+from src.renamer import check_and_complete, sorted_by_level
 
 
 @pytest.fixture(scope="module")
@@ -34,7 +34,7 @@ def test_check_and_complete_failed(base_path, paths):
         check_and_complete(paths)
 
 
-def test_sorted_by_decreasing_level():
+def test_sorted_by_level():
     _ = "whatever"
     clauses = {
         Path("/sys"): _,
@@ -51,20 +51,20 @@ def test_sorted_by_decreasing_level():
         Path("/usr/bin/X11"): _,
     }
     expected = [
-        Path("/usr/X11R6/lib/tls"),
-        Path("/usr/X11R6/bin"),
-        Path("/usr/X11R6/include"),
-        Path("/usr/X11R6/lib"),
-        Path("/usr/X11R6/man"),
-        Path("/usr/X11R6/share"),
-        Path("/usr/bin/X11"),
-        Path("/usr/X11R6"),
-        Path("/usr/bin"),
-        Path("/sys"),
-        Path("/tmp"),
-        Path("/usr"),
+        (Path("/sys"), _),
+        (Path("/tmp"), _),
+        (Path("/usr"), _),
+        (Path("/usr/X11R6"), _),
+        (Path("/usr/bin"), _),
+        (Path("/usr/X11R6/bin"), _),
+        (Path("/usr/X11R6/include"), _),
+        (Path("/usr/X11R6/lib"), _),
+        (Path("/usr/X11R6/man"), _),
+        (Path("/usr/X11R6/share"), _),
+        (Path("/usr/bin/X11"), _),
+        (Path("/usr/X11R6/lib/tls"), _),
     ]
-    result = sorted_by_decreasing_level(clauses)
+    result = sorted_by_level(clauses)
     assert list(result) == expected
 
 

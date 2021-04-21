@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import List, Iterable
-from collections import Counter
+from collections import Counter, deque
 
 from src.file_system import FileSystem
 
@@ -15,8 +15,8 @@ def check_and_complete(paths: Iterable[Path]):
     return result
 
 
-def sorted_by_decreasing_level(clauses):
-    return dict(sorted(clauses.items(), key=lambda item: len(item[0].parts), reverse=True))
+def sorted_by_level(clauses):
+    return deque(sorted(clauses.items(), key=lambda item: len(item[0].parts)))
 
 
 def redundant_targets(clauses):
@@ -29,25 +29,39 @@ def redundant_targets(clauses):
     return duplicates
 
 
+def outer_name_clashes(file_system, clauses):
+    clashes = []
+    for (path, new_name) in clauses.items():
+        new_path = path.with_name(new_name)
+        if new_path in file_system and new_path not in clauses:
+            clashes.append(new_path)
+    return clashes
+
+
 def rename(clause_list, file_system=None):
     clauses = {}
     for (path, new_name) in clause_list:
-        if path in clauses and clauses[path] != new_name:
-            return # TODO: update the error report
+        if path in clauses:
+            if clauses[path] == new_name:
+                continue  # skip null renaming
+            else:
+                return  # TODO: update the error report
         clauses[path] = new_name
-    
+
     if redundant_targets(clauses):
         return  # TODO: update the error report
-    
+
     if file_system is None:
         file_system = FileSystem(check_and_complete(clauses.keys()))
-    
-    clauses = sorted_by_decreasing_level(clauses)
+
+    if outer_name_clashes(file_system, clauses):
+        return  # TODO: update the error report
+
+    clauses = sorted_by_level(clauses)
     while clauses:
-        for (path, new_name) in list(clauses.items()):
-            new_path = path.with_name(new_name)
-            if new_path in file_system:
-                new_path = file_system.non_existing_sibling(path)
-                clauses[new_path] = new_name
-            file_system.rename(path, new_path)
-            del clauses[path]
+        (path, new_name) = clauses.pop()
+        new_path = path.with_name(new_name)
+        if new_path in file_system:
+            new_path = file_system.non_existing_sibling(path)
+            clauses.appendleft((new_path, new_name))
+        file_system.rename(path, new_path)

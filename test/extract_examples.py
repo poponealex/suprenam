@@ -17,7 +17,7 @@ original path \| new path
 def extract_rows(table):
     if not table:
         return []
-    return [tuple(row.split(" | ")) for row in table.strip().split("\n")]
+    return [tuple([x.strip() for x in row.split("|")]) for row in table.strip().split("\n")]
 
 
 def extract_examples(path):
