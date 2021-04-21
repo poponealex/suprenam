@@ -96,7 +96,7 @@ def parse_new_names(
         try:
             inode, new_name = strip_name(name.strip())[0]
         except:
-            raise ValueError(f"Error parsing the new names: {name}")
+            raise ValueError(f"Error parsing the new name: {name}")
         if "/" in new_name:
             raise ValueError(f"< {new_name} > : Illegal character '/'.")
         file_path = file_system.as_population.pop(inode, None)
