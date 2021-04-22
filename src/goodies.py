@@ -26,3 +26,10 @@ def print_fail(message: str):
 def print_exit(message: str):
     """Print the given message on `sys.stderr` and exit."""
     sys.exit(f"{FAIL}Error: {message}{RESET}")
+
+
+from shutil import which
+
+def is_tool(name): # https://stackoverflow.com/a/34177358/173003
+    """Check whether `name` is on PATH and marked as executable."""
+    return which(name) is not None
