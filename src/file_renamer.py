@@ -114,8 +114,8 @@ def parse_new_names(
     return result
 
 
-def level_of_path(path):
-    return str(path).count("/")
+def level_of_path(clause: Clause):
+    return len(clause.path.parts)
 
 
 def sort_clauses(clauses: List[Clause]) -> Levels:
@@ -125,34 +125,25 @@ def sort_clauses(clauses: List[Clause]) -> Levels:
     return result
 
 
-def create_edges(clauses: List[Clause], file_system: FileSystem) -> Edges:
-    final_edges = []
-    temporary_edges = []
-    for clause in clauses:
-        destination_path = Path(clause.path.parent / clause.new_name)
-        if destination_path not in file_system.as_set:
-            final_edges.insert(0, Edge(clause.path, destination_path))
-        else:
-            temp_path = file_system.uncollide(clause.path)
-            temporary_edges.append(Edge(clause.path, temp_path))
-            final_edges.append(Edge(temp_path, destination_path))
-    return Edges(temporary_edges, final_edges)
-
-
 def renamer(levels: Levels, file_system: FileSystem, completed_renames: List = []):
     for level in levels:
-        edges = create_edges(level, file_system)
-        logging.info(f"Create edges for {level}:\n{edges}")
-        for edge in edges.temporary_edges:
-            file_system.rename(edge.original_path, edge.destination_path)
-            logging.info(f"RENAME: {edge.original_path} -> {edge.destination_path}")
-            completed_renames.append(edge)
-        for edge in edges.final_edges:
-            file_system.rename(edge.original_path, edge.destination_path)
-            logging.info(f"RENAME: {edge.original_path} -> {edge.destination_path}")
-            completed_renames.append(edge)
+        temporary_clauses = []
         for clause in level:
-            print_rename(str(clause.path), str(Path(clause.path.parent / clause.new_name)))
+            destination_path = clause.path.with_name(clause.new_name) 
+            if destination_path not in file_system.as_set:
+                file_system.rename(clause.path, destination_path)
+                logging.info(f"RENAME: {clause.path} -> {destination_path}")
+                completed_renames.append(Edge(clause.path, destination_path))
+            else:
+                temp_path = file_system.uncollide(clause.path)
+                file_system.rename(clause.path, temp_path)
+                completed_renames.append(Edge(clause.path, temp_path))
+                logging.info(f"RENAME: {clause.path} -> {temp_path}")
+                temporary_clauses.append(Edge(temp_path, destination_path))
+        for clause in temporary_clauses:
+            file_system.rename(clause.original_path, clause.destination_path)
+            completed_renames.append(Edge(clause.original_path, clause.destination_path))
+            logging.info(f"RENAME: {clause.original_path} -> {clause.destination_path}")
 
 
 def unrenamer(file_system: FileSystem, edges: List[Edge]):
