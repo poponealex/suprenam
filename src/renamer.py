@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import List, Iterable
-from collections import Counter, deque
+from collections import Counter
 
 from src.file_system import FileSystem
 
@@ -16,7 +16,7 @@ def check_and_complete(paths: Iterable[Path]):
 
 
 def sorted_by_level(clauses):
-    return deque(sorted(clauses.items(), key=lambda item: len(item[0].parts)))
+    return sorted(clauses.items(), key=lambda item: len(item[0].parts), reverse=True)
 
 
 def redundant_targets(clauses):
@@ -58,10 +58,12 @@ def rename(clause_list, file_system=None):
         return  # TODO: update the error report
 
     clauses = sorted_by_level(clauses)
-    while clauses:
-        (path, new_name) = clauses.pop()
+    i = 0
+    while i < len(clauses):  # `clauses` sequence may grow
+        (path, new_name) = clauses[i]
         new_path = path.with_name(new_name)
         if new_path in file_system:
             new_path = file_system.non_existing_sibling(path)
-            clauses.appendleft((new_path, new_name))
+            clauses.append((new_path, new_name))
         file_system.rename(path, new_path)
+        i += 1

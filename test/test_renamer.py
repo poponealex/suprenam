@@ -51,18 +51,18 @@ def test_sorted_by_level():
         Path("/usr/bin/X11"): _,
     }
     expected = [
-        (Path("/sys"), _),
-        (Path("/tmp"), _),
-        (Path("/usr"), _),
-        (Path("/usr/X11R6"), _),
-        (Path("/usr/bin"), _),
+        (Path("/usr/X11R6/lib/tls"), _),
         (Path("/usr/X11R6/bin"), _),
         (Path("/usr/X11R6/include"), _),
         (Path("/usr/X11R6/lib"), _),
         (Path("/usr/X11R6/man"), _),
         (Path("/usr/X11R6/share"), _),
         (Path("/usr/bin/X11"), _),
-        (Path("/usr/X11R6/lib/tls"), _),
+        (Path("/usr/X11R6"), _),
+        (Path("/usr/bin"), _),
+        (Path("/sys"), _),
+        (Path("/tmp"), _),
+        (Path("/usr"), _),
     ]
     result = sorted_by_level(clauses)
     assert list(result) == expected
