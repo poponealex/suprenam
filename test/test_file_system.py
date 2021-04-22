@@ -20,6 +20,28 @@ def test_constructor(fs):
     assert Path("/usr/local") in fs
 
 
+def test_update_with_source_paths_concrete():
+    fs = FileSystem([])
+    paths = [
+        Path("./src/goodies.py"),
+        Path("."),
+    ]
+    fs.update_with_source_paths(paths)
+    assert Path("./src/file_system.py") in fs # sibling of `goodies.py`
+    assert Path("./test") in fs # sibling of `.`
+    assert Path("./LICENSE") in fs # sibling of `.`
+    assert Path("./test/test_file_system.py") not in fs # child of a sibling of `.`
+
+
+def test_update_with_source_paths_not_existing(fs):
+    paths = [
+        Path("/foo/bar"),
+    ]
+    with pytest.raises(FileNotFoundError) as offending_path:
+        fs.update_with_source_paths(paths)
+    assert offending_path.value.args[0] == Path("/foo/bar")
+
+
 def test_children(fs):
     expected = {
         "/usr/X11R6",
@@ -41,19 +63,20 @@ def test_children(fs):
 
 def test_siblings(fs):
     expected = {
-        "/usr/X11R6",
-        "/usr/bin",
-        "/usr/etc",
-        "/usr/games",
-        "/usr/include",
-        "/usr/lib",
-        "/usr/libexec",
-        "/usr/sbin",
-        "/usr/share",
-        "/usr/src",
-        "/usr/tmp",
+        Path("/usr/X11R6"),
+        Path("/usr/bin"),
+        Path("/usr/etc"),
+        Path("/usr/games"),
+        Path("/usr/include"),
+        Path("/usr/lib"),
+        Path("/usr/libexec"),
+        Path("/usr/local"),  # a node is considered as its own sibling
+        Path("/usr/sbin"),
+        Path("/usr/share"),
+        Path("/usr/src"),
+        Path("/usr/tmp"),
     }
-    result = set(map(str, fs.siblings(Path("/usr/local"))))
+    result = set(fs.siblings(Path("/usr/local")))
     assert result == expected
 
 

@@ -9,14 +9,16 @@ original path \| new name
 ---\|---
 ((?:.+\n)*)
 #### Result\n
-original path \| new path
----\|---
-((?:.+\n)*)"""
+(?:original path \| new path
+---\|---\n)?((?:.+\n)*)"""
 
 
 def extract_rows(table):
     if not table:
         return []
+    m = re.match(r"`(\w+Error)\(\"(.+)\"\)`\n", table)
+    if m:
+        return (m[1], m[2])
     return [tuple([x.strip() for x in row.split("|")]) for row in table.strip().split("\n")]
 
 

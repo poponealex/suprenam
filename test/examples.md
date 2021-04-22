@@ -449,8 +449,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`SourceHasMultipleTargetsError("/bin")`
 
 --------------------------------------------------------------------------------
 
@@ -465,8 +464,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`SourceHasMultipleTargetsError("/etc")`
 
 --------------------------------------------------------------------------------
 
@@ -481,8 +479,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`TargetHasMultipleSourcesError("/usr/lib/foobar")`
 
 --------------------------------------------------------------------------------
 
@@ -497,8 +494,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`TargetHasMultipleSourcesError("/usr/foobar")`
 
 --------------------------------------------------------------------------------
 
@@ -513,8 +509,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`TargetHasMultipleSourcesError("/usr/foobar")`
 
 ## Name clash outside renaming clauses
 
@@ -530,8 +525,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`TargetHasMultipleSourcesError("/usr/share/man/man2")`
 
 --------------------------------------------------------------------------------
 
@@ -545,8 +539,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`TargetHasMultipleSourcesError("/mnt")`
 
 --------------------------------------------------------------------------------
 
@@ -561,8 +554,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`TargetHasMultipleSourcesError("/mnt")`
 
 --------------------------------------------------------------------------------
 
@@ -576,8 +568,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`TargetHasMultipleSourcesError("/opt")`
 
 --------------------------------------------------------------------------------
 
@@ -591,5 +582,4 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`TargetHasMultipleSourcesError("/mnt")`

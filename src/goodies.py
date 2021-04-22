@@ -30,6 +30,7 @@ def print_exit(message: str):
 
 from shutil import which
 
-def is_tool(name): # https://stackoverflow.com/a/34177358/173003
+
+def is_tool(name):  # https://stackoverflow.com/a/34177358/173003
     """Check whether `name` is on PATH and marked as executable."""
     return which(name) is not None
