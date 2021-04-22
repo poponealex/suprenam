@@ -81,7 +81,6 @@ def test_secure_clauses_with_intermediate_clash(fs):
         (Path("/usr/X11R6"), "bar"),
     ]
     result = secure_clauses(fs, clauses)
-    print(result)
     assert result == [
         (Path("/usr/X11R6/lib"), "76b5a357391276b282a516f54f48ef3c-0"),
         (Path("/usr/X11R6/man"), "foo"),
@@ -194,7 +193,7 @@ def test_sorted_by_level():
             ],
         ),
     ]
-    result = list(sorted_by_level(clause_dict))
+    result = sorted_by_level(clause_dict)
     assert result == expected
 
 
