@@ -6,14 +6,16 @@ import context
 import src.secure_clauses as sc
 from src.file_system import FileSystem
 from extract_examples import extract_examples
-
+from reformat_examples import main as reformat_examples
 
 PATHS = [Path(line) for line in Path("test/fhs.txt").read_text().strip().split("\n")]
+EXAMPLES_MD_PATH = Path("test/examples.md")
 
+reformat_examples(EXAMPLES_MD_PATH)
 
 @pytest.mark.parametrize(
     "i, title, example, expected",
-    [d.values() for d in extract_examples(Path("test/examples.md"))[:]],
+    [d.values() for d in extract_examples(EXAMPLES_MD_PATH)[:]],
 )
 def test(i, title, example, expected):
     clauses = [(Path(row[0]), row[1]) for row in example]

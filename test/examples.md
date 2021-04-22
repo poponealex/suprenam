@@ -33,6 +33,7 @@
   - [Name clash outside renaming clauses](#name-clash-outside-renaming-clauses)
     - [Giving a leaf the name of an existing leaf](#giving-a-leaf-the-name-of-an-existing-leaf)
     - [Giving a leaf the name of an existing folder](#giving-a-leaf-the-name-of-an-existing-folder)
+    - [Giving a leaf the name of an existing folder renamed into itself](#giving-a-leaf-the-name-of-an-existing-folder-renamed-into-itself)
     - [Giving a folder the name of an existing leaf](#giving-a-folder-the-name-of-an-existing-leaf)
     - [Giving a folder the name of an existing folder](#giving-a-folder-the-name-of-an-existing-folder)
 
