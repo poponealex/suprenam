@@ -51,7 +51,8 @@ class FileSystem(set):
         for suffix in count():
             new_path = path.with_stem(f"{digest}-{suffix}")
             if new_path not in self:
-                return new_path
+                break
+        return new_path
     
     def rename(self, path, new_path):
         """Rename a path into a new path, and renames recursively its descendants.

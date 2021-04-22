@@ -8,7 +8,7 @@ Name = NewType("Name", str)
 
 def secure_clauses(
     file_system: FileSystem,
-    clauses: Iterable[Tuple[Path, Name]],
+    clauses: List[Tuple[Path, Name]],
 ) -> List[Tuple[Path, Name]]:
     """Construct a "safe" version of the given renaming clauses and update the file system.
 
@@ -17,7 +17,7 @@ def secure_clauses(
     the concrete file system without any collisions or other adverse effect.
 
     Args:
-        clauses (Iterable[Tuple[Path, Name]]): A collection of renaming clauses of the form `(path,
+        clauses (List[Tuple[Path, Name]]): A collection of renaming clauses of the form `(path,
         new_name)` in no particular order.
         file_system (FileSystem): Either a nonempty list of paths
     
@@ -44,7 +44,7 @@ def secure_clauses(
         new_path = path.with_name(new_name)
         if new_path in file_system:
             new_path = file_system.non_existing_sibling(path)
-            clauses[i] = (path, new_path.name)
+            clauses[i] = (path, Name(new_path.name))
             clauses.append((new_path, new_name))
         file_system.rename(path, new_path)
         i += 1
@@ -71,13 +71,12 @@ def dict_of_clauses(clauses: Iterable[Tuple[Path, Name]]) -> Dict[Path, Name]:
     Returns:
         Dict[Path, Name]: A dictionary associating paths to new names.
     """
-    result = {}
+    result: Dict[Path, Name] = {}
     for (path, new_name) in clauses:
         if path in result and result[path] != new_name:
             raise SourceHasMultipleTargetsError(path)
         result[path] = new_name
     return result
-    max()
 
 
 class TargetHasMultipleSourcesError(Exception):
