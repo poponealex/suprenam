@@ -11,7 +11,7 @@ class FileSystem(set):
         super().__init__(paths)
         if paths:  # when some initial paths are provided, the file system is considered as pure
             self.path_exists = lambda path: path in self
-            self.siblings = lambda path: (sibling for sibling in self.children(path.parent))
+            self.siblings = lambda path: self.children(path.parent)
         else:  # otherwise, the file system is considered as concrete
             self.path_exists = lambda path: path.exists()
             self.siblings = lambda path: path.parent.glob("*")
@@ -69,7 +69,7 @@ class FileSystem(set):
         
         Notes:
             - The renaming is virtual only. The ultimate goal is to produce a sequence of "safe"
-                clauses for an ulterior actual renaming. Nevertheless, all the consquencees of a
+                clauses for an ulterior actual renaming. Nevertheless, all the consequences of a
                 renaming (specifically, of a folder) are simulated to ensure testability.
             - In a virtual file system, renaming a node before its parent is not mandatory.
         """

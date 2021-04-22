@@ -1,10 +1,12 @@
 from collections import Counter
 from pathlib import Path
 from typing import Iterable, List, Tuple, NewType, Dict
+from itertools import groupby
 
 from src.file_system import FileSystem
 
 Name = NewType("Name", str)
+
 
 def secure_clauses(
     file_system: FileSystem,
@@ -20,7 +22,7 @@ def secure_clauses(
         clauses (List[Tuple[Path, Name]]): A collection of renaming clauses of the form `(path,
         new_name)` in no particular order.
         file_system (FileSystem): Either a nonempty list of paths
-    
+
     Raises:
         SourceHasMultipleTargetsError: when two distinct renaming targets are specified for the same source.
         TargetHasMultipleSourcesError: when two distinct sources have the same renaming target, or when a
@@ -37,18 +39,21 @@ def secure_clauses(
     clause_dict = dict_of_clauses(clauses)
     file_system.update_with_source_paths(clause_dict.keys())
     check_injectivity(file_system, clause_dict)
-    clauses = sorted_by_level(clause_dict)
-    i = 0
-    while i < len(clauses):  # `clauses` sequence may grow
-        (path, new_name) = clauses[i]
-        new_path = path.with_name(new_name)
-        if new_path in file_system:
-            new_path = file_system.non_existing_sibling(path)
-            clauses[i] = (path, Name(new_path.name))
-            clauses.append((new_path, new_name))
-        file_system.rename(path, new_path)
-        i += 1
-    return clauses
+    clauses_by_levels = sorted_by_level(clause_dict)
+    safe_clauses = []
+    for (level, clauses) in clauses_by_levels:
+        i = 0
+        while i < len(clauses):  # `clauses` sequence may grow
+            (path, new_name) = clauses[i]
+            new_path = path.with_name(new_name)
+            if new_path in file_system:
+                new_path = file_system.non_existing_sibling(path)
+                clauses[i] = (path, Name(new_path.name))
+                clauses.append((new_path, new_name))
+            file_system.rename(path, new_path)
+            i += 1
+        safe_clauses.extend(clauses)
+    return safe_clauses
 
 
 class SourceHasMultipleTargetsError(Exception):
@@ -106,6 +111,12 @@ def check_injectivity(file_system: FileSystem, clauses: Dict[Path, Name]):
         already_seen.add(new_path)
 
 
-def sorted_by_level(clauses: Dict[Path, Name]):
-    """Order the items of a clause dictionary with the most nested first."""
-    return sorted(clauses.items(), key=lambda item: len(item[0].parts), reverse=True)
+def level_of_clause(clause: Tuple[Path, Name]) -> int:
+    return len(clause[0].parts)
+
+
+def sorted_by_level(clauses: Dict[Path, Name]) -> List[Tuple[int, List[Tuple[Path, Name]]]]:
+    """Order and group the items of a clause dictionary with the most nested first."""
+    sorted_clauses = sorted(clauses.items(), key=level_of_clause, reverse=True)
+    grouped_clauses = groupby(sorted_clauses, key=level_of_clause)
+    return [(item[0], list(item[1])) for item in grouped_clauses]

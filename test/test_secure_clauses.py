@@ -24,7 +24,6 @@ def test_secure_clauses(fs):
         (Path("/usr/lib"), "include"),
     ]
     result = secure_clauses(fs, clauses)
-    print(result)
     assert result == [
         (Path("/usr/X11R6/include"), "foobar"),
         (Path("/usr/local"), "bocal"),
@@ -37,42 +36,58 @@ def test_secure_clauses(fs):
         Path("/usr/X11R6"),
         Path("/usr/libexec"),
         Path("/usr/X11R6/share"),
-        Path("/usr/X11R6/foobar"), # new path
+        Path("/usr/X11R6/foobar"),  # new path
         Path("/usr/src"),
         Path("/usr/X11R6/lib"),
-        Path("/usr/bocal/share/man/man4"), # new path
-        Path("/usr/bocal/share/info"), # new path
-        Path("/usr/bocal/share/man/man2"), # new path
-        Path("/usr/bocal/src"), # new path
-        Path("/usr/bocal/libexec"), # new path
-        Path("/usr/bocal/share/man/man3"), # new path
-        Path("/usr/bocal/etc"), # new path
-        Path("/usr/bocal/bin"), # new path
-        Path("/usr/bocal/lib"), # new path
-        Path("/usr/bocal/include"), # new path
-        Path("/usr/bocal/share/man/man8"), # new path
-        Path("/usr/bocal"), # new path
-        Path("/usr/bocal/games"), # new path
-        Path("/usr/bocal/sbin"), # new path
-        Path("/usr/bocal/share/man/man6"), # new path
-        Path("/usr/bocal/share/man/man5"), # new path
-        Path("/usr/bocal/share/man"), # new path
-        Path("/usr/bocal/share/man/man1"), # new path
-        Path("/usr/bocal/share/man/man9"), # new path
-        Path("/usr/bocal/share/man/man7"), # new path
-        Path("/usr/bocal/share"), # new path
-        Path("/usr/bocal/share/man/mann"), # new path
+        Path("/usr/bocal/share/man/man4"),  # new path
+        Path("/usr/bocal/share/info"),  # new path
+        Path("/usr/bocal/share/man/man2"),  # new path
+        Path("/usr/bocal/src"),  # new path
+        Path("/usr/bocal/libexec"),  # new path
+        Path("/usr/bocal/share/man/man3"),  # new path
+        Path("/usr/bocal/etc"),  # new path
+        Path("/usr/bocal/bin"),  # new path
+        Path("/usr/bocal/lib"),  # new path
+        Path("/usr/bocal/include"),  # new path
+        Path("/usr/bocal/share/man/man8"),  # new path
+        Path("/usr/bocal"),  # new path
+        Path("/usr/bocal/games"),  # new path
+        Path("/usr/bocal/sbin"),  # new path
+        Path("/usr/bocal/share/man/man6"),  # new path
+        Path("/usr/bocal/share/man/man5"),  # new path
+        Path("/usr/bocal/share/man"),  # new path
+        Path("/usr/bocal/share/man/man1"),  # new path
+        Path("/usr/bocal/share/man/man9"),  # new path
+        Path("/usr/bocal/share/man/man7"),  # new path
+        Path("/usr/bocal/share"),  # new path
+        Path("/usr/bocal/share/man/mann"),  # new path
         Path("/usr/share"),
         Path("/usr/tmp"),
         Path("/usr/X11R6/man"),
-        Path("/usr/include"), # swapped path
-        Path("/usr/lib"), # swapped path
+        Path("/usr/include"),  # swapped path
+        Path("/usr/lib"),  # swapped path
         Path("/usr/etc"),
         Path("/usr/sbin"),
         Path("/usr/games"),
         Path("/usr/X11R6/bin"),
     }
     assert expected_fs_subset.issubset(fs)
+
+
+def test_secure_clauses_with_intermediate_clash(fs):
+    clauses = [
+        (Path("/usr/X11R6/lib"), "man"),
+        (Path("/usr/X11R6/man"), "foo"),
+        (Path("/usr/X11R6"), "bar"),
+    ]
+    result = secure_clauses(fs, clauses)
+    print(result)
+    assert result == [
+        (Path("/usr/X11R6/lib"), "76b5a357391276b282a516f54f48ef3c-0"),
+        (Path("/usr/X11R6/man"), "foo"),
+        (Path("/usr/X11R6/76b5a357391276b282a516f54f48ef3c-0"), "man"),
+        (Path("/usr/X11R6"), "bar"),
+    ]
 
 
 def test_dict_of_clauses():
@@ -146,20 +161,40 @@ def test_sorted_by_level():
         Path("/usr/bin/X11"): _,
     }
     expected = [
-        (Path("/usr/X11R6/lib/tls"), _),
-        (Path("/usr/X11R6/bin"), _),
-        (Path("/usr/X11R6/include"), _),
-        (Path("/usr/X11R6/lib"), _),
-        (Path("/usr/X11R6/man"), _),
-        (Path("/usr/X11R6/share"), _),
-        (Path("/usr/bin/X11"), _),
-        (Path("/usr/X11R6"), _),
-        (Path("/usr/bin"), _),
-        (Path("/sys"), _),
-        (Path("/tmp"), _),
-        (Path("/usr"), _),
+        (
+            5,
+            [
+                (Path("/usr/X11R6/lib/tls"), _),
+            ],
+        ),
+        (
+            4,
+            [
+                (Path("/usr/X11R6/bin"), _),
+                (Path("/usr/X11R6/include"), _),
+                (Path("/usr/X11R6/lib"), _),
+                (Path("/usr/X11R6/man"), _),
+                (Path("/usr/X11R6/share"), _),
+                (Path("/usr/bin/X11"), _),
+            ],
+        ),
+        (
+            3,
+            [
+                (Path("/usr/X11R6"), _),
+                (Path("/usr/bin"), _),
+            ],
+        ),
+        (
+            2,
+            [
+                (Path("/sys"), _),
+                (Path("/tmp"), _),
+                (Path("/usr"), _),
+            ],
+        ),
     ]
-    result = sorted_by_level(clause_dict)
+    result = list(sorted_by_level(clause_dict))
     assert result == expected
 
 
