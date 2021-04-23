@@ -450,7 +450,7 @@ original path | new name
 
 #### Result
 
-`SourceHasMultipleTargetsError("/bin")`
+`SeveralTargetsError("/bin")`
 
 --------------------------------------------------------------------------------
 
@@ -465,7 +465,7 @@ original path | new name
 
 #### Result
 
-`SourceHasMultipleTargetsError("/etc")`
+`SeveralTargetsError("/etc")`
 
 --------------------------------------------------------------------------------
 
@@ -480,7 +480,7 @@ original path | new name
 
 #### Result
 
-`TargetHasMultipleSourcesError("/usr/lib/foobar")`
+`SeveralSourcesError("/usr/lib/foobar")`
 
 --------------------------------------------------------------------------------
 
@@ -495,7 +495,7 @@ original path | new name
 
 #### Result
 
-`TargetHasMultipleSourcesError("/usr/foobar")`
+`SeveralSourcesError("/usr/foobar")`
 
 --------------------------------------------------------------------------------
 
@@ -510,7 +510,7 @@ original path | new name
 
 #### Result
 
-`TargetHasMultipleSourcesError("/usr/foobar")`
+`SeveralSourcesError("/usr/foobar")`
 
 ## Name clash outside renaming clauses
 
@@ -526,7 +526,7 @@ original path | new name
 
 #### Result
 
-`TargetHasMultipleSourcesError("/usr/share/man/man2")`
+`SeveralSourcesError("/usr/share/man/man2")`
 
 --------------------------------------------------------------------------------
 
@@ -540,7 +540,7 @@ original path | new name
 
 #### Result
 
-`TargetHasMultipleSourcesError("/mnt")`
+`SeveralSourcesError("/mnt")`
 
 --------------------------------------------------------------------------------
 
@@ -555,7 +555,7 @@ original path | new name
 
 #### Result
 
-`TargetHasMultipleSourcesError("/mnt")`
+`SeveralSourcesError("/mnt")`
 
 --------------------------------------------------------------------------------
 
@@ -569,7 +569,7 @@ original path | new name
 
 #### Result
 
-`TargetHasMultipleSourcesError("/opt")`
+`SeveralSourcesError("/opt")`
 
 --------------------------------------------------------------------------------
 
@@ -583,4 +583,4 @@ original path | new name
 
 #### Result
 
-`TargetHasMultipleSourcesError("/mnt")`
+`SeveralSourcesError("/mnt")`

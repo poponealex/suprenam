@@ -109,7 +109,7 @@ def test_dict_of_clauses_when_not_a_function():
         (Path("/ping"), "pong"),
         (Path("/ping"), "fail"),  # contradiction
     ]
-    with pytest.raises(SourceHasMultipleTargetsError) as offending_path:
+    with pytest.raises(SeveralTargetsError) as offending_path:
         dict_of_clauses(clauses)
     assert offending_path.value.args[0] == Path("/ping")
 
@@ -129,7 +129,7 @@ def test_check_injectivity_with_internal_problem(fs):
         Path("/usr/lib/games"): "foobar",
         Path("/usr/lib/X11"): "foobar",
     }
-    with pytest.raises(TargetHasMultipleSourcesError) as offending_path:
+    with pytest.raises(SeveralSourcesError) as offending_path:
         check_injectivity(fs, clauses)
     assert offending_path.value.args[0] == Path("/usr/lib/foobar")
 
@@ -138,7 +138,7 @@ def test_check_injectivity_with_external_problem(fs):
     clauses = {
         Path("/usr/lib/games"): "X11",
     }
-    with pytest.raises(TargetHasMultipleSourcesError) as offending_path:
+    with pytest.raises(SeveralSourcesError) as offending_path:
         check_injectivity(fs, clauses)
     assert offending_path.value.args[0] == Path("/usr/lib/X11")
 

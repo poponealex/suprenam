@@ -1,6 +1,6 @@
 from collections import Counter
 from pathlib import Path
-from typing import Iterable, List, Tuple, NewType, Dict
+from typing import Iterable, List, Tuple, NewType, Dict, NamedTuple
 from itertools import groupby
 
 from src.file_system import FileSystem
@@ -8,10 +8,13 @@ from src.file_system import FileSystem
 Name = NewType("Name", str)
 
 
-def secure_clauses(
-    file_system: FileSystem,
-    clauses: List[Tuple[Path, Name]],
-) -> List[Tuple[Path, Name]]:
+class Clause(NamedTuple):
+    path: Path
+    new_name: Name
+
+ClauseMap = Dict[Path, Name]
+
+def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Clause]:
     """Construct a "safe" version of the given renaming clauses and update the file system.
 
     The resulting sequence is a reordered copy of the given clauses, with potentially the
@@ -19,13 +22,13 @@ def secure_clauses(
     the concrete file system without any collisions or other adverse effect.
 
     Args:
-        clauses (List[Tuple[Path, Name]]): A collection of renaming clauses of the form `(path,
+        clauses (List[Clause]): A collection of renaming clauses of the form `(path,
         new_name)` in no particular order.
         file_system (FileSystem): Either a nonempty list of paths
 
     Raises:
-        SourceHasMultipleTargetsError: when two distinct renaming targets are specified for the same source.
-        TargetHasMultipleSourcesError: when two distinct sources have the same renaming target, or when a
+        SeveralTargetsError: when two distinct renaming targets are specified for the same source.
+        SeveralSourcesError: when two distinct sources have the same renaming target, or when a
             renaming target already exists and has no specified renaming.
         FileNotFound: when a source does not exist in the file system.
 
@@ -34,7 +37,7 @@ def secure_clauses(
         all the renamings would have been executed).
 
     Returns:
-        List[Tuple[Path, Name]]: A "safe" version of the given renaming clauses.
+        List[Clause]: A "safe" version of the given renaming clauses.
     """
     clause_dict = dict_of_clauses(clauses)
     file_system.update_with_source_paths(clause_dict.keys())
@@ -48,47 +51,47 @@ def secure_clauses(
             new_path = path.with_name(new_name)
             if new_path in file_system:
                 new_path = file_system.non_existing_sibling(path)
-                clauses[i] = (path, Name(new_path.name))
-                clauses.append((new_path, new_name))
+                clauses[i] = Clause(path, Name(new_path.name))
+                clauses.append(Clause(new_path, new_name))
             file_system.rename(path, new_path)
             i += 1
         safe_clauses.extend(clauses)
     return safe_clauses
 
 
-class SourceHasMultipleTargetsError(Exception):
+class SeveralTargetsError(Exception):
     ...
 
 
-def dict_of_clauses(clauses: Iterable[Tuple[Path, Name]]) -> Dict[Path, Name]:
+def dict_of_clauses(clauses: Iterable[Clause]) -> ClauseMap:
     """Make a dictionary from the given clauses.
 
-    The result is silently deduplicated. During its construction, a `SourceHasMultipleTargetsError` is raised
+    The result is silently deduplicated. During its construction, a `SeveralTargetsError` is raised
     iff there exists at least one couple of clauses `(path, new_name_1)` and `(path, new_name_2)`
     with `new_name_1 != new_name_2`.
 
     Args:
-        clauses (List[Tuple[Path, Name]]): A list of couples of the form `(path, new_name)`.
+        clauses (List[Clause]): A list of couples of the form `(path, new_name)`.
 
     Raises:
-        SourceHasMultipleTargetsError: Two distinct new names are specified for the same path.
+        SeveralTargetsError: Two distinct new names are specified for the same path.
 
     Returns:
-        Dict[Path, Name]: A dictionary associating paths to new names.
+        ClauseMap: A dictionary associating paths to new names.
     """
-    result: Dict[Path, Name] = {}
+    result: ClauseMap = {}
     for (path, new_name) in clauses:
         if path in result and result[path] != new_name:
-            raise SourceHasMultipleTargetsError(path)
+            raise SeveralTargetsError(path)
         result[path] = new_name
     return result
 
 
-class TargetHasMultipleSourcesError(Exception):
+class SeveralSourcesError(Exception):
     ...
 
 
-def check_injectivity(file_system: FileSystem, clauses: Dict[Path, Name]):
+def check_injectivity(file_system: FileSystem, clauses: ClauseMap):
     """Check that no resulting path has more than one antecedent.
 
     This function detects the following problems:
@@ -98,25 +101,26 @@ def check_injectivity(file_system: FileSystem, clauses: Dict[Path, Name]):
        file system is not renamed itself (i.e., is not the source of any clause).
 
     Args:
-        clauses (Dict[Path, Name]): A dictionary associating paths to new names.
+        clauses (ClauseMap): A dictionary associating paths to new names.
 
     Raises:
-        TargetHasMultipleSourcesError: A resulting path has two distinct antecedents.
+        SeveralSourcesError: A resulting path has two distinct antecedents.
     """
     already_seen = set()
     for (path, new_name) in clauses.items():
         new_path = path.with_name(new_name)
         if new_path in already_seen or (new_path in file_system and new_path not in clauses):
-            raise TargetHasMultipleSourcesError(new_path)
+            raise SeveralSourcesError(new_path)
         already_seen.add(new_path)
 
 
-def level_of_clause(clause: Tuple[Path, Name]) -> int:
-    return len(clause[0].parts)
+def level_of_clause(clause: Clause) -> int:
+    return len(clause.path.parts)
 
 
-def sorted_by_level(clauses: Dict[Path, Name]) -> List[Tuple[int, List[Tuple[Path, Name]]]]:
+def sorted_by_level(clauses: ClauseMap) -> List[Tuple[int, List[Clause]]]:
     """Order and group the items of a clause dictionary with the most nested first."""
-    sorted_clauses = sorted(clauses.items(), key=level_of_clause, reverse=True)
+    items = (Clause(*item) for item in clauses.items()) # required by mypy (as v. 0.812)
+    sorted_clauses = sorted(items, key=level_of_clause, reverse=True)
     grouped_clauses = groupby(sorted_clauses, key=level_of_clause)
-    return [(item[0], list(item[1])) for item in grouped_clauses]
+    return [(level, list(clauses)) for (level, clauses) in grouped_clauses]
