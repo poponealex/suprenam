@@ -1,8 +1,7 @@
-from pathlib import Path
 from hashlib import sha256
 from itertools import count
-
-from typing import Iterable, Set, Generator
+from pathlib import Path
+from typing import Generator, Iterable, Set
 
 
 class FileSystem(set):
@@ -33,7 +32,6 @@ class FileSystem(set):
         self.update(result) # should not change a pure file system
 
     def children(self, path: Path) -> Generator[Path, None, None]:
-
         for candidate in self:
             if candidate.match(f"{path}/*"):
                 yield candidate
