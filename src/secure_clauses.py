@@ -22,9 +22,14 @@ def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Claus
     the concrete file system without any collisions or other adverse effect.
 
     Args:
-        clauses (List[Clause]): A collection of renaming clauses of the form `(path,
-        new_name)` in no particular order.
-        file_system (FileSystem): Either a nonempty list of paths
+        clauses (List[Clause]): A collection of renaming clauses of the form `(path, new_name)`
+            in no particular order.
+        file_system (FileSystem): A file system constructed either with an empty or nonempty list
+            of paths:
+            - empty: the arborescence will be populated by calling `update_with_source_paths()`
+                with a list of source paths: this method will add not only the given paths, but
+                their actual siblings too.
+            - nonempty: used with a prepopulated test file system, like `test/fhs.txt`.
 
     Raises:
         SeveralTargetsError: when two distinct renaming targets are specified for the same source.
