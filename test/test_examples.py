@@ -8,10 +8,17 @@ from src.file_system import FileSystem
 from extract_examples import extract_examples
 from reformat_examples import main as reformat_examples
 
+EXCEPTIONS = {
+    "FileNotFoundError": __builtins__["FileNotFoundError"],
+    "SeveralTargetsError": getattr(sc, "SeveralTargetsError"),
+    "SeveralSourcesError": getattr(sc, "SeveralSourcesError"),
+}
+
 PATHS = [Path(line) for line in Path("test/fhs.txt").read_text().strip().split("\n")]
 EXAMPLES_MD_PATH = Path("test/examples.md")
 
 reformat_examples(EXAMPLES_MD_PATH)
+
 
 @pytest.mark.parametrize(
     "i, title, example, expected",
@@ -23,8 +30,7 @@ def test(i, title, example, expected):
     original_fs = set(fs)
     if isinstance(expected, tuple):
         (exception_name, expected_culprit) = expected
-        exception = getattr(sc, exception_name)
-        with pytest.raises(exception) as culprit:
+        with pytest.raises(EXCEPTIONS[exception_name]) as culprit:
             sc.secure_clauses(fs, clauses)
         assert culprit.value.args[0] == Path(expected_culprit)
         assert fs == original_fs
@@ -35,7 +41,6 @@ def test(i, title, example, expected):
         (additions, deletions) = (additions - deletions, deletions - additions)
         assert original_fs - fs == deletions
         assert fs - original_fs == additions
-
 
 
 if __name__ == "__main__":
