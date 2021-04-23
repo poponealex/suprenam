@@ -119,13 +119,9 @@ def check_injectivity(file_system: FileSystem, clauses: ClauseMap):
         already_seen.add(new_path)
 
 
-def level_of_clause(clause: Clause) -> int:
-    return len(clause.path.parts)
-
-
 def sorted_by_level(clauses: ClauseMap) -> List[Tuple[int, List[Clause]]]:
     """Order and group the items of a clause dictionary with the most nested first."""
     items = (Clause(*item) for item in clauses.items()) # required by mypy (as v. 0.812)
-    sorted_clauses = sorted(items, key=level_of_clause, reverse=True)
-    grouped_clauses = groupby(sorted_clauses, key=level_of_clause)
+    sorted_clauses = sorted(items, key=lambda clause: len(clause.path.parts), reverse=True)
+    grouped_clauses = groupby(sorted_clauses, key=lambda clause: len(clause.path.parts))
     return [(level, list(clauses)) for (level, clauses) in grouped_clauses]
