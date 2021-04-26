@@ -81,20 +81,20 @@ def test_siblings(fs):
 
 
 def test_non_existing_sibling_folder(fs):
-    expected = "/usr/25bf8e1a2393f1108d37029b3df55932-0"
+    expected = "/usr/NRXWGYLM-0"
     result = str(fs.non_existing_sibling(Path("/usr/local")))
     assert result == expected
 
 
 def test_non_existing_sibling_file(fs):
-    expected = "/etc/6184c2e07c47afbd767e35fe6e07b824-0.d"
+    expected = "/etc/PBUW4ZLUMQXGI===-0"
     result = str(fs.non_existing_sibling(Path("/etc/xinetd.d")))
     assert result == expected
 
 
 def test_non_existing_sibling_file_with_collision(fs):
-    fs.add(Path("/etc/6184c2e07c47afbd767e35fe6e07b824-0.d"))
-    expected = "/etc/6184c2e07c47afbd767e35fe6e07b824-1.d"
+    fs.add(Path("/etc/PBUW4ZLUMQXGI===-0"))
+    expected = "/etc/PBUW4ZLUMQXGI===-1"
     result = str(fs.non_existing_sibling(Path("/etc/xinetd.d")))
     assert result == expected
 

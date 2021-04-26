@@ -1,4 +1,4 @@
-from hashlib import sha256
+from base64 import b32encode
 from itertools import count
 from pathlib import Path
 from typing import Generator, Iterable, Set
@@ -44,10 +44,17 @@ class FileSystem(set):
 
         Returns:
             Path: the path to be temporarily used for an intermediate renaming.
+        
+        Notes:
+            - A previous version relied on `Path.with_stem`, which requires Python 3.9. In the
+            present version, the non existing sibling does not conserve the extension of the
+            original file.
+            - Truncated SHA-256 and BASE-64 were considered, but the former is overkill, and the
+            character set of the latter is not appropriate for filenames.
         """
-        digest = sha256(path.stem.encode("utf8")).hexdigest()[:32]
+        digest = b32encode(path.name.encode("utf8")).decode("ascii")[:32]
         for suffix in count():
-            new_path = path.with_stem(f"{digest}-{suffix}")
+            new_path = path.with_name(f"{digest}-{suffix}")
             if new_path not in self:
                 break
         return new_path

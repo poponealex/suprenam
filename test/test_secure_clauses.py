@@ -27,9 +27,9 @@ def test_secure_clauses(fs):
     assert result == [
         (Path("/usr/X11R6/include"), "foobar"),
         (Path("/usr/local"), "bocal"),
-        (Path("/usr/include"), "c0cbff04cc90f5b4cd53a53533285f7d-0"),
+        (Path("/usr/include"), "NFXGG3DVMRSQ====-0"),
         (Path("/usr/lib"), "include"),
-        (Path("/usr/c0cbff04cc90f5b4cd53a53533285f7d-0"), "lib"),
+        (Path("/usr/NFXGG3DVMRSQ====-0"), "lib"),
     ]
     expected_fs_subset = {
         Path("/usr/bin"),
@@ -82,9 +82,9 @@ def test_secure_clauses_with_intermediate_clash(fs):
     ]
     result = secure_clauses(fs, clauses)
     assert result == [
-        (Path("/usr/X11R6/lib"), "76b5a357391276b282a516f54f48ef3c-0"),
+        (Path("/usr/X11R6/lib"), "NRUWE===-0"),
         (Path("/usr/X11R6/man"), "foo"),
-        (Path("/usr/X11R6/76b5a357391276b282a516f54f48ef3c-0"), "man"),
+        (Path("/usr/X11R6/NRUWE===-0"), "man"),
         (Path("/usr/X11R6"), "bar"),
     ]
 
