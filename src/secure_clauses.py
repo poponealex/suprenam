@@ -12,7 +12,7 @@ def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Claus
 
     The resulting sequence is a reordered copy of the given clauses, with potentially the
     insertion of intermediate renamings, in such a way that they can be executed sequentially in
-    the concrete file system without any collisions or other adverse effect.
+    the concrete file system without any collision or other adverse effect.
 
     Args:
         clauses (List[Clause]): A collection of renaming clauses of the form `(path, new_name)`
@@ -37,10 +37,10 @@ def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Claus
     Returns:
         List[Clause]: A "safe" version of the given renaming clauses.
     """
-    clause_dict = dict_of_clauses(clauses)
+    clause_dict = _dict_of_clauses(clauses)
     file_system.update_with_source_paths(clause_dict.keys())
-    check_injectivity(file_system, clause_dict)
-    clauses_by_levels = sorted_by_level(clause_dict)
+    _check_injectivity(file_system, clause_dict)
+    clauses_by_levels = _sorted_by_level(clause_dict)
     safe_clauses = []
     for (level, clauses) in clauses_by_levels:
         i = 0
@@ -61,7 +61,7 @@ class SeveralTargetsError(Exception):
     ...
 
 
-def dict_of_clauses(clauses: Iterable[Clause]) -> ClauseMap:
+def _dict_of_clauses(clauses: Iterable[Clause]) -> ClauseMap:
     """Make a dictionary from the given clauses.
 
     The result is silently deduplicated. During its construction, a `SeveralTargetsError` is raised
@@ -89,14 +89,14 @@ class SeveralSourcesError(Exception):
     ...
 
 
-def check_injectivity(file_system: FileSystem, clauses: ClauseMap):
+def _check_injectivity(file_system: FileSystem, clauses: ClauseMap):
     """Check that no resulting path has more than one antecedent.
 
     This function detects the following problems:
 
     1. There are two sibling nodes being renamed onto the same target path.
     2. There is a node being renamed onto a target path which already exists in the
-       file system is not renamed itself (i.e., is not the source of any clause).
+       file system without being itself renamed (i.e., not the source of any clause).
 
     Args:
         clauses (ClauseMap): A dictionary associating paths to new names.
@@ -112,7 +112,7 @@ def check_injectivity(file_system: FileSystem, clauses: ClauseMap):
         already_seen.add(new_path)
 
 
-def sorted_by_level(clauses: ClauseMap) -> List[Tuple[int, List[Clause]]]:
+def _sorted_by_level(clauses: ClauseMap) -> List[Tuple[int, List[Clause]]]:
     """Order and group the items of a clause dictionary with the most nested first."""
     items = (Clause(*item) for item in clauses.items()) # required by mypy (as of v. 0.812)
     sorted_clauses = sorted(items, key=lambda clause: len(clause.path.parts), reverse=True)

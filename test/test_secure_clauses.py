@@ -99,7 +99,7 @@ def test_dict_of_clauses():
         Path("/foo/bar"): "buzz",
         Path("/ping"): "pong",
     }
-    result = dict_of_clauses(clauses)
+    result = _dict_of_clauses(clauses)
     assert result == expected
 
 
@@ -110,7 +110,7 @@ def test_dict_of_clauses_when_not_a_function():
         (Path("/ping"), "fail"),  # contradiction
     ]
     with pytest.raises(SeveralTargetsError) as offending_path:
-        dict_of_clauses(clauses)
+        _dict_of_clauses(clauses)
     assert offending_path.value.args[0] == Path("/ping")
 
 
@@ -121,7 +121,7 @@ def test_check_injectivity(fs):
         Path("/usr/bin/X11"): "R2D2",
         Path("/usr/lib/X11"): "R2D2",
     }
-    assert check_injectivity(fs, clauses) is None
+    assert _check_injectivity(fs, clauses) is None
 
 
 def test_check_injectivity_with_internal_problem(fs):
@@ -130,7 +130,7 @@ def test_check_injectivity_with_internal_problem(fs):
         Path("/usr/lib/X11"): "foobar",
     }
     with pytest.raises(SeveralSourcesError) as offending_path:
-        check_injectivity(fs, clauses)
+        _check_injectivity(fs, clauses)
     assert offending_path.value.args[0] == Path("/usr/lib/foobar")
 
 
@@ -139,7 +139,7 @@ def test_check_injectivity_with_external_problem(fs):
         Path("/usr/lib/games"): "X11",
     }
     with pytest.raises(SeveralSourcesError) as offending_path:
-        check_injectivity(fs, clauses)
+        _check_injectivity(fs, clauses)
     assert offending_path.value.args[0] == Path("/usr/lib/X11")
 
 
@@ -193,7 +193,7 @@ def test_sorted_by_level():
             ],
         ),
     ]
-    result = sorted_by_level(clause_dict)
+    result = _sorted_by_level(clause_dict)
     assert result == expected
 
 
