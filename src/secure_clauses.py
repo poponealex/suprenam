@@ -1,6 +1,5 @@
 from collections import Counter
 from itertools import groupby
-from pathlib import Path
 from typing import Iterable, List, Tuple
 
 from src.file_system import FileSystem
@@ -37,10 +36,10 @@ def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Claus
     Returns:
         List[Clause]: A "safe" version of the given renaming clauses.
     """
-    clause_dict = _dict_of_clauses(clauses)
+    clause_dict = dict_of_clauses(clauses)
     file_system.update_with_source_paths(clause_dict.keys())
-    _check_injectivity(file_system, clause_dict)
-    clauses_by_levels = _sorted_by_level(clause_dict)
+    check_injectivity(file_system, clause_dict)
+    clauses_by_levels = sorted_by_level(clause_dict)
     safe_clauses = []
     for (level, clauses) in clauses_by_levels:
         i = 0
@@ -61,7 +60,7 @@ class SeveralTargetsError(Exception):
     ...
 
 
-def _dict_of_clauses(clauses: Iterable[Clause]) -> ClauseMap:
+def dict_of_clauses(clauses: Iterable[Clause]) -> ClauseMap:
     """Make a dictionary from the given clauses.
 
     The result is silently deduplicated. During its construction, a `SeveralTargetsError` is raised
@@ -89,7 +88,7 @@ class SeveralSourcesError(Exception):
     ...
 
 
-def _check_injectivity(file_system: FileSystem, clauses: ClauseMap):
+def check_injectivity(file_system: FileSystem, clauses: ClauseMap):
     """Check that no resulting path has more than one antecedent.
 
     This function detects the following problems:
@@ -112,7 +111,7 @@ def _check_injectivity(file_system: FileSystem, clauses: ClauseMap):
         already_seen.add(new_path)
 
 
-def _sorted_by_level(clauses: ClauseMap) -> List[Tuple[int, List[Clause]]]:
+def sorted_by_level(clauses: ClauseMap) -> List[Tuple[int, List[Clause]]]:
     """Order and group the items of a clause dictionary with the most nested first."""
     items = (Clause(*item) for item in clauses.items()) # required by mypy (as of v. 0.812)
     sorted_clauses = sorted(items, key=lambda clause: len(clause.path.parts), reverse=True)
