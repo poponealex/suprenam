@@ -3,10 +3,10 @@ from itertools import groupby
 from typing import Iterable, List, Tuple
 
 from src.file_system import FileSystem
-from src.user_types import Clause, ClauseMap, Name
+from src.user_types import Clause, ClauseMap, Name, Renaming
 
 
-def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Clause]:
+def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Renaming]:
     """Construct a "safe" version of the given renaming clauses and update the file system.
 
     The resulting sequence is a reordered copy of the given clauses, with potentially the
@@ -34,7 +34,8 @@ def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Claus
         all the renamings would have been executed).
 
     Returns:
-        List[Clause]: A "safe" version of the given renaming clauses.
+        List[Renaming]: A "safe" version of the given renaming clauses, presented as a list of
+            source and target paths.
     """
     clause_dict = dict_of_clauses(clauses)
     file_system.update_with_source_paths(clause_dict.keys())
@@ -53,7 +54,7 @@ def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Claus
             file_system.rename(path, new_path)
             i += 1
         safe_clauses.extend(clauses)
-    return safe_clauses
+    return [Renaming(path, path.parent / new_name) for (path, new_name) in safe_clauses]
 
 
 class SeveralTargetsError(Exception):

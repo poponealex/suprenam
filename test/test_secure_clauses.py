@@ -25,11 +25,11 @@ def test_secure_clauses(fs):
     ]
     result = secure_clauses(fs, clauses)
     assert result == [
-        (Path("/usr/X11R6/include"), "foobar"),
-        (Path("/usr/local"), "bocal"),
-        (Path("/usr/include"), "NFXGG3DVMRSQ====-0"),
-        (Path("/usr/lib"), "include"),
-        (Path("/usr/NFXGG3DVMRSQ====-0"), "lib"),
+        (Path("/usr/X11R6/include"), Path("/usr/X11R6/foobar")),
+        (Path("/usr/local"), Path("/usr/bocal")),
+        (Path("/usr/include"), Path("/usr/NFXGG3DVMRSQ====-0")),
+        (Path("/usr/lib"), Path("/usr/include")),
+        (Path("/usr/NFXGG3DVMRSQ====-0"), Path("/usr/lib")),
     ]
     expected_fs_subset = {
         Path("/usr/bin"),
@@ -82,10 +82,10 @@ def test_secure_clauses_with_intermediate_clash(fs):
     ]
     result = secure_clauses(fs, clauses)
     assert result == [
-        (Path("/usr/X11R6/lib"), "NRUWE===-0"),
-        (Path("/usr/X11R6/man"), "foo"),
-        (Path("/usr/X11R6/NRUWE===-0"), "man"),
-        (Path("/usr/X11R6"), "bar"),
+        (Path("/usr/X11R6/lib"), Path("/usr/X11R6/NRUWE===-0")),
+        (Path("/usr/X11R6/man"), Path("/usr/X11R6/foo")),
+        (Path("/usr/X11R6/NRUWE===-0"), Path("/usr/X11R6/man")),
+        (Path("/usr/X11R6"), Path("/usr/bar")),
     ]
 
 
