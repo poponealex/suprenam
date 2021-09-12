@@ -6,7 +6,7 @@ from platform import platform
 OS = {
     "macOS": {
         "QUERY_DEFAULTS_COMMAND": ["defaults", "read", "com.apple.LaunchServices/com.apple.launchservices.secure", "LSHandlers"],
-        "REGEX": r'(?m)(?s)\s*\{\s*LSHandlerContentType = "public\.plain-text";\s*LSHandlerPreferredVersions =\s*\{\s*LSHandlerRoleAll = "-";\s*\};\s*LSHandlerRoleAll = "([\w.]+)";',
+        "REGEX": r'(?ms)\s*\{\s*LSHandlerContentType = "public\.plain-text";\s*LSHandlerPreferredVersions =\s*\{\s*LSHandlerRoleAll = "-";\s*\};\s*LSHandlerRoleAll = "([\w.]+)";',
         "DEFAULT_COMMAND": ["open", "-neW"],
         "EDITOR_COMMAND": {"com.microsoft.vscode": ["code", "-w"], "com.sublimetext.3": ["subl", "-w"]},
     },
@@ -40,7 +40,11 @@ def get_editor_command_name(os_name: str = "") -> str:
         raise UnsupportedOS("OS not yet supported.")
     parse_output = re.compile(os["REGEX"]).findall
     try:
-        result = parse_output(subprocess.run(os["QUERY_DEFAULTS_COMMAND"], stdout=subprocess.PIPE).stdout.decode("utf-8"))
+        result = parse_output(
+            subprocess.run(
+                os["QUERY_DEFAULTS_COMMAND"], encoding="utf-8", stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True
+            ).stdout
+        )
         if result:
             return os["EDITOR_COMMAND"][result[0]]
     except Exception as e:
