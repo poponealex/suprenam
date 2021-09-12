@@ -7,7 +7,7 @@ OS = {
         "QUERY_DEFAULTS_COMMAND": ["defaults", "read", "com.apple.LaunchServices/com.apple.launchservices.secure", "LSHandlers"],
         "REGEX": r'(?ms)\s*\{\s*LSHandlerContentType = "public\.plain-text";\s*LSHandlerPreferredVersions =\s*\{\s*LSHandlerRoleAll = "-";\s*\};\s*LSHandlerRoleAll = "([\w.]+)";',
         "DEFAULT_COMMAND": ["open", "-neW"],
-        "EDITOR_COMMAND": {"com.microsoft.vscode": ["code", "-w"], "com.sublimetext.3": ["subl", "-w"]},
+        "EDITOR_COMMAND": {"com.microsoft.vscode": ["code", "-w"], "com.sublimetext.3": ["subl", "-w"]}, #TODO: add different versions of Sublime Text
     },
     "Linux": {
         "QUERY_DEFAULTS_COMMAND": ["xdg-mime", "query", "default", "text/plain"],
@@ -46,7 +46,7 @@ def get_editor_command_name(os_name: str = "") -> str:
         )
         if result:
             return os["EDITOR_COMMAND"][result[0]]
-    except Exception as e:
+    except (subprocess.CalledProcessError, KeyError) as e:
         print(e)
     return os["DEFAULT_COMMAND"]
 
