@@ -1,5 +1,6 @@
 import re
 import subprocess
+from platform import platform
 
 
 OS = {
@@ -37,7 +38,7 @@ def get_editor_command_name(os_name: str = "") -> str:
         raise UnsupportedOS("OS not yet supported.")
     parse_output = re.compile(os["REGEX"], re.DOTALL).findall
     try:
-        result = parse_output(subprocess.run(os["QUERY_DEFAULTS_COMMAND"], capture_output=True).stdout.decode("utf-8"))
+        result = parse_output(subprocess.run(os["QUERY_DEFAULTS_COMMAND"], stdout=subprocess.PIPE).stdout.decode("utf-8"))
         if result:
             return os["EDITOR_COMMAND"][result[0]]
     except Exception as e:
