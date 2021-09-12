@@ -21,6 +21,8 @@ OS = {
 
 def get_editor_command_name(os_name: str = "") -> str:
     """
+    Retrieve the system's default text editor.
+
     Args:
         os_name: operating system's name
             macOS and Linux (with XDG utils installed) currently supported
