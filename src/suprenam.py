@@ -5,7 +5,7 @@ from itertools import groupby
 from pathlib import Path
 from platform import platform
 from tempfile import NamedTemporaryFile
-from typing import List, Callable
+from typing import List
 
 
 from src.default_editor import get_editor_command_name
@@ -79,6 +79,28 @@ def cli_arguments():
     return parser.parse_args()
 
 
+def get_text(paths: List[Path]) -> str:
+    """
+    Get the text to output to the user's interface.
+
+    Args:
+        paths: List of paths to rename.
+
+    Returns:
+        A string formated as follow:
+            Parent Directory path
+            inode   file name
+    """
+    sorted_paths = sorted(paths, key=lambda path: len(path.parts), reverse=True)
+    result = ""
+    for _, current_paths in groupby(sorted_paths, key=lambda path: len(path.parts)):
+        current_paths = list(current_paths)
+        result += f"{current_paths[0].resolve().parent}\n\n"
+        result += "\n".join(f"{path.stat().st_ino}\t{path.name}" for path in current_paths)
+        result += "\n"
+    return result
+
+
 def create_temporary_file(paths: List[Path]) -> Path:
     """
     Create a temporary file populated with the names of the files to rename.
@@ -88,24 +110,13 @@ def create_temporary_file(paths: List[Path]) -> Path:
 
     Returns:
         The temporary file's Path.
-
-    Format:
-        Parent Directory path
-            inode   file name
     """
     temp_file = Path(NamedTemporaryFile(mode="w+", delete=False, suffix=".txt").name)
-    sorted_paths = sorted(paths, key=lambda path: len(path.parts), reverse=True)
-    output = ""
-    for _, current_paths in groupby(sorted_paths, key=lambda path: len(path.parts)):
-        current_paths = list(current_paths)
-        output += f"{current_paths[0].resolve().parent}\n\n"
-        output += "\n".join(f"{path.stat().st_ino}\t{path.name}" for path in current_paths)
-        output += "\n"
-    temp_file.write_text(output)
+    temp_file.write_text(get_text(paths))
     return temp_file
 
 
-def parse_temporary_file(temp_file: Path, population: dict, match_renaming: Callable = re.compile(r"^\d+\t.+$").match) -> List[Clause]:
+def parse_temporary_file(temp_file: Path, population: dict, match_renaming=re.compile(r"\d+\t.+")) -> List[Clause]:
     """
     Parse the temporary file to collect the renamings.
 
@@ -122,16 +133,11 @@ def parse_temporary_file(temp_file: Path, population: dict, match_renaming: Call
         IllegalInode Error : An error is raised if an inode is modified.
     """
     result = []
-    for line in temp_file.read_text().split("\n"):
-        if not match_renaming(line):
-            continue
-        line = line.split("\t")
-        if "/" in line[1]:
-            raise IllegalCharacter("Illegal character '/'.")
-        try:
-            result += [Clause(population[int(line[0])], line[1])]
-        except KeyError:
-            raise IllegalInode("Illegal inode.")
+    for line in re.finditer(match_renaming, temp_file.read_text()):
+        line = line.group(0).split("\t")
+        path = population.get(int(line[0]), None)
+        if path:
+            result += [Clause(path, line[1])]
     return result
 
 
@@ -139,14 +145,6 @@ def create_log():
     if not LOG_DIR.exists():
         LOG_DIR.mkdir()
     return set_logger(LOG_DIR / LOG_NAME)
-
-
-class IllegalCharacter(Exception):
-    ...
-
-
-class IllegalInode(Exception):
-    ...
 
 
 if __name__ == "__main__":
