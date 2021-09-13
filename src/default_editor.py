@@ -38,7 +38,6 @@ def get_editor_command_name(os_name: str = "") -> str:
     Raises:
         UnsupportedOS Error if the os is not supported.
     """
-
     os = OS.get(os_name, None)
     if not os:
         raise UnsupportedOS("OS not yet supported.")
