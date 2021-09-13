@@ -6,19 +6,35 @@ from src.goodies import print_warning
 
 OS = {
     "macOS": {
-        "QUERY_DEFAULTS_COMMAND": ["defaults", "read", "com.apple.LaunchServices/com.apple.launchservices.secure", "LSHandlers"],
+        "QUERY_DEFAULTS_COMMAND": [
+            "defaults",
+            "read",
+            "com.apple.LaunchServices/com.apple.launchservices.secure",
+            "LSHandlers",
+        ],
         "REGEX": r'(?ms)\s*\{\s*LSHandlerContentType = "public\.plain-text";\s*LSHandlerPreferredVersions =\s*\{\s*LSHandlerRoleAll = "-";\s*\};\s*LSHandlerRoleAll = "([\w.]+)";',
-        "DEFAULT_COMMAND": ["open", "-neW"],
+        "DEFAULT_COMMAND": [
+            "open",
+            "-neW",
+        ],
         "EDITOR_COMMAND": {
             "com.microsoft.vscode": ["code", "-w"],
             "com.sublimetext.3": ["subl", "-w"],
         },  # TODO: add different versions of Sublime Text
     },
     "Linux": {
-        "QUERY_DEFAULTS_COMMAND": ["xdg-mime", "query", "default", "text/plain"],
+        "QUERY_DEFAULTS_COMMAND": [
+            "xdg-mime",
+            "query",
+            "default",
+            "text/plain",
+        ],
         "REGEX": r"^(.*)\.desktop$",
         "DEFAULT_COMMAND": ["open", "-w"],
-        "EDITOR_COMMAND": {"code": ["code", "-w"], "sublime_text": ["subl", "-w"]},
+        "EDITOR_COMMAND": {
+            "code": ["code", "-w"],
+            "sublime_text": ["subl", "-w"],
+        },
     },
 }
 
@@ -46,7 +62,11 @@ def get_editor_command_name(os_name: str = "") -> str:
     try:
         result = parse_output(
             subprocess.run(
-                os["QUERY_DEFAULTS_COMMAND"], encoding="utf-8", stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True
+                os["QUERY_DEFAULTS_COMMAND"],
+                encoding="utf-8",
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=True,
             ).stdout
         )
         if result:
