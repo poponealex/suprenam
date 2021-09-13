@@ -48,5 +48,5 @@ def undo_renamings(
     log_path: Path,
     find_all_renamings=re.compile(r"(?m)^INFO:\w+:SOURCE:(.+)\nINFO:\w+:TARGET:(.+)").findall,
 ):
-    """Read a log file and apply the renamings in reversed and by swapping sources and targets."""
+    """Read a log file and apply the renamings in reverse and by swapping sources and targets."""
     perform_renamings(list(map(swap, reversed(find_all_renamings(log_path.read_text())))))
