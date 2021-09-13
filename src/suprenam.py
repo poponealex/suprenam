@@ -16,7 +16,7 @@ from src.secure_clauses import secure_clauses
 from src.user_types import Clause
 
 
-LOG_DIR = Path.cwd() / "LOG"
+LOG_DIR = Path.cwd() / ".suprenam"
 LOG_NAME = "previous_session.log"
 
 
