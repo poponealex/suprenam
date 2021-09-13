@@ -116,7 +116,11 @@ def create_temporary_file(paths: List[Path]) -> Path:
     return temp_file
 
 
-def parse_temporary_file(temp_file: Path, population: dict, match_renaming=re.compile(r"\d+\t.+")) -> List[Clause]:
+def parse_temporary_file(
+    temp_file: Path,
+    population: dict,
+    find_all=re.compile(r"(\d+)\t(.+)").findall,
+) -> List[Clause]:
     """
     Parse the temporary file to collect the renamings.
 
@@ -133,11 +137,10 @@ def parse_temporary_file(temp_file: Path, population: dict, match_renaming=re.co
         IllegalInode Error : An error is raised if an inode is modified.
     """
     result = []
-    for line in re.finditer(match_renaming, temp_file.read_text()):
-        line = line.group(0).split("\t")
-        path = population.get(int(line[0]), None)
+    for (inode, new_name) in find_all(temp_file.read_text()):
+        path = population.get(int(inode))
         if path:
-            result += [Clause(path, line[1])]
+            result += [Clause(path, new_name)]
     return result
 
 
