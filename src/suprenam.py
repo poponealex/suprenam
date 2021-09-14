@@ -32,12 +32,8 @@ def main():
     if not paths:
         return print_warning("No paths were provided.")
     create_log()
-    file_system = FileSystem()
-    population = {path.stat().st_ino: path for path in paths}
-    temp_file = create_temporary_file(population.values())
-    os = platform().split("-")[0]
-    subprocess.run(get_editor_command_name(os) + [str(temp_file)], check=True)
-    renamings = secure_clauses(file_system, parse_temporary_file(temp_file, population))
+    file_system = FileSystem([])
+    renamings = secure_clauses(file_system, edit_paths(paths))
     return perform_renamings(renamings)
 
 
@@ -79,26 +75,54 @@ def cli_arguments():
     return parser.parse_args()
 
 
-def get_text(paths: List[Path]) -> str:
+def edit_paths(
+    paths: List[Path],
+    get_inode=lambda path: path.stat().st_ino,
+    create_temporary_file=lambda paths: create_temporary_file(paths),
+    get_edition_handler=lambda file: file.read_text(),
+    edit=lambda editor: subprocess.run(editor, check=True),
+    handler=lambda file: get_editor_command_name(platform().split("-")[0]) + [str(file)],
+):
+    """
+    Create the user interaface and parse the renamings, can be parameterized to work with a pure FileSystem.
+
+    Args:
+        paths: List of Paths to rename.
+        get_inode: function called to get the inode.
+        create_temporary_file: function called to create a temporary file populated with the paths to rename.
+        get_edition_handler: function called to read the content of the temporary file.
+        edit: function called to run the handler.
+        handler: the argument used by the edit function.
+
+    Returns:
+        A list of Clause with the effective renamings.
+    """
+    population = {get_inode(path): path for path in paths}
+    temp_file = create_temporary_file(population.values())
+    edit(handler(temp_file))
+    text = get_edition_handler(temp_file)
+    return parse_text(text, population)
+
+
+def get_text(paths: List[Path], get_inode=lambda path: path.stat().st_ino) -> str:
     """
     Get the text to output to the user's interface.
 
     Args:
-        paths: List of paths to rename.
+        paths: List of Paths to rename.
 
     Returns:
         A string formated as follow:
             Parent Directory path
             inode   file name
     """
-    sorted_paths = sorted(paths, key=lambda path: len(path.parts), reverse=True)
-    result = ""
+    sorted_paths = sorted(paths, key=lambda path: len(path.parts))
+    result = []
     for _, current_paths in groupby(sorted_paths, key=lambda path: len(path.parts)):
         current_paths = list(current_paths)
-        result += f"{current_paths[0].resolve().parent}\n\n"
-        result += "\n".join(f"{path.stat().st_ino}\t{path.name}" for path in current_paths)
-        result += "\n"
-    return result
+        result += [f"{current_paths[0].resolve().parent}\n"]
+        result += [f"{get_inode(path)}\t{path.name}" for path in current_paths] + ["\n"]
+    return "\n".join(result)[:-1]
 
 
 def create_temporary_file(paths: List[Path]) -> Path:
@@ -116,13 +140,13 @@ def create_temporary_file(paths: List[Path]) -> Path:
     return temp_file
 
 
-def parse_temporary_file(
-    temp_file: Path,
+def parse_text(
+    text: str,
     population: dict,
     find_all=re.compile(r"(\d+)\t(.+)").findall,
 ) -> List[Clause]:
     """
-    Parse the temporary file to collect the renamings.
+    Parse the renamings' text.
 
     Args:
         temp_file: The temporary file's Path.
@@ -133,7 +157,7 @@ def parse_temporary_file(
         A list of Clause (path, new_name).
     """
     result = []
-    for (inode, new_name) in find_all(temp_file.read_text()):
+    for (inode, new_name) in find_all(text):
         path = population.get(int(inode))
         if path:
             result += [Clause(path, new_name)]
