@@ -131,10 +131,6 @@ def parse_temporary_file(
 
     Returns:
         A list of Clause (path, new_name).
-
-    Raises:
-        IllegalCharacter Error: An error is raised if the user enter a renaming with the '/' character.
-        IllegalInode Error : An error is raised if an inode is modified.
     """
     result = []
     for (inode, new_name) in find_all(temp_file.read_text()):
