@@ -7,37 +7,49 @@ from src.suprenam import *
 from test_renamings import rm_tree
 
 
+@pytest.fixture(scope="module")
+def paths():
+    return [Path(line) for line in Path("test/fhs.txt").read_text().strip().split("\n")]
+
+
+@pytest.fixture(scope="module")
+def inodes(paths):
+    return {path: i for (i, path) in enumerate(paths)}
+
+
 def test_get_text():
-    base = Path("test") / "temp"
-    rm_tree(base)
-    base.mkdir()
-    parent = Path.cwd() / "test" / "temp"
+    base = Path("/Users/bob/")
     paths = [base / "foo", base / "bar", base / "spam"]
-    for path in paths:
-        path.touch()
-    actual = get_text(paths)
-    expected = f"{parent}\n\n{paths[0].stat().st_ino}\tfoo\n{paths[1].stat().st_ino}\tbar\n{paths[2].stat().st_ino}\tspam\n"
-    print(expected)
+    inodes = {path: i for (i, path) in enumerate(paths)}
+    actual = get_text(paths, get_inode=lambda path: inodes[path])
+    expected = f"{base}\n\n0\tfoo\n1\tbar\n2\tspam\n"
     assert actual == expected
-    rm_tree(base)
 
 
-def test_parse_temporary_file():
-    base = Path("test") / "temp"
-    rm_tree(base)
-    base.mkdir()
-    parent = Path.cwd() / "test" / "temp"
-    paths = [base / "foo", base / "bar", base / "spam"]
-    for path in paths:
-        path.touch()
-    population = {path.stat().st_ino: path for path in paths}
-    temp_file = Path(base) / "temp.txt"
-    temp_file.touch()
-    temp_file.write_text(f"{parent}\n\n{paths[0].stat().st_ino}\tfoo\n{paths[1].stat().st_ino}\tbar\n{paths[2].stat().st_ino}\tspam\n")
-    actual = parse_temporary_file(temp_file, population)
-    expected = [Clause(paths[0], "foo"), Clause(paths[1], "bar"), Clause(paths[2], "spam")]
+def test_parse_text(paths, inodes):
+    population = {i: path for (i, path) in enumerate(paths)}
+    text = get_text(paths, get_inode=lambda path: inodes[path])
+    actual = set(parse_text(text, population))
+    expected = set(map(lambda path: Clause(path, path.name), paths))
     assert actual == expected
-    rm_tree(base)
+
+
+def test_edit_paths(paths, inodes):
+    get_inode = lambda path: inodes[path]
+    suffix = "_edit"
+    new_paths = [*map(lambda path: path.with_name(path.name + suffix), paths)]
+    actual = set(
+        edit_paths(
+            paths,
+            get_inode=get_inode,
+            create_temporary_file=lambda _: get_text(paths, get_inode),
+            get_edition_handler=lambda text: "\n".join(map(lambda line: line + suffix, text.split("\n"))),
+            edit=lambda _: None,
+            handler=lambda _: None,
+        )
+    )
+    expected = set(map(lambda path: Clause(path, path.name + suffix), paths))
+    assert actual == expected
 
 
 if __name__ == "__main__":
