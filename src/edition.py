@@ -5,16 +5,27 @@ from tempfile import NamedTemporaryFile
 
 
 def get_editable_text(inode_paths):
+    if not inode_paths:
+        return ""
     result = []
     paths_and_inodes = sorted(
         ((path, inode) for (inode, path) in inode_paths.items()),
-        key=lambda x: (x[0].parent, x[0].name), # sorted by parent, then by name
+        key=lambda x: (x[0].parent, x[0].name),  # sorted by parent, then by name
     )
-    for (parent, children) in groupby(paths_and_inodes, key=lambda item: item[0].parent):
-        result.append(f"{parent}")
-        for (path, inode) in children:
+    # TODO for the name, use natural sort instead of lexicographic sort, and test thorougly
+    groups = [
+        (parent, list(children)) # converting to list prevents len(groups) to consume the generator
+        for (parent, children) in groupby(paths_and_inodes, key=lambda item: item[0].parent)
+    ]
+    if len(groups) > 1: 
+        for (parent, children) in groups:
+            result.append(f"{parent}")
+            for (path, inode) in children:
+                result.append(f"{inode}\t{path.name}")
+            result.append("")
+    else: # when all files to rename are siblings, it is useless to print their parent's path
+        for (path, inode) in groups[0][1]:
             result.append(f"{inode}\t{path.name}")
-        result.append("")
     return "\n".join(result)
 
 
