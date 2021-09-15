@@ -19,14 +19,13 @@ def get_editable_text(inode_paths):
     ]
     if len(groups) > 1: 
         for (parent, children) in groups:
-            result.append(f"{parent}")
+            result.append(f"\n{parent}\n") # empty line before each parent for maximal consistency
             for (path, inode) in children:
-                result.append(f"{inode}\t{path.name}")
-            result.append("")
+                result.append(f"{inode}\t{path.name}\n")
     else: # when all files to rename are siblings, it is useless to print their parent's path
         for (path, inode) in groups[0][1]:
-            result.append(f"{inode}\t{path.name}")
-    return "\n".join(result)
+            result.append(f"{inode}\t{path.name}\n")
+    return "".join(result)
 
 
 def get_editable_file_path(inode_paths):

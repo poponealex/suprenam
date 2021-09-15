@@ -5,7 +5,7 @@ from src.edition import *
 
 import pytest
 
-editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and paths are tab-separated.
+editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names are tab-separated.
     # Rename nothing -> empty result (TODO check if this case can occur or is filtered out before)
     (
         {},
@@ -29,7 +29,7 @@ editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and paths 
             2612647906	
         """,
     ),
-    # Rename a bunch of siblings -> their parent is not displayed
+    # Rename a bunch of siblings -> their (unique) parent is not displayed
     (
         {
             2612647906: Path("/usr/lib/gcc-lib"),
