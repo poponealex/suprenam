@@ -5,33 +5,48 @@ from src.edition import *
 
 import pytest
 
+editable_text_dataset = [
+    (
+        {
+            1421832123: Path("/usr/bin/X11"),
+        },
+        """
+            /usr/bin
+            1421832123	X11
+        """,  # NB: inodes and paths are tab-separated
+    ),
+    (
+        {
+            1421832123: Path("/usr/bin/X11"),
+            2612647906: Path("/usr/lib/gcc-lib"),
+            2784148792: Path("/usr/lib"),
+            3263123972: Path("/usr/lib/locale"),
+            482466386: Path("/usr/bin"),
+            549534358: Path("/usr/lib/X11"),
+            582956841: Path("/usr/lib/tls"),
+            981263235: Path("/usr/lib/games"),
+        },
+        """
+            /usr
+            482466386	bin
+            2784148792	lib
+    
+            /usr/bin
+            1421832123	X11
+    
+            /usr/lib
+            549534358	X11
+            981263235	games
+            2612647906	gcc-lib
+            3263123972	locale
+            582956841	tls
+        """,  # NB: inodes and paths are tab-separated
+    ),
+]
 
-def test_get_editable_text():
-    inode_paths = {
-        1421832123: Path("/usr/bin/X11"),
-        2612647906: Path("/usr/lib/gcc-lib"),
-        2784148792: Path("/usr/lib"),
-        3263123972: Path("/usr/lib/locale"),
-        482466386: Path("/usr/bin"),
-        549534358: Path("/usr/lib/X11"),
-        582956841: Path("/usr/lib/tls"),
-        981263235: Path("/usr/lib/games"),
-    }
-    expected = """
-        /usr
-        482466386	bin
-        2784148792	lib
 
-        /usr/bin
-        1421832123	X11
-
-        /usr/lib
-        549534358	X11
-        981263235	games
-        2612647906	gcc-lib
-        3263123972	locale
-        582956841	tls
-    """  # NB: inodes and paths are tab-separated
+@pytest.mark.parametrize("inode_paths, expected", editable_text_dataset)
+def test_get_editable_text(inode_paths, expected):
     expected = expected.strip().replace("    ", "").split("\n")
     result = get_editable_text(inode_paths).strip().split("\n")
     assert len(expected) == len(result)
