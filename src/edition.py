@@ -6,7 +6,6 @@ from tempfile import NamedTemporaryFile
 
 def get_editable_text(inode_paths):
     result = []
-    print(list(inode_paths.items()))
     paths_and_inodes = sorted(
         ((path, inode) for (inode, path) in inode_paths.items()),
         key=lambda x: (x[0].parent, x[0].name), # sorted by parent, then by name
