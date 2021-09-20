@@ -117,18 +117,6 @@ edited_text_dataset = [
         ],
     ),
     (
-        "Parse a file which is missing multiple inodes.",
-        {
-            123: Path("/home/foo"),
-            456: Path("/home/bar"),
-        },
-        """
-            	foobar
-            	club
-        """,
-        [],
-    ),
-    (
         "Parse a file which is missing a name.",
         {
             123: Path("/home/foo"),
@@ -141,18 +129,6 @@ edited_text_dataset = [
         [
             Clause(Path("/home/bar"), "club"),
         ],
-    ),
-    (
-        "Parse a file which is missing multiple names.",
-        {
-            123: Path("/home/foo"),
-            456: Path("/home/bar"),
-        },
-        """
-            123	
-            456	
-        """,
-        [],
     ),
     (
         "Parse a file which contains a name made of whitespaces.",
