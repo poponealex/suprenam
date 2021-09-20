@@ -6,13 +6,13 @@ from src.edition import *
 import pytest
 
 editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names are tab-separated.
-    # Rename nothing -> empty result (TODO check if this case can occur or is filtered out before)
     (
+        "Rename nothing -> empty result (TODO check if this case can occur or is filtered out before)",
         {},
         "",
     ),
-    # Rename empty path -> empty string (TODO check if this case can occur or is filtered out before)
     (
+        "Rename empty path -> empty string (TODO check if this case can occur or is filtered out before)",
         {
             2612647906: Path(),
         },
@@ -20,8 +20,8 @@ editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names 
             2612647906	
         """,
     ),
-    # Rename root -> empty string (TODO check if this case can occur or is filtered out before) (the system won't allow that anyway)
     (
+        "Rename root -> empty string (TODO check if this case can occur or is filtered out before)",
         {
             2612647906: Path("/"),
         },
@@ -29,8 +29,8 @@ editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names 
             2612647906	
         """,
     ),
-    # Rename a bunch of siblings -> their (unique) parent is not displayed
     (
+        "Rename a bunch of siblings -> their (unique) parent is not displayed",
         {
             2612647906: Path("/usr/lib/gcc-lib"),
             3263123972: Path("/usr/lib/locale"),
@@ -46,8 +46,8 @@ editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names 
             1582956841	tls
         """,
     ),
-    # Rename an arbitrary arborescence -> the siblings are grouped by parents, and sorted
     (
+        "Rename an arbitrary arborescence -> the siblings are grouped by parents, and sorted",
         {
             1421832123: Path("/usr/bin/X11"),
             2612647906: Path("/usr/lib/gcc-lib"),
@@ -77,8 +77,9 @@ editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names 
 ]
 
 
-@pytest.mark.parametrize("inode_paths, expected", editable_text_dataset)
-def test_get_editable_text(inode_paths, expected):
+@pytest.mark.parametrize("title, inode_paths, expected", editable_text_dataset)
+def test_get_editable_text(title, inode_paths, expected):
+    print(title)
     expected = expected.strip().replace("    ", "").split("\n")
     result = get_editable_text(inode_paths).strip().split("\n")
     assert len(expected) == len(result)
