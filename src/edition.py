@@ -1,10 +1,30 @@
+import re
 from pathlib import Path
 from typing import List
 from itertools import groupby
 from tempfile import NamedTemporaryFile
 
+from src.default_editor import get_editor_command_name
+from src.user_types import Clause
 
-def get_editable_text(inode_paths):
+
+def get_editable_text(inode_paths: dict) -> str:
+    """
+    Get the text to output to the user's interface.
+
+    Args:
+        inode_paths: dict of { inode : path }
+
+    Returns:
+        A string in the either formats:
+            1. If all files are siblings:
+                inode   file name
+                ...
+            2. Else:
+                /parent
+                inode   file name
+                ...
+    """
     if not inode_paths:
         return ""
     result = []
@@ -29,17 +49,53 @@ def get_editable_text(inode_paths):
 
 
 def get_editable_file_path(inode_paths):
+    """
+    Create a temporary file populated with the names of the files to rename.
+
+    Args:
+        inode_paths: dict of { inode : path }
+
+    Returns:
+        The temporary file's Path.
+    """
     path = Path(NamedTemporaryFile(mode="w+", delete=False, suffix=".txt"))
     path.write_text(get_editable_text(inode_paths))
     return path
 
 
 def run_editor(editable_file_path: Path) -> str:
-    pass
+    """
+    Open the editable text on the system's default text editor to allow the user to perform the renamings.
+
+    Args:
+        editable_file_path: Path to the temporary file populated with the editable text.
+    
+    Returns:
+        The text contained in editable_file_path when the user closes the editor's window.
+    """
+    editor = get_editor_command_name(platform().split("-")[0]) + [str(editable_file_path)]
+    subprocess.run(editor, check=True)
+    return editable_file_path.read_text()
 
 
-def parse_edited_text(text, inode_paths):
-    pass
+def parse_edited_text(text, inode_paths, find_all=re.compile(r"(\d+)\t(.+)").findall):
+    """
+    Parse the renamings' text.
+
+    Args:
+        text: the text with the effective renamings.
+        inode_paths: dict containing each path (value) with its inode (key).
+        find_all: regular expression to find all lines containing a renaming.
+
+    Returns:
+        A list of Clause (path, new_name).
+    """
+    result = []
+    for (inode, new_name) in find_all(text):
+        path = inode_paths.get(int(inode))
+        if path:
+            result += [Clause(path, new_name)]
+    return result
 
 
 def edit_paths(
@@ -48,6 +104,18 @@ def edit_paths(
     get_edition_handler=get_editable_file_path,  # enable testing with a pure function returning a text
     edit=run_editor,  # enable simulating the user's editions
 ):
+    """
+    Handle the user interface to edit paths, can be parameterized to work with a pure FileSystem.
+
+    Args:
+        paths: list of Paths to rename.
+        get_inode: function to get the inode.
+        get_edition_handler: function called to get the text to write to the temporary file.
+        edit: function called to run the editor.
+
+    Returns:
+        A list of Clause (path, new_name) with the effective renamings.
+    """
     inode_paths = {get_inode(path): path for path in paths}
     handler = get_edition_handler(inode_paths)
     text = edit(handler)
