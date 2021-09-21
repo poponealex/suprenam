@@ -78,7 +78,7 @@ def run_editor(editable_file_path: Path) -> str:
     return editable_file_path.read_text()
 
 
-def parse_edited_text(text, inode_paths, find_all=re.compile(r"(\d+)\t([^\t\n/]+)\s*").findall):
+def parse_edited_text(text, inode_paths, find_all=re.compile(r"(?m)^(\d+)\t([^\t\n/]+)$").findall):
     """
     Parse the renamings' text.
 
