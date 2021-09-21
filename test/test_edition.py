@@ -117,18 +117,6 @@ edited_text_dataset = [
         ],
     ),
     (
-        "Parse a file which is missing multiple inodes.",
-        {
-            123: Path("/home/foo"),
-            456: Path("/home/bar"),
-        },
-        """
-            	foobar
-            	club
-        """,
-        [],
-    ),
-    (
         "Parse a file which is missing a name.",
         {
             123: Path("/home/foo"),
@@ -141,18 +129,6 @@ edited_text_dataset = [
         [
             Clause(Path("/home/bar"), "club"),
         ],
-    ),
-    (
-        "Parse a file which is missing multiple names.",
-        {
-            123: Path("/home/foo"),
-            456: Path("/home/bar"),
-        },
-        """
-            123	
-            456	
-        """,
-        [],
     ),
     (
         "Parse a file which contains a name made of whitespaces.",
@@ -194,22 +170,6 @@ edited_text_dataset = [
         """,
         [
             Clause(Path("/home/foo"), "12345"),
-            Clause(Path("/home/bar"), "club"),
-        ],
-    ),
-    (
-        "Parse a file which contains too many inodes.",
-        {
-            123: Path("/home/foo"),
-            456: Path("/home/bar"),
-        },
-        """
-            123	foobar
-            456	club
-            789 spam
-        """,
-        [
-            Clause(Path("/home/foo"), "foobar"),
             Clause(Path("/home/bar"), "club"),
         ],
     ),
@@ -328,6 +288,7 @@ def test_parse_edited_text(title, inode_paths, text, expected):
 
 @pytest.mark.parametrize("title, inode_paths, text, expected", edited_text_dataset)
 def test_edit_paths(title, inode_paths, text, expected):
+    print(title)
     actual = edit_paths(
         paths=inode_paths.values(),
         get_inode=lambda x: {path: inode for (inode, path) in inode_paths.items()}[x],
