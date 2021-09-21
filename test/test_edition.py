@@ -131,7 +131,7 @@ edited_text_dataset = [
         ],
     ),
     (
-        "Parse a file which contains a name made of whitespaces.",
+        "Parse a file which contains a name made of multiple whitespaces.",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -141,6 +141,7 @@ edited_text_dataset = [
             456	club
         """,
         [
+            Clause(Path("/home/foo"), "    "),
             Clause(Path("/home/bar"), "club"),
         ],
     ),
@@ -152,6 +153,50 @@ edited_text_dataset = [
         },
         """
             123				foobar
+            456	club
+        """,
+        [
+            Clause(Path("/home/bar"), "club"),
+        ],
+    ),
+    (
+        "Parse a file which contains a name ending with a space.",
+        {
+            123: Path("/home/foo"),
+            456: Path("/home/bar"),
+        },
+        """
+            123	foobar 
+            456	club
+        """,
+        [
+            Clause(Path("/home/foo"), "foobar "),
+            Clause(Path("/home/bar"), "club"),
+        ],
+    ),
+    (
+        "Parse a file which contains a name starting with a space.",
+        {
+            123: Path("/home/foo"),
+            456: Path("/home/bar"),
+        },
+        """
+            123	 foobar
+            456	club
+        """,
+        [
+            Clause(Path("/home/foo"), " foobar"),
+            Clause(Path("/home/bar"), "club"),
+        ],
+    ),
+    (
+        "Parse a file which contains a line starting with a space.",
+        {
+            123: Path("/home/foo"),
+            456: Path("/home/bar"),
+        },
+        """
+             123	 foobar
             456	club
         """,
         [
@@ -203,18 +248,20 @@ edited_text_dataset = [
         ],
     ),
     (
-        "Parse a file which only contains different inodes from the original ones (symmetric difference).",
+        "Parse a file which contains only one modification (symmetric difference).",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
             789: Path("/home/spam"),
         },
         """
-            1234	foobar
-            4567	club
-            7890	spam
+            123	foo
+            456	club
+            789	spam
         """,
-        [],
+        [
+            Clause(Path("/home/bar"), "club"),
+        ],
     ),
     (
         "Parse a file which doesn't contain any modification.",
@@ -277,11 +324,12 @@ edited_text_dataset = [
     ),
 ]
 
+split_startwith_tabs = re.compile(r"(?m)^([ ]{4})*(.*)$").findall
 
 @pytest.mark.parametrize("title, inode_paths, text, expected", edited_text_dataset)
 def test_parse_edited_text(title, inode_paths, text, expected):
     print(title)
-    text = "\n".join(line.strip() for line in text.split("\n"))
+    text = "\n".join(line for (_, line) in split_startwith_tabs(text))
     actual = parse_edited_text(text, inode_paths)
     assert actual == expected
 
@@ -293,7 +341,7 @@ def test_edit_paths(title, inode_paths, text, expected):
         paths=inode_paths.values(),
         get_inode=lambda x: {path: inode for (inode, path) in inode_paths.items()}[x],
         get_edition_handler=lambda _: None,
-        edit=lambda _: "\n".join(line.strip() for line in text.split("\n")),
+        edit=lambda _: "\n".join(line for (_, line) in split_startwith_tabs(text)),
     )
     assert actual == expected
 
