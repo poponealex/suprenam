@@ -1,4 +1,5 @@
 from pathlib import Path
+from pathvalidate import ValidationError
 
 import context
 from src.edition import *
@@ -117,64 +118,6 @@ edited_text_dataset = [
         ],
     ),
     (
-        "Parse a file which is missing a name.",
-        {
-            123: Path("/home/foo"),
-            456: Path("/home/bar"),
-        },
-        """
-            123	
-            456	club
-        """,
-        [
-            Clause(Path("/home/bar"), "club"),
-        ],
-    ),
-    (
-        "Parse a file which contains a name made of multiple whitespaces.",
-        {
-            123: Path("/home/foo"),
-            456: Path("/home/bar"),
-        },
-        """
-            123	    
-            456	club
-        """,
-        [
-            Clause(Path("/home/foo"), "    "),
-            Clause(Path("/home/bar"), "club"),
-        ],
-    ),
-    (
-        "Parse a file which contains a line with multiple tabs.",
-        {
-            123: Path("/home/foo"),
-            456: Path("/home/bar"),
-        },
-        """
-            123				foobar
-            456	club
-        """,
-        [
-            Clause(Path("/home/bar"), "club"),
-        ],
-    ),
-    (
-        "Parse a file which contains a name ending with a space.",
-        {
-            123: Path("/home/foo"),
-            456: Path("/home/bar"),
-        },
-        """
-            123	foobar 
-            456	club
-        """,
-        [
-            Clause(Path("/home/foo"), "foobar "),
-            Clause(Path("/home/bar"), "club"),
-        ],
-    ),
-    (
         "Parse a file which contains a name starting with a space.",
         {
             123: Path("/home/foo"),
@@ -190,13 +133,13 @@ edited_text_dataset = [
         ],
     ),
     (
-        "Parse a file which contains a line starting with a space.",
+        "Parse a file which contains an inode preceeded by a whitespace.",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
         },
         """
-             123	 foobar
+             123	foobar
             456	club
         """,
         [
@@ -248,7 +191,7 @@ edited_text_dataset = [
         ],
     ),
     (
-        "Parse a file which contains only one modification (symmetric difference).",
+        "Parse a file which contains only one modification.",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -324,7 +267,58 @@ edited_text_dataset = [
     ),
 ]
 
+
+edited_text_errors_dataset = [
+    (
+        "Parse a file which is missing a name.",
+        {
+            123: Path("/home/foo"),
+        },
+        """
+            123	
+        """,
+    ),
+    (
+        "Parse a file which contains an illegal '/' character.",
+        {
+            123: Path("/home/foo"),
+        },
+        """
+            123	foo/bar
+        """,
+    ),
+    (
+        "Parse a file which contains a non-existent inode.",
+        {
+            123: Path("/home/foo"),
+        },
+        """
+            222	foobar
+        """,
+    ),
+    (
+        "Parse a file which contains a name which is made of tabs.",
+        {
+            123: Path("/home/foo"),
+        },
+        """
+            123				
+        """,
+    ),
+    (
+        "Parse a file which contains multiple tabs in between the inode and the new name.",
+        {
+            123: Path("/home/foo"),
+        },
+        """
+            123				foobar
+        """,
+    ),
+]
+
+
 split_startwith_tabs = re.compile(r"(?m)^([ ]{4})*(.*)$").findall
+
 
 @pytest.mark.parametrize("title, inode_paths, text, expected", edited_text_dataset)
 def test_parse_edited_text(title, inode_paths, text, expected):
@@ -344,6 +338,14 @@ def test_edit_paths(title, inode_paths, text, expected):
         edit=lambda _: "\n".join(line for (_, line) in split_startwith_tabs(text)),
     )
     assert actual == expected
+
+
+@pytest.mark.parametrize("title, inode_paths, text", edited_text_errors_dataset)
+def test_parse_edited_text_errors(title, inode_paths, text):
+    print(title)
+    text = "\n".join(line for (_, line) in split_startwith_tabs(text))
+    with pytest.raises((ValidationError, InodeError, TabError)):
+        parse_edited_text(text, inode_paths)
 
 
 if __name__ == "__main__":
