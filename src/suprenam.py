@@ -1,12 +1,8 @@
-import re
-import subprocess, sys
+import sys
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from itertools import groupby
 from pathlib import Path
-from platform import platform
-from tempfile import NamedTemporaryFile
-from typing import List
 
+from src.edition import edit_paths
 from src.file_system import FileSystem
 from src.goodies import *
 from src.renamings import perform_renamings, undo_renamings, set_logger
