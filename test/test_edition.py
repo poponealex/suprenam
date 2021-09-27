@@ -5,6 +5,7 @@ import context
 from src.edition import *
 
 import pytest
+import re
 
 editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names are tab-separated.
     (
