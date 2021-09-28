@@ -92,6 +92,8 @@ def test_get_editable_text(title, inode_paths, expected):
 edited_text_dataset = [
     (
         "Parse a file which doesn't end with a newline.",
+        ["universal"],
+        "valid",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -106,6 +108,8 @@ edited_text_dataset = [
     ),
     (
         "Parse a file which is missing an inode.",
+        ["universal"],
+        "valid",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -120,6 +124,8 @@ edited_text_dataset = [
     ),
     (
         "Parse a file which contains a name starting with a space.",
+        ["universal"],
+        "valid",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -134,7 +140,43 @@ edited_text_dataset = [
         ],
     ),
     (
+        "Parse a file which contains a name made of multiple whitespaces.",
+        ["macOS", "Linux"],
+        "valid",
+        {
+            123: Path("/home/foo"),
+            456: Path("/home/bar"),
+        },
+        """
+            123	    
+            456	club
+        """,
+        [
+            Clause(Path("/home/foo"), "    "),
+            Clause(Path("/home/bar"), "club"),
+        ],
+    ),
+    (
+        "Parse a file which contains a name ending with a space.",
+        ["macOS", "Linux"],
+        "valid",
+        {
+            123: Path("/home/foo"),
+            456: Path("/home/bar"),
+        },
+        """
+            123	foobar 
+            456	club
+        """,
+        [
+            Clause(Path("/home/foo"), "foobar "),
+            Clause(Path("/home/bar"), "club"),
+        ],
+    ),
+    (
         "Parse a file which contains an inode preceeded by a whitespace.",
+        ["universal"],
+        "valid",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -148,7 +190,41 @@ edited_text_dataset = [
         ],
     ),
     (
+        "Parse a file which contains a name containing a '\\' character on macOS/Linux.",
+        ["macOS", "Linux"],
+        "valid",
+        {
+            123: Path("/home/foo"),
+            456: Path("/home/bar"),
+        },
+        """
+            123	foo\\bar
+            456	club
+        """,
+        [
+            Clause(Path("/home/foo"), "foo\\bar"),
+            Clause(Path("/home/bar"), "club"),
+        ],
+    ),
+    (
+        "Parse a file which contains a name containing a '\\' character on Windows.",
+        ["Windows"],
+        "invalid",
+        {
+            123: Path("/home/foo"),
+            456: Path("/home/bar"),
+        },
+        """
+            123	foo\\bar
+            456	club
+        """,
+        [
+        ],
+    ),
+    (
         "Parse a file which contains a name that is only digits.",
+        ["universal"],
+        "valid",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -164,6 +240,8 @@ edited_text_dataset = [
     ),
     (
         "Parse a file which contains too many inodes (superset).",
+        ["universal"],
+        "valid",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -180,6 +258,8 @@ edited_text_dataset = [
     ),
     (
         "Parse a file which doesn't contain all the inodes (subset).",
+        ["universal"],
+        "valid",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -193,6 +273,8 @@ edited_text_dataset = [
     ),
     (
         "Parse a file which contains only one modification.",
+        ["universal"],
+        "valid",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -209,6 +291,8 @@ edited_text_dataset = [
     ),
     (
         "Parse a file which doesn't contain any modification.",
+        ["universal"],
+        "valid",
         {123: Path("/home/foo"), 456: Path("/home/bar")},
         """
             123	foo
@@ -218,6 +302,8 @@ edited_text_dataset = [
     ),
     (
         "Parse a file which is empty.",
+        ["universal"],
+        "valid",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -227,6 +313,8 @@ edited_text_dataset = [
     ),
     (
         "Parse a file which doesn't contain any errors.",
+        ["universal"],
+        "valid",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -242,6 +330,8 @@ edited_text_dataset = [
     ),
     (
         "Parse a file which contains paths with different parents.",
+        ["universal"],
+        "valid",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -266,54 +356,70 @@ edited_text_dataset = [
             Clause(Path("/hello/world"), "moon"),
         ],
     ),
-]
-
-
-edited_text_errors_dataset = [
     (
         "Parse a file which is missing a name.",
+        ["universal"],
+        "invalid",
         {
             123: Path("/home/foo"),
         },
         """
             123	
         """,
+        [
+        ],
     ),
     (
         "Parse a file which contains an illegal '/' character.",
+        ["universal"],
+        "invalid",
         {
             123: Path("/home/foo"),
         },
         """
             123	foo/bar
         """,
+        [
+        ],
     ),
     (
         "Parse a file which contains a non-existent inode.",
+        ["universal"],
+        "invalid",
         {
             123: Path("/home/foo"),
         },
         """
             222	foobar
         """,
+        [
+        ],
     ),
     (
         "Parse a file which contains a name which is made of tabs.",
+        ["universal"],
+        "invalid",
         {
             123: Path("/home/foo"),
         },
         """
             123				
         """,
+        [
+        ],
     ),
     (
         "Parse a file which contains multiple tabs in between the inode and the new name.",
+        ["universal"],
+        "invalid",
         {
             123: Path("/home/foo"),
         },
         """
             123				foobar
         """,
+        [
+        ],
     ),
 ]
 
@@ -321,32 +427,33 @@ edited_text_errors_dataset = [
 split_startwith_tabs = re.compile(r"(?m)^([ ]{4})*(.*)$").findall
 
 
-@pytest.mark.parametrize("title, inode_paths, text, expected", edited_text_dataset)
-def test_parse_edited_text(title, inode_paths, text, expected):
+@pytest.mark.parametrize("title, platform, is_valid, inode_paths, text, expected", edited_text_dataset)
+def test_parse_edited_text(title, platform, is_valid, inode_paths, text, expected):
     print(title)
     text = "\n".join(line for (_, line) in split_startwith_tabs(text))
-    actual = parse_edited_text(text, inode_paths)
-    assert actual == expected
+    actual = lambda: parse_edited_text(text, inode_paths, platform=platform[0])
+    if is_valid == "invalid":
+        with pytest.raises((ValidationError, UnknownInodeError, TabError)):
+            actual()
+    else:
+        assert actual() == expected
 
 
-@pytest.mark.parametrize("title, inode_paths, text, expected", edited_text_dataset)
-def test_edit_paths(title, inode_paths, text, expected):
-    print(title)
-    actual = edit_paths(
+@pytest.mark.parametrize("title, platform, is_valid, inode_paths, text, expected", edited_text_dataset)
+def test_edit_paths(title, platform, is_valid, inode_paths, text, expected):
+    print(title, platform)
+    actual = lambda: edit_paths(
         paths=inode_paths.values(),
         get_inode=lambda x: {path: inode for (inode, path) in inode_paths.items()}[x],
         get_edition_handler=lambda _: None,
         edit=lambda _: "\n".join(line for (_, line) in split_startwith_tabs(text)),
+        platform=platform[0],
     )
-    assert actual == expected
-
-
-@pytest.mark.parametrize("title, inode_paths, text", edited_text_errors_dataset)
-def test_parse_edited_text_errors(title, inode_paths, text):
-    print(title)
-    text = "\n".join(line for (_, line) in split_startwith_tabs(text))
-    with pytest.raises((ValidationError, UnknownInodeError, TabError)):
-        parse_edited_text(text, inode_paths)
+    if is_valid == "invalid":
+        with pytest.raises((ValidationError, UnknownInodeError, TabError)):
+            actual()
+    else:
+        assert actual() == expected
 
 
 if __name__ == "__main__":
