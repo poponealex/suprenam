@@ -82,8 +82,8 @@ def run_editor(editable_file_path: Path) -> str:
 
 def parse_edited_text(
     text: str,
-    inode_paths,
-    platform: str = platform().split("-")[0],
+    inode_paths: dict,
+    platform: str,
 ) -> List[Clause]:
     """
     Parse the renamings' text.
@@ -91,7 +91,7 @@ def parse_edited_text(
     Args:
         text: the text with the effective renamings.
         inode_paths: dict containing each path (value) with its inode (key).
-        find_all: regular expression to find all lines containing a renaming.
+        platform: OS on which the renamings will be performed.
 
     Raises:
         UnknownInodeError: the edited text contains an inode absent from the source text.
@@ -126,6 +126,7 @@ def edit_paths(
     get_inode=lambda path: path.stat().st_ino,  # enable testing with a fake (pure) inode getter
     get_edition_handler=get_editable_file_path,  # enable testing with a pure function returning a text
     edit=run_editor,  # enable simulating the user's editions
+    platform: str = "auto", # enable testing on different platforms
 ):
     """
     Handle the user interface to edit paths, can be parameterized to work with a pure FileSystem.
@@ -135,6 +136,7 @@ def edit_paths(
         get_inode: function to get the inode.
         get_edition_handler: function called to get the text to write to the temporary file.
         edit: function called to run the editor.
+        platform: OS on which the renamings will be performed.
 
     Returns:
         A list of Clause (path, new_name) with the effective renamings.
@@ -142,7 +144,7 @@ def edit_paths(
     inode_paths = {get_inode(path): path for path in paths}
     handler = get_edition_handler(inode_paths)
     text = edit(handler)
-    clauses = parse_edited_text(text, inode_paths)
+    clauses = parse_edited_text(text, inode_paths, platform=platform)
     return clauses
 
 
