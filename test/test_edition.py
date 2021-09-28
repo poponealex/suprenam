@@ -345,7 +345,7 @@ def test_edit_paths(title, inode_paths, text, expected):
 def test_parse_edited_text_errors(title, inode_paths, text):
     print(title)
     text = "\n".join(line for (_, line) in split_startwith_tabs(text))
-    with pytest.raises((ValidationError, InodeError, TabError)):
+    with pytest.raises((ValidationError, UnknownInodeError, TabError)):
         parse_edited_text(text, inode_paths)
 
 

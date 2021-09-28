@@ -80,7 +80,11 @@ def run_editor(editable_file_path: Path) -> str:
     return editable_file_path.read_text()
 
 
-def parse_edited_text(text: str, inode_paths, platform: str = platform().split("-")[0]) -> List[Clause]:
+def parse_edited_text(
+    text: str,
+    inode_paths,
+    platform: str = platform().split("-")[0],
+) -> List[Clause]:
     """
     Parse the renamings' text.
 
@@ -88,6 +92,13 @@ def parse_edited_text(text: str, inode_paths, platform: str = platform().split("
         text: the text with the effective renamings.
         inode_paths: dict containing each path (value) with its inode (key).
         find_all: regular expression to find all lines containing a renaming.
+
+    Raises:
+        UnknownInodeError: the edited text contains an inode absent from the source text.
+        TabError: a new name contains a tabulation. Although such a character is valid on most
+            platforms, in the edited text it probably results from a typo.
+        pathvalidate.ValidationError: a new name includes invalid character(s) for a filename
+            (depends on the target platform).
 
     Returns:
         A list of Clause (path, new_name).
@@ -98,14 +109,15 @@ def parse_edited_text(text: str, inode_paths, platform: str = platform().split("
         if not inode.isdigit():
             continue
         path = inode_paths.get(int(inode))
-        if not path:
-            raise InodeError(f"This inode is invalid: '{inode}'.")
+        if path is None:
+            raise UnknownInodeError(f"Unknown inode {inode}.")
         new_name = tail[0]
         if "\t" in new_name:
-            raise TabError(f"Illegal \\t character in the new name: '{new_name}'.")
-        if Path(path).name != new_name:
-            validate_filename(new_name, platform=platform)
-            result += [Clause(path, new_name)]
+            raise TabError(f"Illegal tabulation in the new name: {repr(new_name)}.")
+        if path.name == new_name:
+            continue
+        validate_filename(new_name, platform=platform)
+        result.append(Clause(path, new_name))
     return result
 
 
@@ -134,7 +146,7 @@ def edit_paths(
     return clauses
 
 
-class InodeError(ValueError):
+class UnknownInodeError(ValueError):
     ...
 
 
