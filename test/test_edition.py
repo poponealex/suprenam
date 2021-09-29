@@ -157,23 +157,6 @@ edited_text_dataset = [
         ],
     ),
     (
-        "Parse a file which contains a name ending with a space.",
-        ["macOS", "Linux"],
-        "valid",
-        {
-            123: Path("/home/foo"),
-            456: Path("/home/bar"),
-        },
-        """
-            123	foobar 
-            456	club
-        """,
-        [
-            Clause(Path("/home/foo"), "foobar "),
-            Clause(Path("/home/bar"), "club"),
-        ],
-    ),
-    (
         "Parse a file which contains an inode preceeded by a whitespace.",
         ["universal"],
         "valid",
@@ -218,8 +201,7 @@ edited_text_dataset = [
             123	foo\\bar
             456	club
         """,
-        [
-        ],
+        [],
     ),
     (
         "Parse a file which contains a name that is only digits.",
@@ -312,23 +294,6 @@ edited_text_dataset = [
         [],
     ),
     (
-        "Parse a file which doesn't contain any errors.",
-        ["universal"],
-        "valid",
-        {
-            123: Path("/home/foo"),
-            456: Path("/home/bar"),
-        },
-        """
-            123	foobar
-            456	club
-        """,
-        [
-            Clause(Path("/home/foo"), "foobar"),
-            Clause(Path("/home/bar"), "club"),
-        ],
-    ),
-    (
         "Parse a file which contains paths with different parents.",
         ["universal"],
         "valid",
@@ -366,8 +331,7 @@ edited_text_dataset = [
         """
             123	
         """,
-        [
-        ],
+        [],
     ),
     (
         "Parse a file which contains an illegal '/' character.",
@@ -379,8 +343,7 @@ edited_text_dataset = [
         """
             123	foo/bar
         """,
-        [
-        ],
+        [],
     ),
     (
         "Parse a file which contains a non-existent inode.",
@@ -392,21 +355,7 @@ edited_text_dataset = [
         """
             222	foobar
         """,
-        [
-        ],
-    ),
-    (
-        "Parse a file which contains a name which is made of tabs.",
-        ["universal"],
-        "invalid",
-        {
-            123: Path("/home/foo"),
-        },
-        """
-            123				
-        """,
-        [
-        ],
+        [],
     ),
     (
         "Parse a file which contains multiple tabs in between the inode and the new name.",
@@ -418,8 +367,7 @@ edited_text_dataset = [
         """
             123				foobar
         """,
-        [
-        ],
+        [],
     ),
 ]
 
