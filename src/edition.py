@@ -66,7 +66,7 @@ def get_editable_file_path(inode_paths: dict) -> Path:
     Returns:
         The temporary file's Path.
     """
-    path = Path(NamedTemporaryFile(mode="w+", delete=False, suffix=".txt"))
+    path = Path(NamedTemporaryFile(mode="w+", delete=False, suffix=".txt").name)
     path.write_text(get_editable_text(inode_paths))
     return path
 
