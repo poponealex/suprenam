@@ -1,4 +1,5 @@
 import sys
+sys.path[0:0] = ["."]
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pathlib import Path
 
@@ -42,7 +43,7 @@ def cli_arguments():
     """
     parser = ArgumentParser(
         formatter_class=RawDescriptionHelpFormatter,
-        usage=f"\n{WARNING}suprenam.py [-p paths] [-f file] [-h help]{RESET}",
+        usage=f"\n{WARNING}{Path(__file__).name} [-p paths] [-f file] [-h help]{RESET}",
         description=f"{OK}\nFILE RENAMER{RESET}",
     )
 
@@ -65,7 +66,7 @@ def cli_arguments():
         "-u",
         "--undo",
         help=f"{OK}Undo completed renamings from the previous session.{RESET}",
-        action="store",
+        action="store_true",
     )
 
     return parser.parse_args()
