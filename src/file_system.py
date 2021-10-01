@@ -1,14 +1,16 @@
 from base64 import b32encode
 from itertools import count
 from pathlib import Path
+from pathvalidate import validate_filename
 from typing import Generator, Iterable, Set
 
 
 class FileSystem(set):
-
-    def __init__(self, paths: Iterable[Path]):
+    def __init__(self, paths: Iterable[Path], platform: str = "auto"):
         super().__init__(paths)
         if paths:  # when some initial paths are provided, the file system is considered as pure
+            for path in self:
+                validate_filename(path.name, platform=platform) # validate each filename when working with a pure FileSystem
             self.path_exists = lambda path: path in self
             self.siblings = lambda path: self.children(path.parent)
         else:  # otherwise, the file system is considered as concrete
@@ -29,7 +31,7 @@ class FileSystem(set):
             if not self.path_exists(source_path):
                 raise FileNotFoundError(source_path)
             result.update(self.siblings(source_path))
-        self.update(result) # should not change a pure file system
+        self.update(result)  # should not change a pure file system
 
     def children(self, path: Path) -> Generator[Path, None, None]:
         for candidate in self:
@@ -38,13 +40,13 @@ class FileSystem(set):
 
     def non_existing_sibling(self, path: Path) -> Path:
         """Create the path of a non-existing sibling of a given path.
-        
+
         Args:
             path (Path): a source path which is the target of another renaming.
 
         Returns:
             Path: the path to be temporarily used for an intermediate renaming.
-        
+
         Notes:
             - A previous version relied on `Path.with_stem`, which requires Python 3.9. In the
             present version, the non existing sibling does not conserve the extension of the
@@ -58,10 +60,10 @@ class FileSystem(set):
             if new_path not in self:
                 break
         return new_path
-    
+
     def rename(self, path, new_path):
         """Rename a path into a new path, and renames recursively its descendants.
-        
+
         The following preconditions are normally satisfied:
 
         1. `path` and `new_path` are siblings,
@@ -71,7 +73,7 @@ class FileSystem(set):
         Results:
             - `path` is replaced by `new_path` in the file system.
             - Any descendant of `path` is replaced by the appropriate `path`.
-        
+
         Notes:
             - The renaming is virtual only. The ultimate goal is to produce a sequence of "safe"
                 clauses for an ulterior actual renaming. Nevertheless, all the consequences of a
