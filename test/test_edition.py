@@ -9,26 +9,49 @@ import re
 
 editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names are tab-separated.
     (
-        "Rename nothing -> empty result (TODO check if this case can occur or is filtered out before)",
+        "Rename nothing -> empty result",
         {},
         "",
     ),
     (
-        "Rename empty path -> empty string (TODO check if this case can occur or is filtered out before)",
+        "Rename empty path -> empty string",
         {
             2612647906: Path(),
         },
-        """
-            2612647906	
-        """,
+        "",
     ),
     (
-        "Rename root -> empty string (TODO check if this case can occur or is filtered out before)",
+        "Rename root -> empty string",
         {
             2612647906: Path("/"),
         },
+        "",
+    ),
+    (
+        "Rename a path containing two consecutive '/'",
+        {
+            2612647906: Path("/foobar//"),
+        },
         """
-            2612647906	
+        2612647906	foobar
+        """,
+    ),
+    (
+        "Rename a relative path in the current working directory.",
+        {
+            2612647906: Path("foobar"),
+        },
+        """
+        2612647906	foobar
+        """,
+    ),
+    (
+        "Rename a path ending with a '/'.",
+        {
+            2612647906: Path("foobar/"),
+        },
+        """
+        2612647906	foobar
         """,
     ),
     (
@@ -41,11 +64,11 @@ editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names 
             1981263235: Path("/usr/lib/games"),
         },
         """
-            1549534358	X11
             1981263235	games
             2612647906	gcc-lib
             3263123972	locale
             1582956841	tls
+            1549534358	X11
         """,
     ),
     (
@@ -69,11 +92,30 @@ editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names 
             1421832123	X11
     
             /usr/lib
-            1549534358	X11
             1981263235	games
             2612647906	gcc-lib
             3263123972	locale
             1582956841	tls
+            1549534358	X11
+        """,
+    ),
+    (
+        "Rename a bunch of siblings provided in a reversed natural order -> names sorted in natural order",
+        {
+            1549534358: Path("/usr/lib/X11"),
+            1582956841: Path("/usr/lib/tls"),
+            3263123972: Path("/usr/lib/locale"),
+            2612647906: Path("/usr/lib/gcc-lib"),
+            1981263235: Path("/usr/lib/games"),
+            1981263299: Path("/usr/lib/almonds"),
+        },
+        """
+            1981263299	almonds
+            1981263235	games
+            2612647906	gcc-lib
+            3263123972	locale
+            1582956841	tls
+            1549534358	X11
         """,
     ),
 ]
