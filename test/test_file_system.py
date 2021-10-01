@@ -4,6 +4,7 @@ from pathlib import Path
 
 import context
 from src.file_system import FileSystem
+from pathvalidate import ValidationError
 
 
 @pytest.fixture(scope="module")
@@ -20,6 +21,14 @@ def test_constructor(fs):
     assert Path("/usr/local") in fs
 
 
+def test_invalid_pure_filenames():
+    macOS_linux = [Path("/foo/bar\0")]
+    windows = [Path("/foo/bar?")]
+    with pytest.raises(ValidationError):
+        FileSystem(macOS_linux, platform="linux")
+        FileSystem(windows, platform="windows")
+
+
 def test_update_with_source_paths_concrete():
     fs = FileSystem([])
     paths = [
@@ -27,10 +36,10 @@ def test_update_with_source_paths_concrete():
         Path("."),
     ]
     fs.update_with_source_paths(paths)
-    assert Path("./src/file_system.py") in fs # sibling of `goodies.py`
-    assert Path("./test") in fs # sibling of `.`
-    assert Path("./LICENSE") in fs # sibling of `.`
-    assert Path("./test/test_file_system.py") not in fs # child of a sibling of `.`
+    assert Path("./src/file_system.py") in fs  # sibling of `goodies.py`
+    assert Path("./test") in fs  # sibling of `.`
+    assert Path("./LICENSE") in fs  # sibling of `.`
+    assert Path("./test/test_file_system.py") not in fs  # child of a sibling of `.`
 
 
 def test_update_with_source_paths_not_existing(fs):
