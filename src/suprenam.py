@@ -17,17 +17,20 @@ def main():
     args = cli_arguments()
     paths = []
     if args.undo:
-        return undo_renamings(LOG_DIR / LOG_NAME)
+        undo_renamings(LOG_DIR / LOG_NAME)
+        return print_success("Renamings from the previous sessions were undone succefully.")
     if args.paths:
-        paths += [*map(lambda x: Path(x), args.paths)]
+        paths += [*map(Path, args.paths)]
     if args.file:
         paths += [Path(path) for path in Path(args.file).read_text().split("\n") if path]
     if not paths:
-        return print_warning("No paths were provided.")
+        return print_exit("No paths were provided.")
     create_log()
     file_system = FileSystem([])
-    renamings = secure_clauses(file_system, edit_paths(paths))
-    return perform_renamings(renamings)
+    clauses = edit_paths(paths)
+    renamings = secure_clauses(file_system, clauses)
+    perform_renamings(renamings)
+    return print_success("Renamings were performed successfully.")
 
 
 def cli_arguments():
