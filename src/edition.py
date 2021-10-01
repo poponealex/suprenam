@@ -5,6 +5,7 @@ from platform import platform
 from itertools import groupby
 from tempfile import NamedTemporaryFile
 from typing import List
+from natsort import os_sorted
 
 from src.default_editor import get_editor_command_name
 from src.user_types import Clause
@@ -31,14 +32,19 @@ def get_editable_text(inode_paths: dict) -> str:
         return ""
     result = []
     paths_and_inodes = sorted(
-        ((path, inode) for (inode, path) in inode_paths.items()),
+        # checking path's name existence to silence an error that would be raised by os_sorted in the unlikely case a blank path or root being provided
+        ((path, inode) for (inode, path) in inode_paths.items() if path.name),
         key=lambda x: (x[0].parent, x[0].name),  # sorted by parent, then by name
     )
-    # TODO for the name, use natural sort instead of lexicographic sort, and test thorougly
     groups = [
-        (parent, list(children))  # converting to list prevents len(groups) to consume the generator
+        (
+            parent,
+            os_sorted(list(children), key=lambda x: x[0]),
+        )  # converting to list prevents len(groups) to consume the generator
         for (parent, children) in groupby(paths_and_inodes, key=lambda item: item[0].parent)
     ]
+    if not len(groups):
+        return ""
     if len(groups) > 1:
         for (parent, children) in groups:
             result.append(f"\n{parent}\n")  # empty line before each parent for maximal consistency
@@ -126,7 +132,7 @@ def edit_paths(
     get_inode=lambda path: path.stat().st_ino,  # enable testing with a fake (pure) inode getter
     get_edition_handler=get_editable_file_path,  # enable testing with a pure function returning a text
     edit=run_editor,  # enable simulating the user's editions
-    platform: str = "auto", # enable testing on different platforms
+    platform: str = "auto",  # enable testing on different platforms
 ):
     """
     Handle the user interface to edit paths, can be parameterized to work with a pure FileSystem.
