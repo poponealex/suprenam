@@ -1,6 +1,5 @@
 import re
 import subprocess
-from pathlib import Path
 
 from src.goodies import print_warning
 
@@ -15,12 +14,12 @@ OS = {
         ],
         "REGEX": r'(?ms)\s*\{\s*LSHandlerContentType = "public\.plain-text";\s*LSHandlerPreferredVersions =\s*\{\s*LSHandlerRoleAll = "-";\s*\};\s*LSHandlerRoleAll = "([\w.]+)";',
         "DEFAULT_COMMAND": [
-            "/usr/bin/open",
+            "open",
             "-neW",
         ],
         "EDITOR_COMMAND": {
-            "com.microsoft.vscode": ["/usr/local/bin/code", "-w"],
-            "com.sublimetext.3": ["/usr/local/bin/subl", "-w"],
+            "com.microsoft.vscode": ["code", "-w"],
+            "com.sublimetext.3": ["subl", "-w"],
         },  # TODO: add different versions of Sublime Text
     },
     "Linux": {
@@ -31,16 +30,16 @@ OS = {
             "text/plain",
         ],
         "REGEX": r"^(.*)\.desktop$",
-        "DEFAULT_COMMAND": ["/bin/open", "-w"],
+        "DEFAULT_COMMAND": ["open", "-w"],
         "EDITOR_COMMAND": {
-            "code": ["/usr/bin/code", "-w"],
-            "sublime_text": ["/usr/bin/subl", "-w"],
+            "code": ["code", "-w"],
+            "sublime_text": ["subl", "-w"],
         },
     },
 }
 
 
-def get_editor_command(os_name: str = "") -> str:
+def get_editor_command_name(os_name: str = "") -> str:
     """
     Retrieve the system's default text editor.
 
@@ -55,7 +54,7 @@ def get_editor_command(os_name: str = "") -> str:
     Raises:
         UnsupportedOS Error if the os is not supported.
     """
-    os = OS.get(os_name)
+    os = OS.get(os_name, None)
     if not os:
         raise UnsupportedOS("OS not yet supported.")
     parse_output = re.compile(os["REGEX"]).findall
@@ -70,8 +69,6 @@ def get_editor_command(os_name: str = "") -> str:
             ).stdout
         )
         if result:
-            if not Path(os["EDITOR_COMMAND"][result[0]][0]).exists():
-                raise BinaryNotFound(f"Please add a symbolic link for {result[0]} to {os['EDITOR_COMMAND'][result[0]][0]}")
             return os["EDITOR_COMMAND"][result[0]]
     except (subprocess.CalledProcessError, KeyError) as e:
         print_warning(e)
@@ -79,8 +76,4 @@ def get_editor_command(os_name: str = "") -> str:
 
 
 class UnsupportedOS(Exception):
-    ...
-
-
-class BinaryNotFound(Exception):
     ...
