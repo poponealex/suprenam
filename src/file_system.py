@@ -10,7 +10,9 @@ class FileSystem(set):
         super().__init__(paths)
         if paths:  # when some initial paths are provided, the file system is considered as pure
             for path in self:
-                validate_filename(path.name, platform=platform) # validate each filename when working with a pure FileSystem
+                validate_filename(
+                    path.name, platform=platform
+                )  # validate each filename when working with a pure FileSystem
             self.path_exists = lambda path: path in self
             self.siblings = lambda path: self.children(path.parent)
         else:  # otherwise, the file system is considered as concrete

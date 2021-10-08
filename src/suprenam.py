@@ -1,5 +1,7 @@
 import sys
+
 sys.path[0:0] = ["."]
+
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pathlib import Path
 
@@ -51,7 +53,7 @@ def cli_arguments():
         "-p",
         "--paths",
         nargs="+",
-        help=f"{OK}The paths you want to rename.{RESET}",
+        help=f"{OK}The paths to rename.{RESET}",
         action="store",
     )
 

@@ -5,10 +5,10 @@ from platform import platform
 from itertools import groupby
 from tempfile import NamedTemporaryFile
 from typing import List
-from natsort import os_sorted
+from natsort import os_sorted  # type: ignore
 
 from src.default_editor import get_editor_command_name
-from src.user_types import Clause
+from src.user_types import Clause, Name
 
 
 def get_editable_text(inode_paths: dict) -> str:
@@ -123,7 +123,7 @@ def parse_edited_text(
         if path.name == new_name:
             continue
         validate_filename(new_name, platform=platform)
-        result.append(Clause(path, new_name))
+        result.append(Clause(path, Name(new_name)))
     return result
 
 

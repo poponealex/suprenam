@@ -39,7 +39,7 @@ OS = {
 }
 
 
-def get_editor_command_name(os_name: str = "") -> str:
+def get_editor_command_name(os_name: str = "") -> list:
     """
     Retrieve the system's default text editor.
 
@@ -54,14 +54,14 @@ def get_editor_command_name(os_name: str = "") -> str:
     Raises:
         UnsupportedOS Error if the os is not supported.
     """
-    os = OS.get(os_name, None)
+    os = OS.get(os_name)
     if not os:
         raise UnsupportedOS("OS not yet supported.")
-    parse_output = re.compile(os["REGEX"]).findall
+    parse_output = re.compile(str(os["REGEX"])).findall  # make mypy happy
     try:
         result = parse_output(
             subprocess.run(
-                os["QUERY_DEFAULTS_COMMAND"],
+                list(os["QUERY_DEFAULTS_COMMAND"]),  # make mypy happy
                 encoding="utf-8",
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -69,10 +69,10 @@ def get_editor_command_name(os_name: str = "") -> str:
             ).stdout
         )
         if result:
-            return os["EDITOR_COMMAND"][result[0]]
+            return os["EDITOR_COMMAND"][result[0]]  # type: ignore
     except (subprocess.CalledProcessError, KeyError) as e:
-        print_warning(e)
-    return os["DEFAULT_COMMAND"]
+        print_warning(str(e))  # make mypy happy
+    return list(os["DEFAULT_COMMAND"])  # make mypy happy
 
 
 class UnsupportedOS(Exception):

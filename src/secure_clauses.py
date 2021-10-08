@@ -1,4 +1,3 @@
-from collections import Counter
 from itertools import groupby
 from typing import Iterable, List, Tuple
 
@@ -114,7 +113,7 @@ def check_injectivity(file_system: FileSystem, clauses: ClauseMap):
 
 def sorted_by_level(clauses: ClauseMap) -> List[Tuple[int, List[Clause]]]:
     """Order and group the items of a clause dictionary with the most nested first."""
-    items = (Clause(*item) for item in clauses.items()) # required by mypy (as of v. 0.812)
+    items = (Clause(*item) for item in clauses.items())  # required by mypy (as of v. 0.812)
     sorted_clauses = sorted(items, key=lambda clause: len(clause.path.parts), reverse=True)
     grouped_clauses = groupby(sorted_clauses, key=lambda clause: len(clause.path.parts))
     return [(level, list(clauses)) for (level, clauses) in grouped_clauses]

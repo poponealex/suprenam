@@ -1,6 +1,6 @@
-from pathlib import Path
 import logging
 import re
+from pathlib import Path
 from typing import List
 
 from src.goodies import print_exit, print_success
@@ -29,7 +29,7 @@ def rollback_renamings(renamings: List[Renaming]):
         print_exit("Recoverable error during the renaming. No changes.")
     except OSError:
         logging.critical("Failed rollback.")
-        log_path = logging.getLoggerClass().root.handlers[0].baseFilename
+        log_path = logging.getLoggerClass().root.handlers[0].baseFilename  # type: ignore
         print_exit(f"Unrecoverable error during the renaming, see '{log_path}'.")
 
 
@@ -49,4 +49,6 @@ def undo_renamings(
     find_all_renamings=re.compile(r"(?m)^INFO:\w+:SOURCE:(.+)\nINFO:\w+:TARGET:(.+)").findall,
 ):
     """Read a log file and apply the renamings in reverse and by swapping sources and targets."""
-    perform_renamings(list(map(swap, reversed([*map(lambda x: Renaming(x[0], x[1]), find_all_renamings(log_path.read_text()))]))))
+    perform_renamings(
+        list(map(swap, reversed([*map(lambda x: Renaming(x[0], x[1]), find_all_renamings(log_path.read_text()))])))
+    )
