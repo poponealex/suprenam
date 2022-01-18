@@ -81,8 +81,8 @@ def run_editor(editable_file_path: Path) -> str:
     Returns:
         The text contained in editable_file_path when the user closes the editor's window.
     """
-    editor = get_editor_command(platform().split("-")[0]) + [str(editable_file_path)]
-    subprocess.run(editor, check=True)
+    editor_command = get_editor_command(platform().split("-")[0]) + [str(editable_file_path)]
+    subprocess.run(editor_command, check=True)
     return editable_file_path.read_text()
 
 
