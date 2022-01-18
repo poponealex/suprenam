@@ -5,14 +5,14 @@ import context
 from src.default_editor import *
 
 
-def test_get_editor_command_name():
+def test_get_editor_command():
     os = platform().split("-")[0]
-    if os != "Linux" and os != "macOS":
-        with pytest.raises(UnsupportedOS):
-            get_editor_command_name(os)
+    if os not in ("Linux", "macOS"):
+        with pytest.raises(UnsupportedOSError):
+            get_editor_command(os)
     else:
-        result = get_editor_command_name(os)
-        assert result[0] in ("code", "subl", "open")
+        command = get_editor_command(os)
+        assert command[0] in ("code", "subl", "open")
 
 
 if __name__ == "__main__":
