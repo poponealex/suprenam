@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 from pathvalidate import validate_filename
-from platform import platform
+from platform import platform as get_platform_string
 from itertools import groupby
 from tempfile import NamedTemporaryFile
 from typing import List
@@ -100,8 +100,9 @@ def run_editor(editable_file_path: Path) -> str:
     Returns:
         The text contained in editable_file_path when the user closes the editor's window.
     """
-    editor_command = get_editor_command(platform().split("-")[0]) + [str(editable_file_path)]
-    subprocess.run(editor_command, check=True)
+    platform = get_platform_string().split("-")[0]
+    editor_command = get_editor_command(platform)
+    subprocess.run(editor_command + [str(editable_file_path)], check=True)
     return editable_file_path.read_text()
 
 
