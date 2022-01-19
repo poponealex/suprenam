@@ -487,7 +487,7 @@ def test_parse_edited_text(title, platform, is_valid, inode_paths, text, expecte
 
 
 @pytest.mark.parametrize("title, platform, is_valid, inode_paths, text, expected", edited_text_dataset)
-def _test_edit_paths(title, platform, is_valid, inode_paths, text, expected):
+def test_edit_paths(title, platform, is_valid, inode_paths, text, expected):
     print(title, platform)
     actual = lambda: edit_paths(
         paths=inode_paths.values(),
