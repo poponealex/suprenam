@@ -71,7 +71,7 @@ def get_editable_text(inode_paths: InodePaths) -> str:
         result = []
         for (parent, children) in groups:
             result.append(f"{parent}")
-            result.extend([f"{inode}\t{name}" for (_, name, inode) in children])
+            result.extend(f"{inode}\t{name}" for (_, name, inode) in children)
         return "\n".join(result)
 
 
