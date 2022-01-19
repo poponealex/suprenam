@@ -30,7 +30,7 @@ def test_invalid_pure_filenames():
 
 
 def test_update_with_source_paths_concrete():
-    fs = FileSystem([])
+    fs = FileSystem()
     paths = [
         Path("./src/goodies.py"),
         Path("."),

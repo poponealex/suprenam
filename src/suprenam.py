@@ -21,7 +21,7 @@ def main():
     paths = []
     if args.undo:
         undo_renamings(LOG_DIR / LOG_NAME)
-        return print_success("Renamings from the previous sessions were undone succefully.")
+        return print_success("Renamings from the previous sessions were undone successfully.")
     if args.paths:
         paths += [*map(Path, args.paths)]
     if args.file:
@@ -29,7 +29,7 @@ def main():
     if not paths:
         return print_exit("No paths were provided.")
     create_log()
-    file_system = FileSystem([])
+    file_system = FileSystem()
     clauses = edit_paths(paths)
     renamings = secure_clauses(file_system, clauses)
     perform_renamings(renamings)

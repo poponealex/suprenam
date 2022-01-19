@@ -2,13 +2,13 @@ from base64 import b32encode
 from itertools import count
 from pathlib import Path
 from pathvalidate import validate_filename
-from typing import Generator, Iterable, Set
+from typing import Generator, Iterable, Set, Optional
 
 
 class FileSystem(set):
-    def __init__(self, paths: Iterable[Path], platform: str = "auto"):
-        super().__init__(paths)
+    def __init__(self, paths: Optional[Iterable[Path]] = None, platform: str = "auto"):
         if paths:  # when some initial paths are provided, the file system is considered as pure
+            super().__init__(paths)
             for path in self:
                 validate_filename(
                     path.name, platform=platform
@@ -16,6 +16,7 @@ class FileSystem(set):
             self.path_exists = lambda path: path in self
             self.siblings = lambda path: self.children(path.parent)
         else:  # otherwise, the file system is considered as concrete
+            super().__init__()
             self.path_exists = lambda path: path.exists()
             self.siblings = lambda path: path.parent.glob("*")
 
