@@ -438,6 +438,34 @@ edited_text_dataset = [
         """,
         [],
     ),
+    (
+        "Parse a file which contains some numerical parents.",
+        ["universal"],
+        "valid",
+        {
+            123: Path("321/foo"),
+            456: Path("321/bar"),
+            789: Path("654/lib"),
+            999: Path("987/world"),
+        },
+        """
+            321
+            123	foobar
+            456	club
+
+            654
+            789	book
+
+            987
+            999	moon
+        """,
+        [
+            Clause(Path("321/foo"), "foobar"),
+            Clause(Path("321/bar"), "club"),
+            Clause(Path("654/lib"), "book"),
+            Clause(Path("987/world"), "moon"),
+        ],
+    ),
 ]
 
 
@@ -453,11 +481,13 @@ def test_parse_edited_text(title, platform, is_valid, inode_paths, text, expecte
         with pytest.raises((ValidationError, UnknownInodeError, TabError)):
             actual()
     else:
+        print(actual())
+        print(expected)
         assert actual() == expected
 
 
 @pytest.mark.parametrize("title, platform, is_valid, inode_paths, text, expected", edited_text_dataset)
-def test_edit_paths(title, platform, is_valid, inode_paths, text, expected):
+def _test_edit_paths(title, platform, is_valid, inode_paths, text, expected):
     print(title, platform)
     actual = lambda: edit_paths(
         paths=inode_paths.values(),

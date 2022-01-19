@@ -17,7 +17,7 @@ def get_editable_text(inode_paths: InodePaths) -> str:
     of these associations, sorted in natural order and grouped by common parent if needed.
 
     Args:
-        inode_paths: dict of { inode : path }
+        inode_paths: dict of { inode: path }
 
     Returns:
         A string in either of these formats (tab-separated):
@@ -131,6 +131,8 @@ def parse_edited_text(
     result = []
     for line in text.split("\n"):
         inode, *tail = line.split("\t", maxsplit=1)
+        if not tail:
+            continue
         if not inode.isdigit():
             continue
         path = inode_paths.get(int(inode))
@@ -158,7 +160,7 @@ def edit_paths(
 
     Args:
         paths: list of Paths to rename.
-        get_inode: function to get the inode.
+        get_inode: function called to get the inode.
         get_edition_handler: function called to get the text to write to the temporary file.
         edit: function called to run the editor.
         platform: OS on which the renamings will be performed.
