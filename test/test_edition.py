@@ -9,26 +9,26 @@ import re
 
 editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names are tab-separated.
     (
-        "Rename nothing -> empty result",
+        "Nothing -> empty result",
         {},
         "",
     ),
     (
-        "Rename empty path -> empty string",
+        "Empty path -> empty string",
         {
             2612647906: Path(),
         },
         "",
     ),
     (
-        "Rename root -> empty string",
+        "Root -> empty string",
         {
             2612647906: Path("/"),
         },
         "",
     ),
     (
-        "Rename a path containing two consecutive '/'",
+        "A path containing two consecutive '/'",
         {
             2612647906: Path("/foobar//"),
         },
@@ -37,7 +37,7 @@ editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names 
         """,
     ),
     (
-        "Rename a relative path in the current working directory.",
+        "A relative path in the current working directory",
         {
             2612647906: Path("foobar"),
         },
@@ -46,7 +46,7 @@ editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names 
         """,
     ),
     (
-        "Rename a path ending with a '/'.",
+        "A path ending with a '/'",
         {
             2612647906: Path("foobar/"),
         },
@@ -55,7 +55,7 @@ editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names 
         """,
     ),
     (
-        "Rename a bunch of siblings -> their (unique) parent is not displayed",
+        "A bunch of siblings -> (unique) parent not displayed",
         {
             2612647906: Path("/usr/lib/gcc-lib"),
             3263123972: Path("/usr/lib/locale"),
@@ -72,7 +72,7 @@ editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names 
         """,
     ),
     (
-        "Rename an arbitrary arborescence -> the siblings are grouped by parents, and sorted",
+        "An arbitrary arborescence -> siblings grouped by parents and sorted",
         {
             1421832123: Path("/usr/bin/X11"),
             2612647906: Path("/usr/lib/gcc-lib"),
@@ -100,22 +100,48 @@ editable_text_dataset = [  # NB: in the triple-quoted strings, inodes and names 
         """,
     ),
     (
-        "Rename a bunch of siblings provided in a reversed natural order -> names sorted in natural order",
+        "A bunch of siblings （shown in default order) -> names sorted in natural order",
         {
-            1549534358: Path("/usr/lib/X11"),
-            1582956841: Path("/usr/lib/tls"),
-            3263123972: Path("/usr/lib/locale"),
-            2612647906: Path("/usr/lib/gcc-lib"),
-            1981263235: Path("/usr/lib/games"),
-            1981263299: Path("/usr/lib/almonds"),
+            1421832123: Path("/usr/lib/Apple"),
+            2612647906: Path("/usr/lib/apple14,689"),
+            2784148792: Path("/usr/lib/apple15"),
+            1482466380: Path("/usr/lib/Banana_b"),
+            3263123972: Path("/usr/lib/banana_a"),
+            1482466386: Path("/usr/lib/banana_c"),
+            1549534358: Path("/usr/lib/version-1.10"),
+            1582956841: Path("/usr/lib/version-1.11"),
+            1981263235: Path("/usr/lib/version-1.9"),
+            1981263299: Path("/usr/lib/version-2.0"),
         },
         """
-            1981263299	almonds
-            1981263235	games
-            2612647906	gcc-lib
-            3263123972	locale
-            1582956841	tls
-            1549534358	X11
+            1421832123	Apple
+            2612647906	apple14,689
+            2784148792	apple15
+            3263123972	banana_a
+            1482466380	Banana_b
+            1482466386	banana_c
+            1981263235	version-1.9
+            1549534358	version-1.10
+            1582956841	version-1.11
+            1981263299	version-2.0
+        """,
+    ),
+    (
+        "The parents are also sorted in natural order",
+        {
+            1482466380: Path("/usr/Banana_b/foobar"),
+            3263123972: Path("/usr/banana_a/foobar"),
+            1482466386: Path("/usr/banana_c/foobar"),
+        },
+        """
+        /usr/banana_a
+        3263123972	foobar
+
+        /usr/Banana_b
+        1482466380	foobar
+
+        /usr/banana_c
+        1482466386	foobar
         """,
     ),
 ]
@@ -126,6 +152,7 @@ def test_get_editable_text(title, inode_paths, expected):
     print(title)
     expected = expected.strip().replace("    ", "").split("\n")
     result = get_editable_text(inode_paths).strip().split("\n")
+    print("\n".join(result))
     assert len(expected) == len(result)
     for (expected_line, result_line) in zip(expected, result):
         assert expected_line == result_line

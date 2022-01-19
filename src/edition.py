@@ -8,52 +8,71 @@ from typing import List
 from natsort import os_sorted  # type: ignore
 
 from src.default_editor import get_editor_command
-from src.user_types import Clause, Name
+from src.user_types import Clause, Name, InodePaths
 
 
-def get_editable_text(inode_paths: dict) -> str:
+def get_editable_text(inode_paths: InodePaths) -> str:
     """
-    Get the text to output to the user's interface.
+    Being given a mapping of inodes (ints) to paths (Path objects), return a textual representation
+    of these associations, sorted in natural order and grouped by common parent if needed.
 
     Args:
         inode_paths: dict of { inode : path }
 
     Returns:
-        A string in the either formats:
+        A string in either of these formats (tab-separated):
             1. If all files are siblings:
-                inode   file name
+                inode   filename
+                inode   filename
                 ...
-            2. Else:
-                /parent
-                inode   file name
+            2. Otherwise:
+                common_ancestor/path/to/common_parent
+                inode   filename
+                inode   filename
                 ...
+
+                common_ancestor/path/to/common_parent
+                inode   filename
+                inode   filename
+                ...
+
+                ...
+
     """
-    if not inode_paths:
-        return ""
-    result = []
-    paths_and_inodes = sorted(
-        # checking path's name existence to silence an error that would be raised by os_sorted in the unlikely case a blank path or root being provided
-        ((path, inode) for (inode, path) in inode_paths.items() if path.name),
-        key=lambda x: (x[0].parent, x[0].name),  # sorted by parent, then by name
+    # Create a naturally sorted list of triples (parent, name, inode) with null paths filtered out
+    parents_names_inodes = os_sorted(  # natural sort by parent, then name, then (useless) inode
+        (
+            f"\n{path.parent}",  # the prefix '\n' adds an empty line for maximal consistency
+            path.name,
+            inode,
+        )
+        for (inode, path) in inode_paths.items()
+        if path.name  # null paths (empty or root) would make os_sorted raise a ValueError
     )
+
+    # Group them by common parents
     groups = [
         (
             parent,
-            os_sorted(list(children), key=lambda x: x[0]),
-        )  # converting to list prevents len(groups) to consume the generator
-        for (parent, children) in groupby(paths_and_inodes, key=lambda item: item[0].parent)
+            list(children),  # converting the inner generator allows to use it twice (len + loop)
+        )
+        for (parent, children) in groupby(
+            parents_names_inodes,
+            key=lambda parent_name_inode: parent_name_inode[0],  # group by parent
+        )
     ]
-    if not len(groups):
+
+    # Format the result
+    if len(groups) == 0:  # empty selection
         return ""
-    if len(groups) > 1:
+    elif len(groups) == 1:  # all files are siblings: showing their parent is useless
+        return "\n".join(f"{inode}\t{name}" for (_, name, inode) in groups[0][1])
+    else:  # several groups of siblings: showing their parents may be useful for desambiguation
+        result = []
         for (parent, children) in groups:
-            result.append(f"\n{parent}\n")  # empty line before each parent for maximal consistency
-            for (path, inode) in children:
-                result.append(f"{inode}\t{path.name}\n")
-    else:  # when all files to rename are siblings, it is useless to print their parent's path
-        for (path, inode) in groups[0][1]:
-            result.append(f"{inode}\t{path.name}\n")
-    return "".join(result)
+            result.append(f"{parent}")
+            result.extend([f"{inode}\t{name}" for (_, name, inode) in children])
+        return "\n".join(result)
 
 
 def get_editable_file_path(inode_paths: dict) -> Path:

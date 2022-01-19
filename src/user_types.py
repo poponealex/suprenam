@@ -16,3 +16,7 @@ ClauseMap = Dict[Path, Name]
 class Renaming(NamedTuple):
     source: Path
     target: Path
+
+Inode = NewType("Inode", int)
+
+InodePaths = Dict[Inode, Path]
