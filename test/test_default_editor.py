@@ -6,12 +6,12 @@ from src.default_editor import *
 
 
 def test_get_editor_command():
-    os = platform().split("-")[0]
-    if os not in ("Linux", "macOS"):
+    os_name = platform().split("-")[0]
+    if os_name not in ("Linux", "macOS"):
         with pytest.raises(UnsupportedOSError):
-            get_editor_command(os)
+            get_editor_command(os_name)
     else:
-        command = get_editor_command(os)
+        command = get_editor_command(os_name)
         assert command[0] in ("code", "subl", "open")
 
 
