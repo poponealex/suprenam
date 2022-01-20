@@ -5,11 +5,12 @@ sys.path[0:0] = ["."]
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pathlib import Path
 
-from src.edition import edit_paths
+from src.edition import get_editable_file_path, get_editable_file_path, run_editor, parse_edited_text
 from src.file_system import FileSystem
 from src.goodies import *
 from src.renamings import perform_renamings, undo_renamings, set_logger
 from src.secure_clauses import secure_clauses
+from src.user_types import Inode
 
 
 LOG_DIR = Path.cwd() / ".suprenam"
@@ -30,7 +31,10 @@ def main():
         return print_exit("No paths were provided.")
     create_log()
     file_system = FileSystem()
-    clauses = edit_paths(paths)
+    inode_paths = {Inode(path.stat().st_ino): path for path in paths}
+    editable_file_path = get_editable_file_path(inode_paths)
+    edited_text = run_editor(editable_file_path)
+    clauses = parse_edited_text(edited_text, inode_paths)
     renamings = secure_clauses(file_system, clauses)
     perform_renamings(renamings)
     return print_success("Renamings were performed successfully.")

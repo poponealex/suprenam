@@ -486,22 +486,6 @@ def test_parse_edited_text(title, platform, is_valid, inode_paths, text, expecte
         assert actual() == expected
 
 
-@pytest.mark.parametrize("title, platform, is_valid, inode_paths, text, expected", edited_text_dataset)
-def test_edit_paths(title, platform, is_valid, inode_paths, text, expected):
-    print(title, platform)
-    actual = lambda: edit_paths(
-        paths=inode_paths.values(),
-        get_inode=lambda x: {path: inode for (inode, path) in inode_paths.items()}[x],
-        get_edition_handler=lambda _: None,
-        edit=lambda _: "\n".join(line for (_, line) in split_startwith_tabs(text)),
-        platform=platform[0],
-    )
-    if is_valid == "invalid":
-        with pytest.raises((ValidationError, UnknownInodeError, TabError)):
-            actual()
-    else:
-        assert actual() == expected
-
 
 if __name__ == "__main__":
     pytest.main(["-qq", __import__("sys").argv[0]])
