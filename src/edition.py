@@ -155,7 +155,7 @@ def edit_paths(
     get_edition_handler=get_editable_file_path,  # enable testing with a pure function returning a text
     edit=run_editor,  # enable simulating the user's editions
     platform: str = "auto",  # enable testing on different platforms
-):
+) -> List[Clause]:
     """
     Handle the user interface to edit paths, can be parameterized to work with a pure FileSystem.
 
