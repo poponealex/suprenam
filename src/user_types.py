@@ -1,6 +1,5 @@
 from pathlib import Path
-from typing import Dict, NamedTuple, NewType
-
+from typing import Dict, Literal, NamedTuple, NewType
 
 Name = NewType("Name", str)
 
@@ -17,6 +16,10 @@ class Renaming(NamedTuple):
     source: Path
     target: Path
 
+
 Inode = NewType("Inode", int)
 
 InodePaths = Dict[Inode, Path]
+
+EditableText = NewType("EditableText", str)
+EditedText = NewType("EditedText", str)

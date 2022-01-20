@@ -8,10 +8,10 @@ from typing import List
 from natsort import os_sorted  # type: ignore
 
 from src.default_editor import get_editor_command
-from src.user_types import Clause, Name, InodePaths
+from src.user_types import Clause, Name, Inode, InodePaths, EditableText, EditedText
 
 
-def get_editable_text(inode_paths: InodePaths) -> str:
+def get_editable_text(inode_paths: InodePaths) -> EditableText:
     """
     Being given a mapping of inodes (ints) to paths (Path objects), return a textual representation
     of these associations, sorted in natural order and grouped by common parent if needed.
@@ -64,18 +64,18 @@ def get_editable_text(inode_paths: InodePaths) -> str:
 
     # Format the result
     if len(groups) == 0:  # empty selection
-        return ""
+        result = []
     elif len(groups) == 1:  # all files are siblings: showing their parent is useless
-        return "\n".join(f"{inode}\t{name}" for (_, name, inode) in groups[0][1])
+        result = [f"{inode}\t{name}" for (_, name, inode) in groups[0][1]]
     else:  # several groups of siblings: showing their parents may be useful for desambiguation
         result = []
         for (parent, children) in groups:
             result.append(f"{parent}")
             result.extend(f"{inode}\t{name}" for (_, name, inode) in children)
-        return "\n".join(result)
+    return EditableText("\n".join(result))
 
 
-def get_editable_file_path(inode_paths: dict) -> Path:
+def get_editable_file_path(inode_paths: InodePaths) -> Path:
     """
     Create a temporary file populated with the names of the files to rename.
 
@@ -90,7 +90,7 @@ def get_editable_file_path(inode_paths: dict) -> Path:
     return path
 
 
-def run_editor(editable_file_path: Path) -> str:
+def run_editor(editable_file_path: Path) -> EditedText:
     """
     Open the editable text on the system's default text editor to allow the user to perform the renamings.
 
@@ -103,12 +103,12 @@ def run_editor(editable_file_path: Path) -> str:
     platform = get_platform_string().split("-")[0]
     editor_command = get_editor_command(platform)
     subprocess.run(editor_command + [str(editable_file_path)], check=True)
-    return editable_file_path.read_text()
+    return EditedText(editable_file_path.read_text())
 
 
 def parse_edited_text(
-    text: str,
-    inode_paths: dict,
+    text: EditedText,
+    inode_paths: InodePaths,
     platform: str,
 ) -> List[Clause]:
     """
@@ -131,12 +131,13 @@ def parse_edited_text(
     """
     result = []
     for line in text.split("\n"):
-        inode, *tail = line.split("\t", maxsplit=1)
+        head, *tail = line.split("\t", maxsplit=1)
         if not tail:
             continue
-        if not inode.isdigit():
+        if not head.isdigit():
             continue
-        path = inode_paths.get(int(inode))
+        inode = Inode(int(head))
+        path = inode_paths.get(inode)
         if path is None:
             raise UnknownInodeError(f"Unknown inode {inode}.")
         new_name = tail[0]
@@ -169,7 +170,7 @@ def edit_paths(
     Returns:
         A list of Clause (path, new_name) with the effective renamings.
     """
-    inode_paths = {get_inode(path): path for path in paths}
+    inode_paths = {Inode(get_inode(path)): path for path in paths}
     handler = get_edition_handler(inode_paths)
     text = edit(handler)
     clauses = parse_edited_text(text, inode_paths, platform=platform)
