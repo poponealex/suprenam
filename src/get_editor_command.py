@@ -1,5 +1,6 @@
 import re
 import subprocess
+from platform import platform as get_platform_string
 
 from src.goodies import print_warning
 
@@ -46,7 +47,7 @@ OS = {
 }
 
 
-def get_editor_command(os_name: str = "") -> list:
+def get_editor_command() -> list:
     """
     Retrieve a command launching a text editor.
 
@@ -63,9 +64,13 @@ def get_editor_command(os_name: str = "") -> list:
     Raises:
         UnsupportedOSError: if the OS dictionary defines no key for the given operating system name.
     """
-    os_dict = OS.get(os_name)
+    platform_string = get_platform_string().split("-")[0]
+    os_dict = OS.get(platform_string)
     if not os_dict:
-        raise UnsupportedOSError("OS not yet supported.")
+        raise UnsupportedOSError(
+            f"Unsupported operating system: {platform_string}. "
+            f"Supported operating systems are: {', '.join(OS.keys())}"
+        )
 
     try:
         output = subprocess.run(

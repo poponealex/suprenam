@@ -2,16 +2,16 @@ import pytest
 from platform import platform as get_platform_string
 
 import context
-from src.default_editor import *
+from src.get_editor_command import *
 
 
 def test_get_editor_command():
-    os_name = get_platform_string().split("-")[0]
-    if os_name not in ("Linux", "macOS"):
+    platform_string = get_platform_string().split("-")[0]
+    if platform_string not in ("Linux", "macOS"):
         with pytest.raises(UnsupportedOSError):
-            get_editor_command(os_name)
+            get_editor_command()
     else:
-        command = get_editor_command(os_name)
+        command = get_editor_command()
         assert command[0] in ("code", "subl", "open")
 
 

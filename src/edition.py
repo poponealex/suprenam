@@ -1,13 +1,12 @@
 import subprocess
 from pathlib import Path
 from pathvalidate import validate_filename
-from platform import platform as get_platform_string
 from itertools import groupby
 from tempfile import NamedTemporaryFile
 from typing import List
 from natsort import os_sorted  # type: ignore
 
-from src.default_editor import get_editor_command
+from src.get_editor_command import get_editor_command
 from src.user_types import Clause, Name, Inode, InodePaths, EditableText, EditedText
 
 
@@ -100,8 +99,7 @@ def run_editor(editable_file_path: Path) -> EditedText:
     Returns:
         The text contained in editable_file_path when the user closes the editor's window.
     """
-    platform = get_platform_string().split("-")[0]
-    editor_command = get_editor_command(platform)
+    editor_command = get_editor_command()
     subprocess.run(editor_command + [str(editable_file_path)], check=True)
     return EditedText(editable_file_path.read_text())
 
