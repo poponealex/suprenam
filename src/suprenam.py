@@ -1,17 +1,21 @@
+import subprocess
 import sys
+from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 sys.path[0:0] = ["."]
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pathlib import Path
 
-from src.edition import get_editable_file_path, get_editable_file_path, run_editor, parse_edited_text
 from src.file_system import FileSystem
+from src.get_editable_text import get_editable_text
+from src.get_editor_command import get_editor_command
 from src.goodies import *
-from src.renamings import perform_renamings, undo_renamings, set_logger
+from src.parse_edited_text import parse_edited_text
+from src.renamings import perform_renamings, set_logger, undo_renamings
 from src.secure_clauses import secure_clauses
-from src.user_types import Inode
-
+from src.user_types import EditedText, Inode
 
 LOG_DIR = Path.cwd() / ".suprenam"
 LOG_NAME = "previous_session.log"
@@ -32,8 +36,11 @@ def main():
     create_log()
     file_system = FileSystem()
     inode_paths = {Inode(path.stat().st_ino): path for path in paths}
-    editable_file_path = get_editable_file_path(inode_paths)
-    edited_text = run_editor(editable_file_path)
+    editable_file_path = Path(NamedTemporaryFile(mode="w+", delete=False, suffix=".txt").name)
+    editable_file_path.write_text(get_editable_text(inode_paths))
+    editor_command = get_editor_command()
+    subprocess.run(editor_command + [str(editable_file_path)], check=True)
+    edited_text = EditedText(editable_file_path.read_text())
     clauses = parse_edited_text(edited_text, inode_paths)
     renamings = secure_clauses(file_system, clauses)
     perform_renamings(renamings)
