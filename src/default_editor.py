@@ -63,13 +63,13 @@ def get_editor_command(os_name: str = "") -> list:
     Raises:
         UnsupportedOSError: if the OS dictionary defines no key for the given operating system name.
     """
-    actual_os = OS.get(os_name)
-    if not actual_os:
+    os_dict = OS.get(os_name)
+    if not os_dict:
         raise UnsupportedOSError("OS not yet supported.")
 
     try:
         output = subprocess.run(
-            list(actual_os["QUERY_ALL_DEFAULTS_COMMAND"]),  # make mypy happy
+            list(os_dict["QUERY_ALL_DEFAULTS_COMMAND"]),  # make mypy happy
             encoding="utf-8",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -79,11 +79,11 @@ def get_editor_command(os_name: str = "") -> list:
         print_warning(str(e))  # make mypy happy
         output = ""  # make the following regular expression fail
 
-    default_editor_handler = re.findall(str(actual_os["EXTRACT_EDITOR"]), output)  # make mypy happy
+    default_editor_handler = re.findall(str(os_dict["EXTRACT_EDITOR"]), output)  # make mypy happy
     if default_editor_handler:
-        return actual_os["DEFAULT_EDITOR_COMMAND"][default_editor_handler[0]]  # type: ignore
+        return os_dict["DEFAULT_EDITOR_COMMAND"][default_editor_handler[0]]  # type: ignore
     else:
-        return list(actual_os["FALLBACK_EDITOR_COMMAND"])  # make mypy happy
+        return list(os_dict["FALLBACK_EDITOR_COMMAND"])  # make mypy happy
 
 
 class UnsupportedOSError(Exception):
