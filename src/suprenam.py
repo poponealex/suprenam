@@ -18,10 +18,10 @@ LOG_NAME = "previous_session.log"
 
 def main():
     args = cli_arguments()
-    paths = []
     if args.undo:
         undo_renamings(LOG_DIR / LOG_NAME)
         return print_success("Renamings from the previous sessions were undone successfully.")
+    paths = []
     if args.paths:
         paths += [*map(Path, args.paths)]
     if args.file:
