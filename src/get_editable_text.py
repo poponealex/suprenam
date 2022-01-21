@@ -1,16 +1,16 @@
 from itertools import groupby
 from natsort import os_sorted  # type: ignore
 
-from src.user_types import InodePaths, EditableText
+from src.user_types import InodesPaths, EditableText
 
 
-def get_editable_text(inode_paths: InodePaths) -> EditableText:
+def get_editable_text(inodes_paths: InodesPaths) -> EditableText:
     """
     Being given a mapping of inodes (ints) to paths (Path objects), return a textual representation
     of these associations, sorted in natural order and grouped by common parent if needed.
 
     Args:
-        inode_paths: dict of { inode: path }
+        inodes_paths: dict of { inode: path }
 
     Returns:
         A string in either of these formats (tab-separated):
@@ -39,7 +39,7 @@ def get_editable_text(inode_paths: InodePaths) -> EditableText:
             path.name,
             inode,
         )
-        for (inode, path) in inode_paths.items()
+        for (inode, path) in inodes_paths.items()
         if path.name  # null paths (empty or root) would make os_sorted raise a ValueError
     )
 

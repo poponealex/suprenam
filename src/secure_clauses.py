@@ -3,6 +3,8 @@ from typing import Iterable, List, Tuple
 
 from src.file_system import FileSystem
 from src.user_types import Clause, ClauseMap, Name, Renaming
+from src.user_errors import *
+from src.goodies import print_fail
 
 
 def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Renaming]:
@@ -56,10 +58,6 @@ def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Renam
     return [Renaming(path, path.parent / new_name) for (path, new_name) in safe_clauses]
 
 
-class SeveralTargetsError(Exception):
-    ...
-
-
 def dict_of_clauses(clauses: Iterable[Clause]) -> ClauseMap:
     """Make a dictionary from the given clauses.
 
@@ -79,13 +77,14 @@ def dict_of_clauses(clauses: Iterable[Clause]) -> ClauseMap:
     result: ClauseMap = {}
     for (path, new_name) in clauses:
         if path in result and result[path] != new_name:
+            print_fail(
+                f"At least two distinct renaming targets for {repr(path)}:\n"
+                "    {result[path]}\n"
+                "    {new_name}."
+            )
             raise SeveralTargetsError(path)
         result[path] = new_name
     return result
-
-
-class SeveralSourcesError(Exception):
-    ...
 
 
 def check_injectivity(file_system: FileSystem, clauses: ClauseMap):
@@ -107,6 +106,7 @@ def check_injectivity(file_system: FileSystem, clauses: ClauseMap):
     for (path, new_name) in clauses.items():
         new_path = path.with_name(new_name)
         if new_path in already_seen or (new_path in file_system and new_path not in clauses):
+            print_fail(f"At least two distinct sources for {repr(new_path)}.")
             raise SeveralSourcesError(new_path)
         already_seen.add(new_path)
 

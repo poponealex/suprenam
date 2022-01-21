@@ -1,8 +1,10 @@
 import re
 import subprocess
+from pathlib import Path
 from platform import platform as get_platform_string
 
-from src.goodies import print_warning
+from src.goodies import print_fail
+from src.user_errors import *
 
 
 OS = {
@@ -47,19 +49,17 @@ OS = {
 }
 
 
-def get_editor_command() -> list:
+def get_editor_command(path: Path) -> list:
     """
-    Retrieve a command launching a text editor.
+    Retrieve a command launching a text editor on a given text file.
 
     Args:
-        os_name: operating system's name.
-            Currently supported (see global OS dictionary):
-            - macOS
-            - Linux (with XDG utils installed)
+        path: the path to the text file to edit.
 
     Returns:
-        A list of strings representing the command to launch the system's default text editor.
-        If no default text editor is defined, a suitable fallback command is returned.
+        A list of strings representing the command to launch the system's default text editor
+        on the given text file. If no default text editor is defined, a suitable fallback command
+        is returned.
 
     Raises:
         UnsupportedOSError: if the OS dictionary defines no key for the given operating system name.
@@ -67,10 +67,11 @@ def get_editor_command() -> list:
     platform_string = get_platform_string().split("-")[0]
     os_dict = OS.get(platform_string)
     if not os_dict:
-        raise UnsupportedOSError(
+        print_fail(
             f"Unsupported operating system: {platform_string}. "
             f"Supported operating systems are: {', '.join(OS.keys())}"
         )
+        raise UnsupportedOSError(platform_string)
 
     try:
         output = subprocess.run(
@@ -81,15 +82,13 @@ def get_editor_command() -> list:
             check=True,
         ).stdout
     except subprocess.CalledProcessError as e:
-        print_warning(str(e))  # make mypy happy
-        output = ""  # make the following regular expression fail
+        print_fail(str(e))  # make mypy happy
+        raise e
 
     default_editor_handler = re.findall(str(os_dict["EXTRACT_EDITOR"]), output)  # make mypy happy
     if default_editor_handler:
-        return os_dict["DEFAULT_EDITOR_COMMAND"][default_editor_handler[0]]  # type: ignore
+        command = os_dict["DEFAULT_EDITOR_COMMAND"][default_editor_handler[0]]  # type: ignore
     else:
-        return list(os_dict["FALLBACK_EDITOR_COMMAND"])  # make mypy happy
+        command = list(os_dict["FALLBACK_EDITOR_COMMAND"])  # make mypy happy
+    return command + [str(path)]
 
-
-class UnsupportedOSError(Exception):
-    ...

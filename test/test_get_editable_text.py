@@ -147,11 +147,11 @@ data = [  # NB: in the triple-quoted strings, inodes and names are tab-separated
 ]
 
 
-@pytest.mark.parametrize("title, inode_paths, expected", data)
-def test_get_editable_text(title, inode_paths, expected):
+@pytest.mark.parametrize("title, inodes_paths, expected", data)
+def test_get_editable_text(title, inodes_paths, expected):
     print(title)
     expected = expected.strip().replace("    ", "").split("\n")
-    result = get_editable_text(inode_paths).strip().split("\n")
+    result = get_editable_text(inodes_paths).strip().split("\n")
     print("\n".join(result))
     assert len(expected) == len(result)
     for (expected_line, result_line) in zip(expected, result):

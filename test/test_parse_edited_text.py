@@ -12,7 +12,7 @@ data = [
     (
         "Parse a file which doesn't end with a newline.",
         ["universal"],
-        "valid",
+        "no_exception",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -28,7 +28,7 @@ data = [
     (
         "Parse a file which is missing an inode.",
         ["universal"],
-        "valid",
+        "no_exception",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -44,7 +44,7 @@ data = [
     (
         "Parse a file which contains a name starting with a space.",
         ["universal"],
-        "valid",
+        "no_exception",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -61,7 +61,7 @@ data = [
     (
         "Parse a file which contains a name made of multiple whitespaces.",
         ["macOS", "Linux"],
-        "valid",
+        "no_exception",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -78,7 +78,7 @@ data = [
     (
         "Parse a file which contains an inode preceeded by a whitespace.",
         ["universal"],
-        "valid",
+        "no_exception",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -94,7 +94,7 @@ data = [
     (
         "Parse a file which contains a name containing a '\\' character on macOS/Linux.",
         ["macOS", "Linux"],
-        "valid",
+        "no_exception",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -111,7 +111,7 @@ data = [
     (
         "Parse a file which contains a name containing a '\\' character on Windows.",
         ["Windows"],
-        "invalid",
+        ValidationError,
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -125,7 +125,7 @@ data = [
     (
         "Parse a file which contains a name that is only digits.",
         ["universal"],
-        "valid",
+        "no_exception",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -142,7 +142,7 @@ data = [
     (
         "Parse a file which contains too many inodes (superset).",
         ["universal"],
-        "valid",
+        "no_exception",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -160,7 +160,7 @@ data = [
     (
         "Parse a file which doesn't contain all the inodes (subset).",
         ["universal"],
-        "valid",
+        "no_exception",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -175,7 +175,7 @@ data = [
     (
         "Parse a file which contains only one modification.",
         ["universal"],
-        "valid",
+        "no_exception",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -193,8 +193,11 @@ data = [
     (
         "Parse a file which doesn't contain any modification.",
         ["universal"],
-        "valid",
-        {123: Path("/home/foo"), 456: Path("/home/bar")},
+        "no_exception",
+        {
+            123: Path("/home/foo"),
+            456: Path("/home/bar"),
+        },
         """
             123	foo
             456	bar
@@ -204,7 +207,7 @@ data = [
     (
         "Parse a file which is empty.",
         ["universal"],
-        "valid",
+        "no_exception",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -215,7 +218,7 @@ data = [
     (
         "Parse a file which contains paths with different parents.",
         ["universal"],
-        "valid",
+        "no_exception",
         {
             123: Path("/home/foo"),
             456: Path("/home/bar"),
@@ -243,7 +246,7 @@ data = [
     (
         "Parse a file which is missing a name.",
         ["universal"],
-        "invalid",
+        ValidationError,
         {
             123: Path("/home/foo"),
         },
@@ -255,7 +258,7 @@ data = [
     (
         "Parse a file which contains an illegal '/' character.",
         ["universal"],
-        "invalid",
+        ValidationError,
         {
             123: Path("/home/foo"),
         },
@@ -267,7 +270,7 @@ data = [
     (
         "Parse a file which contains a non-existent inode.",
         ["universal"],
-        "invalid",
+        UnknownInodeError,
         {
             123: Path("/home/foo"),
         },
@@ -279,7 +282,7 @@ data = [
     (
         "Parse a file which contains multiple tabs in between the inode and the new name.",
         ["universal"],
-        "invalid",
+        TabulationError,
         {
             123: Path("/home/foo"),
         },
@@ -289,9 +292,35 @@ data = [
         [],
     ),
     (
+        "Parse a file which contains several times the same inode with different targets.",
+        ["universal"],
+        SeveralTargetsError,
+        {
+            123: Path("/home/foo"),
+        },
+        """
+            123	foobar
+            123	barfoo
+        """,
+        [],
+    ),
+    (
+        "Parse a file which contains several times the same inode with the same target.",
+        ["universal"],
+        SeveralTargetsError,
+        {
+            123: Path("/home/foo"),
+        },
+        """
+            123	foobar
+            123	foobar
+        """,
+        [],
+    ),
+    (
         "Parse a file which contains some numerical parents.",
         ["universal"],
-        "valid",
+        "no_exception",
         {
             123: Path("321/foo"),
             456: Path("321/bar"),
@@ -322,19 +351,18 @@ data = [
 split_startwith_tabs = re.compile(r"(?m)^([ ]{4})*(.*)$").findall
 
 
-@pytest.mark.parametrize("title, platform, is_valid, inode_paths, text, expected", data)
-def test_parse_edited_text(title, platform, is_valid, inode_paths, text, expected):
+@pytest.mark.parametrize("title, platform, exception, inodes_paths, text, expected", data)
+def test_parse_edited_text(title, platform, exception, inodes_paths, text, expected):
     print(title)
     text = "\n".join(line for (_, line) in split_startwith_tabs(text))
-    actual = lambda: parse_edited_text(text, inode_paths, platform=platform[0])
-    if is_valid == "invalid":
-        with pytest.raises((ValidationError, UnknownInodeError, TabError)):
+    actual = lambda: parse_edited_text(text, inodes_paths, platform=platform[0])
+    if exception != "no_exception":
+        with pytest.raises(exception):
             actual()
     else:
         print(actual())
         print(expected)
         assert actual() == expected
-
 
 
 if __name__ == "__main__":

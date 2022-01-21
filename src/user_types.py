@@ -19,7 +19,7 @@ class Renaming(NamedTuple):
 
 Inode = NewType("Inode", int)
 
-InodePaths = Dict[Inode, Path]
+InodesPaths = Dict[Inode, Path]
 
 EditableText = NewType("EditableText", str)
 EditedText = NewType("EditedText", str)

@@ -4,18 +4,9 @@ from pathlib import Path
 import context
 from src.renamings import *
 from src.user_types import Renaming
+from src.goodies import rm_tree
 
 import pytest
-
-def rm_tree(path: Path):  # https://stackoverflow.com/a/57892171/173003
-    if not path.is_dir():
-        return
-    for child in path.iterdir():
-        if child.is_file():
-            child.unlink()
-        else:
-            rm_tree(child)
-    path.rmdir()
 
 
 def test_happy_path():
@@ -30,8 +21,7 @@ def test_happy_path():
     ]
     for renaming in renamings:
         renaming.source.touch()
-    set_logger(Path("test/happy_log.txt"))
-    perform_renamings(renamings)
+    perform_renamings(renamings, Path("test/happy_log.txt"))
     try:
         assert set(base.iterdir()) == set(renaming.target for renaming in renamings)
         # TODO: uncomment the following lines and try to understand why no logging file
@@ -56,9 +46,8 @@ def test_rollback_path():
     for renaming in renamings:
         renaming.source.touch()
     renamings[2].source.unlink() # delete a source
-    set_logger(Path("test/rollback_log.txt"))
     with pytest.raises(SystemExit):
-        perform_renamings(renamings)
+        perform_renamings(renamings, Path("test/rollback_log.txt"))
     try:
         assert set(base.iterdir()) == {base / "source_1", base / "source_2", base / "source_4"}
     finally:

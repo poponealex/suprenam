@@ -14,7 +14,7 @@ two versions of test/example.md.
 from collections import defaultdict
 import re
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Dict
 from unicodedata import normalize
 
 

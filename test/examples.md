@@ -34,6 +34,8 @@
   - [Name clash among renaming clauses](#name-clash-among-renaming-clauses)
     - [Giving the same leaf at least two distinct names](#giving-the-same-leaf-at-least-two-distinct-names)
     - [Giving the same folder at least two distinct names](#giving-the-same-folder-at-least-two-distinct-names)
+    - [Giving a leaf both the same name and a new name](#giving-a-leaf-both-the-same-name-and-a-new-name)
+    - [Giving a folder both the same name and a new name](#giving-a-folder-both-the-same-name-and-a-new-name)
     - [Giving two distinct sibling leaves the same name](#giving-two-distinct-sibling-leaves-the-same-name)
     - [Giving two distinct sibling leaf and folder the same name](#giving-two-distinct-sibling-leaf-and-folder-the-same-name)
     - [Giving two distinct sibling folders the same name](#giving-two-distinct-sibling-folders-the-same-name)
@@ -588,6 +590,36 @@ original path | new name
 original path | new name
 ---|---
 /etc | etera
+/etc | esc
+
+#### Result
+
+`SeveralTargetsError("/etc")`
+
+--------------------------------------------------------------------------------
+
+### Giving a leaf both the same name and a new name
+
+#### Example
+
+original path | new name
+---|---
+/bin | bin
+/bin | boom
+
+#### Result
+
+`SeveralTargetsError("/bin")`
+
+--------------------------------------------------------------------------------
+
+### Giving a folder both the same name and a new name
+
+#### Example
+
+original path | new name
+---|---
+/etc | etc
 /etc | esc
 
 #### Result

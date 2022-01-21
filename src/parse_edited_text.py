@@ -1,12 +1,15 @@
-from pathvalidate import validate_filename
 from typing import List
 
-from src.user_types import Clause, Name, Inode, InodePaths, EditedText
+import pathvalidate
+
+from src.goodies import print_fail
+from src.user_errors import *
+from src.user_types import Clause, EditedText, Inode, InodesPaths, Name
 
 
 def parse_edited_text(
     text: EditedText,
-    inode_paths: InodePaths,
+    inodes_paths: InodesPaths,
     platform: str = "auto",  # enable testing on different platforms
 ) -> List[Clause]:
     """
@@ -14,12 +17,13 @@ def parse_edited_text(
 
     Args:
         text: the text with the effective renamings.
-        inode_paths: dict containing each path (value) with its inode (key).
-        platform: OS on which the renamings will be performed.
+        inodes_paths: dict containing each path (value) with its inode (key).
+        platform: OS on which the renamings will be performed. The default "auto" means that the
+            platform will be detected automatically.
 
     Raises:
         UnknownInodeError: the edited text contains an inode absent from the source text.
-        TabError: a new name contains a tabulation. Although such a character is valid on most
+        TabulationError: a new name contains a tabulation. Although such a character is valid on most
             platforms, in the edited text it probably results from a typo.
         pathvalidate.ValidationError: a new name includes invalid character(s) for a filename
             (depends on the target platform).
@@ -28,29 +32,36 @@ def parse_edited_text(
         A list of Clause (path, new_name).
     """
     result = []
+    seen_inodes = set()
     for line in text.split("\n"):
         head, *tail = line.split("\t", maxsplit=1)
         if not tail:
             continue
         if not head.isdigit():
             continue
+
         inode = Inode(int(head))
-        path = inode_paths.get(inode)
+        if inode not in seen_inodes:
+            seen_inodes.add(inode)
+        else:
+            print_fail(f"Several targets for inode {inode}.")
+            raise SeveralTargetsError
+        
+        path = inodes_paths.get(inode)
         if path is None:
-            raise UnknownInodeError(f"Unknown inode {inode}.")
+            print_fail(f"Unknown inode {inode}.")
+            raise UnknownInodeError
+        
         new_name = tail[0]
         if "\t" in new_name:
-            raise TabError(f"Illegal tabulation in the new name: {repr(new_name)}.")
+            print_fail(f"Illegal tabulation in the new name: {repr(new_name)}.")
+            raise TabulationError
         if path.name == new_name:
             continue
-        validate_filename(new_name, platform=platform)
+        try:
+            pathvalidate.validate_filename(new_name, platform=platform)
+        except pathvalidate.ValidationError:
+            print_fail(f"Invalid character(s) in the new name: {repr(new_name)}.")
+            raise ValidationError
         result.append(Clause(path, Name(new_name)))
     return result
-
-
-class UnknownInodeError(ValueError):
-    ...
-
-
-class TabError(ValueError):
-    ...
