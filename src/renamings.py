@@ -44,8 +44,8 @@ def perform_renamings(
 
 def rollback_renamings(renamings: List[Renaming]):
     try:
-        for renaming in reversed(renamings):
-            rename_and_log_one_file(swap_source_and_target(renaming))
+        for (source, target) in reversed(renamings):
+            rename_and_log_one_file(Renaming(target, source))
         logging.warning("Rolled back.")
         print_exit("Recoverable error during the renaming. No changes.")
     except OSError:
@@ -60,8 +60,8 @@ def undo_renamings(
 ):
     """Read a log file and apply the renamings in reverse and by swapping sources and targets."""
     renamings = []
-    for source, target in reversed(find_all_renamings(log_path.read_text())):
-        renamings.append(swap_source_and_target(Renaming(Path(source), Path(target))))
+    for (source, target) in reversed(find_all_renamings(log_path.read_text())):
+        renamings.append(Renaming(Path(target), Path(source)))
     perform_renamings(renamings)
 
 
@@ -69,11 +69,6 @@ def rename_and_log_one_file(renaming: Renaming):
     renaming.source.rename(renaming.target)
     logging.info(f"SOURCE:{renaming.source}")
     logging.info(f"TARGET:{renaming.target}")
-
-
-def swap_source_and_target(renaming: Renaming) -> Renaming:
-    """Return a copy of the given renaming where the source and the target are swapped."""
-    return Renaming(Path(renaming.target), Path(renaming.source))
 
 
 def show_log_file(log_path: Path = LOG_DIR / LOG_NAME):
