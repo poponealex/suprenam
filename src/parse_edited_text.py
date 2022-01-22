@@ -32,20 +32,13 @@ def parse_edited_text(
         A list of clauses (path, new_name).
     """
     result = []
-    seen_inodes = set()
     for line in text.split("\n"):
         head, *tail = line.split("\t", maxsplit=1)
         if not tail:
             continue
         if not head.isdigit():
             continue
-
         inode = Inode(int(head))
-        if inode not in seen_inodes:
-            seen_inodes.add(inode)
-        else:
-            print_fail(f"Several targets for inode {inode}.")
-            raise SeveralTargetsError
         
         path = inodes_paths.get(inode)
         if path is None:
@@ -54,14 +47,14 @@ def parse_edited_text(
         
         new_name = tail[0]
         if "\t" in new_name:
-            print_fail(f"Illegal tabulation in the new name: {repr(new_name)}.")
+            print_fail(f"Illegal tabulation in the new name: '{new_name}'.")
             raise TabulationError
         if path.name == new_name:
             continue
         try:
             pathvalidate.validate_filename(new_name, platform=platform)
         except pathvalidate.ValidationError:
-            print_fail(f"Invalid character(s) in the new name: {repr(new_name)}.")
+            print_fail(f"Invalid character(s) in the new name: '{new_name}'.")
             raise ValidationError
         result.append(Clause(path, Name(new_name)))
     return result

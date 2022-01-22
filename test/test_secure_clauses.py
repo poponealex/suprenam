@@ -93,14 +93,11 @@ def test_dict_of_clauses():
     clauses = [
         (Path("/foo/bar"), "buzz"),
         (Path("/ping"), "pong"),
-        (Path("/ping"), "pong"),  # duplicates don't matter
+        (Path("/ping"), "pong"),  # duplicates are forbidden
     ]
-    expected = {
-        Path("/foo/bar"): "buzz",
-        Path("/ping"): "pong",
-    }
-    result = dict_of_clauses(clauses)
-    assert result == expected
+    with pytest.raises(DuplicatedClauseError) as offending_path:
+        dict_of_clauses(clauses)
+    assert offending_path.value.args[0] == Path("/ping")
 
 
 def test_dict_of_clauses_when_not_a_function():
