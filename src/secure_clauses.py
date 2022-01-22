@@ -2,12 +2,12 @@ from itertools import groupby
 from typing import Iterable, List, Tuple
 
 from src.file_system import FileSystem
-from src.user_types import Clause, ClauseMap, Name, Renaming
+from src.user_types import Clause, ClauseMap, Name, Arc
 from src.user_errors import *
 from src.goodies import print_fail
 
 
-def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Renaming]:
+def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Arc]:
     """Construct a "safe" version of the given renaming clauses and update the file system.
 
     The resulting sequence is a reordered copy of the given clauses, with potentially the
@@ -35,7 +35,7 @@ def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Renam
         all the renamings would have been executed).
 
     Returns:
-        List[Renaming]: A "safe" version of the given renaming clauses, presented as a list of
+        List[Arc]: A "safe" version of the given renaming clauses, presented as a list of
             source and target paths.
     """
     clause_dict = dict_of_clauses(clauses)
@@ -55,7 +55,7 @@ def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Renam
             file_system.rename(path, new_path)
             i += 1
         safe_clauses.extend(clauses)
-    return [Renaming(path, path.parent / new_name) for (path, new_name) in safe_clauses]
+    return [Arc(path, path.parent / new_name) for (path, new_name) in safe_clauses]
 
 
 def dict_of_clauses(clauses: Iterable[Clause]) -> ClauseMap:

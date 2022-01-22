@@ -65,7 +65,7 @@ class FileSystem(set):
         return new_path
 
     def rename(self, path, new_path):
-        """Rename a path into a new path, and renames recursively its descendants.
+        """Rename a path into a new path, and rename recursively its descendants.
 
         The following preconditions are normally satisfied:
 
@@ -79,8 +79,9 @@ class FileSystem(set):
 
         Notes:
             - The renaming is virtual only. The ultimate goal is to produce a sequence of "safe"
-                clauses for an ulterior actual renaming. Nevertheless, all the consequences of a
-                renaming (specifically, of a folder) are simulated to ensure testability.
+                clauses (or arcs) for an ulterior actual renaming.
+                Nevertheless, all the consequences of a renaming (specifically, of a folder) are
+                simulated to ensure testability.
             - In a virtual file system, renaming a node before its parent is not mandatory.
         """
         offset = len(str(path)) + 1

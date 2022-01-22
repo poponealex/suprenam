@@ -79,11 +79,11 @@ def run_on_path_list(paths: List[Path]):
         abort_without_renaming()
 
     try:
-        renamings = secure_clauses(FileSystem(), clauses)
+        arcs = secure_clauses(FileSystem(), clauses)
     except (SeveralTargetsError, SeveralSourcesError):
         abort_without_renaming()
 
-    perform_renamings(renamings)
+    perform_renamings(arcs)
     return print_success("Renamings were performed successfully.")
 
 

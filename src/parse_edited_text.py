@@ -13,7 +13,7 @@ def parse_edited_text(
     platform: str = "auto",  # enable testing on different platforms
 ) -> List[Clause]:
     """
-    Parse the renamings' text.
+    Parse the text in which the user has modified some filenames to specify a renaming.
 
     Args:
         text: the text with the effective renamings.
@@ -29,7 +29,7 @@ def parse_edited_text(
             (depends on the target platform).
 
     Returns:
-        A list of Clause (path, new_name).
+        A list of clauses (path, new_name).
     """
     result = []
     seen_inodes = set()

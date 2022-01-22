@@ -12,7 +12,7 @@ class Clause(NamedTuple):
 ClauseMap = Dict[Path, Name]
 
 
-class Renaming(NamedTuple):
+class Arc(NamedTuple):
     source: Path
     target: Path
 

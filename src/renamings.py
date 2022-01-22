@@ -4,21 +4,22 @@ from pathlib import Path
 from typing import List
 
 from src.goodies import *
-from src.user_types import Renaming
+from src.user_types import Arc
 
 LOG_DIR = Path.home() / ".suprenam"
 LOG_NAME = "previous_session.log"
 
 
 def perform_renamings(
-    renamings: List[Renaming],
+    arcs: List[Arc],
     log_path: Path = LOG_DIR / LOG_NAME,
 ):
     """
-    Given a list of renaming operations, perform them and log them in a log file.
+    Perform the renamings specified by the list of arcs (source path, target path), and
+    log them one by one.
 
     Args:
-        renamings: list of Renaming objects
+        arcs: list of couples (source_path, target_path)
         log_path: path to the log file
     """
     # Ensure the log directory exists.
@@ -34,18 +35,18 @@ def perform_renamings(
 
     # Perform the renaming operations.
     try:
-        for (i, renaming) in enumerate(renamings):
-            rename_and_log_one_file(renaming)
+        for (i, arc) in enumerate(arcs):
+            rename_and_log_one_file(arc)
         print_success("Success.")
     except OSError:
         logging.warning("Failed renaming.")
-        rollback_renamings(renamings[:i])
+        rollback_renamings(arcs[:i])
 
 
-def rollback_renamings(renamings: List[Renaming]):
+def rollback_renamings(arcs: List[Arc]):
     try:
-        for (source, target) in reversed(renamings):
-            rename_and_log_one_file(Renaming(target, source))
+        for (source, target) in reversed(arcs):
+            rename_and_log_one_file(Arc(target, source))
         logging.warning("Rolled back.")
         print_exit("Recoverable error during the renaming. No changes.")
     except OSError:
@@ -56,19 +57,19 @@ def rollback_renamings(renamings: List[Renaming]):
 
 def undo_renamings(
     log_path: Path = LOG_DIR / LOG_NAME,
-    find_all_renamings=re.compile(r"(?m)^INFO:\w+:SOURCE:(.+)\nINFO:\w+:TARGET:(.+)").findall,
+    find_all_arcs=re.compile(r"(?m)^INFO:\w+:SOURCE:(.+)\nINFO:\w+:TARGET:(.+)").findall,
 ):
     """Read a log file and apply the renamings in reverse and by swapping sources and targets."""
-    renamings = []
-    for (source, target) in reversed(find_all_renamings(log_path.read_text())):
-        renamings.append(Renaming(Path(target), Path(source)))
-    perform_renamings(renamings)
+    arcs = []
+    for (source, target) in reversed(find_all_arcs(log_path.read_text())):
+        arcs.append(Arc(Path(target), Path(source)))
+    perform_renamings(arcs)
 
 
-def rename_and_log_one_file(renaming: Renaming):
-    renaming.source.rename(renaming.target)
-    logging.info(f"SOURCE:{renaming.source}")
-    logging.info(f"TARGET:{renaming.target}")
+def rename_and_log_one_file(arc: Arc):
+    arc.source.rename(arc.target)
+    logging.info(f"SOURCE:{arc.source}")
+    logging.info(f"TARGET:{arc.target}")
 
 
 def show_log_file(log_path: Path = LOG_DIR / LOG_NAME):
