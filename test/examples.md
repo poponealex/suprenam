@@ -23,16 +23,26 @@
     - [Rolling the names of two leaves and a folder](#rolling-the-names-of-two-leaves-and-a-folder)
     - [Rolling the names of one leaf and two folders](#rolling-the-names-of-one-leaf-and-two-folders)
     - [Rolling the names of three folders](#rolling-the-names-of-three-folders)
+  - [Multiple renaming in the same branch](#multiple-renaming-in-the-same-branch)
+    - [Shifting a node while renaming its parent](#shifting-a-node-while-renaming-its-parent)
+    - [Swapping a node while renaming its parent](#swapping-a-node-while-renaming-its-parent)
+    - [Shifting both a node and its parent](#shifting-both-a-node-and-its-parent)
+    - [Swapping both a node and its parent](#swapping-both-a-node-and-its-parent)
 - [Rejected schemes](#rejected-schemes)
+  - [Non-existing original path](#non-existing-original-path)
+    - [Renaming a non existing folder](#renaming-a-non-existing-folder)
   - [Name clash among renaming clauses](#name-clash-among-renaming-clauses)
     - [Giving the same leaf at least two distinct names](#giving-the-same-leaf-at-least-two-distinct-names)
     - [Giving the same folder at least two distinct names](#giving-the-same-folder-at-least-two-distinct-names)
+    - [Giving a leaf both the same name and a new name](#giving-a-leaf-both-the-same-name-and-a-new-name)
+    - [Giving a folder both the same name and a new name](#giving-a-folder-both-the-same-name-and-a-new-name)
     - [Giving two distinct sibling leaves the same name](#giving-two-distinct-sibling-leaves-the-same-name)
     - [Giving two distinct sibling leaf and folder the same name](#giving-two-distinct-sibling-leaf-and-folder-the-same-name)
     - [Giving two distinct sibling folders the same name](#giving-two-distinct-sibling-folders-the-same-name)
   - [Name clash outside renaming clauses](#name-clash-outside-renaming-clauses)
     - [Giving a leaf the name of an existing leaf](#giving-a-leaf-the-name-of-an-existing-leaf)
     - [Giving a leaf the name of an existing folder](#giving-a-leaf-the-name-of-an-existing-folder)
+    - [Giving a leaf the name of an existing folder renamed into itself](#giving-a-leaf-the-name-of-an-existing-folder-renamed-into-itself)
     - [Giving a folder the name of an existing leaf](#giving-a-folder-the-name-of-an-existing-leaf)
     - [Giving a folder the name of an existing folder](#giving-a-folder-the-name-of-an-existing-folder)
 
@@ -182,6 +192,8 @@ original path | new path
 
 ### Shifting the names of one leaf and one folder
 
+#### Example
+
 original path | new name
 ---|---
 /usr/local/share/info | spam
@@ -236,6 +248,8 @@ original path | new path
 
 ### Shifting the names of two folders
 
+#### Example
+
 original path | new name
 ---|---
 /usr/bin | spam
@@ -245,13 +259,13 @@ original path | new name
 
 original path | new path
 ---|---
-/usr/bin | /usr/spam 
-/usr/bin/X11 | /usr/spam/X11 
+/usr/bin | /usr/spam
+/usr/bin/X11 | /usr/spam/X11
 /usr/lib | /usr/bin
-/usr/lib/X11 | /usr/bin/X11 
-/usr/lib/games | /usr/bin/games 
-/usr/lib/gcc-lib | /usr/bin/gcc-lib 
-/usr/lib/locale | /usr/bin/locale 
+/usr/lib/X11 | /usr/bin/X11
+/usr/lib/games | /usr/bin/games
+/usr/lib/gcc-lib | /usr/bin/gcc-lib
+/usr/lib/locale | /usr/bin/locale
 /usr/lib/tls | /usr/bin/tls
 
 ## Swapping
@@ -428,7 +442,127 @@ original path | new path
 /usr/lib/locale | /usr/bin/locale
 /usr/lib/tls | /usr/bin/tls
 
+## Multiple renaming in the same branch
+
+--------------------------------------------------------------------------------
+
+### Shifting a node while renaming its parent
+
+#### Example
+
+original path | new name
+---|---
+/usr/X11R6/lib | man
+/usr/X11R6/man | foo
+/usr/X11R6 | bar
+
+#### Result
+
+original path | new path
+---|---
+/usr/X11R6 | /usr/bar
+/usr/X11R6/bin | /usr/bar/bin
+/usr/X11R6/include | /usr/bar/include
+/usr/X11R6/lib | /usr/bar/man
+/usr/X11R6/lib/tls | /usr/bar/man/tls
+/usr/X11R6/man | /usr/bar/foo
+/usr/X11R6/share | /usr/bar/share
+
+--------------------------------------------------------------------------------
+
+### Swapping a node while renaming its parent
+
+#### Example
+
+original path | new name
+---|---
+/usr/X11R6/lib | man
+/usr/X11R6/man | lib
+/usr/X11R6 | bar
+
+#### Result
+
+original path | new path
+---|---
+/usr/X11R6 | /usr/bar
+/usr/X11R6/bin | /usr/bar/bin
+/usr/X11R6/include | /usr/bar/include
+/usr/X11R6/lib | /usr/bar/man
+/usr/X11R6/lib/tls | /usr/bar/man/tls
+/usr/X11R6/man | /usr/bar/lib
+/usr/X11R6/share | /usr/bar/share
+
+--------------------------------------------------------------------------------
+
+### Shifting both a node and its parent
+
+#### Example
+
+original path | new name
+---|---
+/usr/X11R6/lib | man
+/usr/X11R6/man | foo
+/usr/X11R6 | bin
+/usr/bin | bar
+
+#### Result
+
+original path | new path
+---|---
+/usr/X11R6 | /usr/bin
+/usr/X11R6/bin | /usr/bin/bin
+/usr/X11R6/include | /usr/bin/include
+/usr/X11R6/lib | /usr/bin/man
+/usr/X11R6/lib/tls | /usr/bin/man/tls
+/usr/X11R6/man | /usr/bin/foo
+/usr/X11R6/share | /usr/bin/share
+/usr/bin | /usr/bar
+/usr/bin/X11 | /usr/bar/X11
+
+--------------------------------------------------------------------------------
+
+### Swapping both a node and its parent
+
+#### Example
+
+original path | new name
+---|---
+/usr/X11R6/lib | man
+/usr/X11R6/man | lib
+/usr/X11R6 | bin
+/usr/bin | X11R6
+
+#### Result
+
+original path | new path
+---|---
+/usr/X11R6 | /usr/bin
+/usr/X11R6/bin | /usr/bin/bin
+/usr/X11R6/include | /usr/bin/include
+/usr/X11R6/lib | /usr/bin/man
+/usr/X11R6/lib/tls | /usr/bin/man/tls
+/usr/X11R6/man | /usr/bin/lib
+/usr/X11R6/share | /usr/bin/share
+/usr/bin | /usr/X11R6
+/usr/bin/X11 | /usr/X11R6/X11
+
 # Rejected schemes
+
+## Non-existing original path
+
+--------------------------------------------------------------------------------
+
+### Renaming a non existing folder
+
+#### Example
+
+original path | new name
+---|---
+/usr/foo | bar
+
+#### Result
+
+`FileNotFoundError("/usr/foo")`
 
 ## Name clash among renaming clauses
 
@@ -445,8 +579,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`SeveralTargetsError("/bin")`
 
 --------------------------------------------------------------------------------
 
@@ -461,8 +594,37 @@ original path | new name
 
 #### Result
 
-original path | new path
+`SeveralTargetsError("/etc")`
+
+--------------------------------------------------------------------------------
+
+### Giving a leaf both the same name and a new name
+
+#### Example
+
+original path | new name
 ---|---
+/bin | bin
+/bin | boom
+
+#### Result
+
+`SeveralTargetsError("/bin")`
+
+--------------------------------------------------------------------------------
+
+### Giving a folder both the same name and a new name
+
+#### Example
+
+original path | new name
+---|---
+/etc | etc
+/etc | esc
+
+#### Result
+
+`SeveralTargetsError("/etc")`
 
 --------------------------------------------------------------------------------
 
@@ -477,8 +639,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`SeveralSourcesError("/usr/lib/foobar")`
 
 --------------------------------------------------------------------------------
 
@@ -493,8 +654,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`SeveralSourcesError("/usr/foobar")`
 
 --------------------------------------------------------------------------------
 
@@ -509,8 +669,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`SeveralSourcesError("/usr/foobar")`
 
 ## Name clash outside renaming clauses
 
@@ -526,8 +685,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`SeveralSourcesError("/usr/share/man/man2")`
 
 --------------------------------------------------------------------------------
 
@@ -541,8 +699,22 @@ original path | new name
 
 #### Result
 
-original path | new path
+`SeveralSourcesError("/mnt")`
+
+--------------------------------------------------------------------------------
+
+### Giving a leaf the name of an existing folder renamed into itself
+
+#### Example
+
+original path | new name
 ---|---
+/opt | mnt
+/mnt | mnt
+
+#### Result
+
+`SeveralSourcesError("/mnt")`
 
 --------------------------------------------------------------------------------
 
@@ -556,8 +728,7 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`SeveralSourcesError("/opt")`
 
 --------------------------------------------------------------------------------
 
@@ -571,5 +742,4 @@ original path | new name
 
 #### Result
 
-original path | new path
----|---
+`SeveralSourcesError("/mnt")`

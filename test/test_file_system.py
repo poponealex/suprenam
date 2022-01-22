@@ -4,19 +4,55 @@ from pathlib import Path
 
 import context
 from src.file_system import FileSystem
+from pathvalidate import ValidationError
 
 
-def test_pure():
-    paths = Path("test/fhs.txt").read_text().strip().split("\n")
-    file_system = FileSystem(paths, is_pure=True)
-    assert file_system.exists(Path("/usr/local"))
-    assert file_system.index(Path("/usr/local")) == 48
-    assert file_system.index(Path("/usr/local/a")) == 48
-    file_system.add(Path("/usr/local/a"))
-    assert file_system.index(Path("/usr/local/a")) == 49
-    assert not file_system.exists(Path("/usr/non_existing_node"))
-    result = list(map(str, file_system.siblings(Path("/usr/local"))))
-    expected = [
+@pytest.fixture(scope="module")
+def paths():
+    return [Path(line) for line in Path("test/fhs.txt").read_text().strip().split("\n")]
+
+
+@pytest.fixture()
+def fs(paths):
+    return FileSystem(paths)
+
+
+def test_constructor(fs):
+    assert Path("/usr/local") in fs
+
+
+def test_invalid_pure_filenames():
+    macOS_linux = [Path("/foo/bar\0")]
+    windows = [Path("/foo/bar?")]
+    with pytest.raises(ValidationError):
+        FileSystem(macOS_linux, platform="linux")
+        FileSystem(windows, platform="windows")
+
+
+def test_update_with_source_paths_concrete():
+    fs = FileSystem()
+    paths = [
+        Path("./src/goodies.py"),
+        Path("."),
+    ]
+    fs.update_with_source_paths(paths)
+    assert Path("./src/file_system.py") in fs  # sibling of `goodies.py`
+    assert Path("./test") in fs  # sibling of `.`
+    assert Path("./LICENSE") in fs  # sibling of `.`
+    assert Path("./test/test_file_system.py") not in fs  # child of a sibling of `.`
+
+
+def test_update_with_source_paths_not_existing(fs):
+    paths = [
+        Path("/foo/bar"),
+    ]
+    with pytest.raises(FileNotFoundError) as offending_path:
+        fs.update_with_source_paths(paths)
+    assert offending_path.value.args[0] == Path("/foo/bar")
+
+
+def test_children(fs):
+    expected = {
         "/usr/X11R6",
         "/usr/bin",
         "/usr/etc",
@@ -24,53 +60,82 @@ def test_pure():
         "/usr/include",
         "/usr/lib",
         "/usr/libexec",
+        "/usr/local",
         "/usr/sbin",
         "/usr/share",
         "/usr/src",
         "/usr/tmp",
-    ]
-    assert set(map(str, file_system.children(Path("/usr")))) == set(expected + ["/usr/local"])
+    }
+    result = set(map(str, fs.children(Path("/usr"))))
     assert result == expected
-    file_system.add(Path("/usr/foo.bar"))
-    new_path = file_system.uncollide(Path("/usr/foo.bar"))
-    assert file_system.exists(Path("/usr/foo.bar"))
-    assert file_system.exists(Path("/usr/2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae-0.bar"))
-    file_system.remove(Path("/usr/2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae-0.bar"))
-    assert not file_system.exists(Path("/usr/2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae-0.bar"))
-    file_system.rename(Path("/etc"), Path("/etcetera"))
-    assert not file_system.exists(Path("/etc"))
-    expected = [
-        Path("/etcetera"),
-        Path("/etcetera/X11"),
-        Path("/etcetera/X11"),
-        Path("/etcetera/opt"),
-        Path("/etcetera/skel"),
-        Path("/etcetera/skel"),
-        Path("/etcetera/sysconfig"),
-        Path("/etcetera/sysconfig"),
-        Path("/etcetera/xinetd.d"),
-    ]
-    assert all(map(file_system.exists, expected))
 
 
-def test_actual():
-    base_path = Path(".").resolve()
-    paths = [
-        base_path / "src" / "goodies.py",
-        base_path / "test" / "context.py",
-        base_path / "non_existing_node",
-    ]
-    with pytest.raises(FileNotFoundError):
-        file_system = FileSystem(paths)
-    paths.pop()  # suppress the offending non existing path
-    file_system = FileSystem(paths)
-    assert file_system.exists(Path(base_path / "src" / "file_system.py"))
-    assert not file_system.exists(Path(base_path / "src"))
-    path = Path(base_path / "test" / "fhs.txt")
-    result = list(file_system.siblings(path))
-    assert path not in result, "A path is not its own sibling."
-    assert Path(base_path / "test" / "examples.md") in result
-    assert Path(base_path / "src" / "goodies.py") not in result
+def test_siblings(fs):
+    expected = {
+        Path("/usr/X11R6"),
+        Path("/usr/bin"),
+        Path("/usr/etc"),
+        Path("/usr/games"),
+        Path("/usr/include"),
+        Path("/usr/lib"),
+        Path("/usr/libexec"),
+        Path("/usr/local"),  # a node is considered as its own sibling
+        Path("/usr/sbin"),
+        Path("/usr/share"),
+        Path("/usr/src"),
+        Path("/usr/tmp"),
+    }
+    result = set(fs.siblings(Path("/usr/local")))
+    assert result == expected
+
+
+def test_non_existing_sibling_folder(fs):
+    expected = "/usr/NRXWGYLM-0"
+    result = str(fs.non_existing_sibling(Path("/usr/local")))
+    assert result == expected
+
+
+def test_non_existing_sibling_file(fs):
+    expected = "/etc/PBUW4ZLUMQXGI===-0"
+    result = str(fs.non_existing_sibling(Path("/etc/xinetd.d")))
+    assert result == expected
+
+
+def test_non_existing_sibling_file_with_collision(fs):
+    fs.add(Path("/etc/PBUW4ZLUMQXGI===-0"))
+    expected = "/etc/PBUW4ZLUMQXGI===-1"
+    result = str(fs.non_existing_sibling(Path("/etc/xinetd.d")))
+    assert result == expected
+
+
+def test_rename_leaf(fs):
+    original_fs = set(fs)
+    fs.rename(Path("/mnt/floppy"), Path("/mnt/toaster"))
+    assert original_fs - fs == {Path("/mnt/floppy")}
+    assert fs - original_fs == {Path("/mnt/toaster")}
+
+
+def test_rename_internal_node(fs):
+    original_fs = set(fs)
+    fs.rename(Path("/usr/X11R6"), Path("/usr/foobar"))
+    assert original_fs - fs == {
+        Path("/usr/X11R6"),
+        Path("/usr/X11R6/bin"),
+        Path("/usr/X11R6/include"),
+        Path("/usr/X11R6/lib"),
+        Path("/usr/X11R6/lib/tls"),
+        Path("/usr/X11R6/man"),
+        Path("/usr/X11R6/share"),
+    }
+    assert fs - original_fs == {
+        Path("/usr/foobar"),
+        Path("/usr/foobar/bin"),
+        Path("/usr/foobar/include"),
+        Path("/usr/foobar/lib"),
+        Path("/usr/foobar/lib/tls"),
+        Path("/usr/foobar/man"),
+        Path("/usr/foobar/share"),
+    }
 
 
 if __name__ == "__main__":

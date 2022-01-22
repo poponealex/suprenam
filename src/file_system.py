@@ -1,85 +1,91 @@
-__import__("sys").path[0:0] = ["."]
-import subprocess
-from pathlib import Path
-from bisect import bisect, insort
-from hashlib import sha256
+from base64 import b32encode
 from itertools import count
+from pathlib import Path
+from pathvalidate import validate_filename
+from typing import Generator, Iterable, Set, Optional
 
 
-class FileSystem:
-    def __init__(self, path_strings, is_pure=False):
-        if is_pure:
-            self.as_set = set(map(Path, path_strings))
-            self.as_population = {str(i): Path(path) for i, path in enumerate(path_strings)}
-            self.rename = self.rename_pure
-        else:
-            self.rename = self.rename_system
-            self.as_set = set()
-            self.as_population = {}
-            for path_string in path_strings:
-                if not path_string:
-                    continue
-                path = Path(path_string).resolve()
-                self.as_population[str(path.stat().st_ino)] = path
-                if path not in self.as_set:
-                    self.as_set.update(path.parent.glob("*"))
-        self.as_list = sorted(self.as_set)
+class FileSystem(set):
+    def __init__(self, paths: Optional[Iterable[Path]] = None, platform: str = "auto"):
+        if paths:  # when some initial paths are provided, the file system is considered as pure
+            super().__init__(paths)
+            for path in self:
+                validate_filename(
+                    path.name, platform=platform
+                )  # validate each filename when working with a pure FileSystem
+            self.path_exists = lambda path: path in self
+            self.siblings = lambda path: self.children(path.parent)
+        else:  # otherwise, the file system is considered as concrete
+            super().__init__()
+            self.path_exists = lambda path: path.exists()
+            self.siblings = lambda path: path.parent.glob("*")
 
-    def exists(self, path):
-        return path in self.as_set
+    def update_with_source_paths(self, source_paths: Iterable[Path]) -> None:
+        """Check all paths exist in the file system and "close" it with their siblings.
 
-    def index(self, path):
-        """Return the index at/after which the given path is/should be stored."""
-        return bisect(self.as_list, path)
+        Args:
+            source_paths (Iterable[Path]): the paths to be renamed.
 
-    def children(self, path):
-        for candidate in self.as_list[self.index(path) :]:
-            if not str(candidate).startswith(f"{path}/"):
-                break
+        Raises:
+            FileNotFoundError: a source path is absent from the file system.
+        """
+        result: Set[Path] = set()
+        for source_path in source_paths:
+            if not self.path_exists(source_path):
+                raise FileNotFoundError(source_path)
+            result.update(self.siblings(source_path))
+        self.update(result)  # should not change a pure file system
+
+    def children(self, path: Path) -> Generator[Path, None, None]:
+        for candidate in self:
             if candidate.match(f"{path}/*"):
                 yield candidate
 
-    def siblings(self, path):
-        for candidate in self.children(path.parent):
-            if path != candidate:
-                yield candidate
+    def non_existing_sibling(self, path: Path) -> Path:
+        """Create the path of a non-existing sibling of a given path.
 
-    def add(self, path):
-        insort(self.as_list, path)
-        self.as_set.add(path)
+        Args:
+            path (Path): a source path which is the target of another renaming.
 
-    def remove(self, path):
-        if self.exists(path):
-            index = self.index(path)
-            if self.as_list[index] != path:
-                index -= 1
-            del self.as_list[index]
-            self.as_set.remove(path)
+        Returns:
+            Path: the path to be temporarily used for an intermediate renaming.
 
-    def uncollide(self, path):
-        """Calculate and add a non-colliding new name for path."""
-        digest = sha256(path.stem.encode("utf8")).hexdigest()
+        Notes:
+            - A previous version relied on `Path.with_stem`, which requires Python 3.9. In the
+            present version, the non existing sibling does not conserve the extension of the
+            original file.
+            - Truncated SHA-256 and BASE-64 were considered, but the former is overkill, and the
+            character set of the latter is not appropriate for filenames.
+        """
+        digest = b32encode(path.name.encode("utf8")).decode("ascii")[:32]
         for suffix in count():
-            new_path = path.with_stem(f"{digest}-{suffix}")
-            if not self.exists(new_path):
-                self.add(new_path)
-                return new_path
+            new_path = path.with_name(f"{digest}-{suffix}")
+            if new_path not in self:
+                break
+        return new_path
 
-    def rename_pure(self, original_path, new_path):
-        """Virtually rename a path in the FileSystem object's as_set and as_list instances."""
-        for path in self.children(original_path):
-            self.remove(path)
-            self.add(Path(new_path / path.name))
-        self.remove(original_path)
-        self.add(new_path)
+    def rename(self, path, new_path):
+        """Rename a path into a new path, and rename recursively its descendants.
 
-    def rename_system(self, original_path, new_path):
-        try:
-            subprocess.run(
-                ["git", "mv", original_path.name, new_path.name],
-                cwd=original_path.parent,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT,
-            ).check_returncode()
-        except subprocess.CalledProcessError:
-            original_path.rename(new_path)
+        The following preconditions are normally satisfied:
+
+        1. `path` and `new_path` are siblings,
+        2. `path` is in the file system,
+        3. and `new_path` is not in the file system yet.
+
+        Results:
+            - `path` is replaced by `new_path` in the file system.
+            - Any descendant of `path` is replaced by the appropriate `path`.
+
+        Notes:
+            - The renaming is virtual only. The ultimate goal is to produce a sequence of "safe"
+                clauses (or arcs) for an ulterior actual renaming.
+                Nevertheless, all the consequences of a renaming (specifically, of a folder) are
+                simulated to ensure testability.
+            - In a virtual file system, renaming a node before its parent is not mandatory.
+        """
+        offset = len(str(path)) + 1
+        for candidate in list(self):
+            if candidate == path or str(candidate).startswith(f"{path}/"):
+                self.remove(candidate)
+                self.add(new_path / str(candidate)[offset:])

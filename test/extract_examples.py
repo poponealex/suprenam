@@ -9,24 +9,27 @@ original path \| new name
 ---\|---
 ((?:.+\n)*)
 #### Result\n
-original path \| new path
----\|---
-((?:.+\n)*)"""
+(?:original path \| new path
+---\|---\n)?((?:.+\n)*)"""
 
 
 def extract_rows(table):
     if not table:
         return []
-    return [tuple(row.split("|")) for row in table.strip().split("\n")]
+    m = re.match(r"`(\w+Error)\(\"(.+)\"\)`\n", table)
+    if m:
+        return (m[1], m[2])
+    return [tuple([x.strip() for x in row.split("|")]) for row in table.strip().split("\n")]
 
 
-def main(path):
+def extract_examples(path):
     result = []
     text = path.read_text()
-    for match in re.finditer(SECTION_PATTERN, text):
+    for (i, match) in enumerate(re.finditer(SECTION_PATTERN, text), 1):
         (title, example, expected) = match.groups()
         result.append(
             {
+                "i": i,
                 "title": title,
                 "example": extract_rows(example),
                 "expected": extract_rows(expected),
@@ -38,8 +41,7 @@ def main(path):
 
 
 if __name__ == "__main__":
-    for (i, test_data) in enumerate(main(Path("test/examples.md")), 1):
-        test_data["#"] = i
-        print("Section {#}: {title}".format(**test_data))
+    for (i, test_data) in enumerate(extract_examples(Path("test/examples.md")), 1):
+        print("Section {i}: {title}".format(**test_data))
         print("Example: {example}".format(**test_data))
         print("Expected: {expected}".format(**test_data))

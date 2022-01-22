@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 # logging
 LOGGING_FORMAT = "%(asctime)s\n%(levelname)s: %(message)s\n"
@@ -24,9 +25,8 @@ def print_warning(message: str):
 
 
 def print_fail(message: str):
-    """Print the given message on `sys.stderr` and raise a ValueError."""
+    """Print the given message on `sys.stderr`."""
     print(f"{FAIL}Error: {message}{RESET}", file=sys.stderr)
-    raise ValueError(message)
 
 
 def print_exit(message: str):
@@ -34,5 +34,26 @@ def print_exit(message: str):
     sys.exit(f"{FAIL}Error: {message}{RESET}")
 
 
-def print_rename(original_path: str, destination_path: str):
-    print(f"{INFO}{original_path} {OK}renamed as {INFO}{destination_path}{RESET}")
+def abort_without_renaming(message=None):
+    if message:
+        print_fail(message)
+    sys.exit(f"{WARNING}Aborted: no renamings were performed.{RESET}")
+
+
+def rm_tree(path: Path): # https://stackoverflow.com/a/57892171/173003
+    if not path.is_dir():
+        return
+    for child in path.iterdir():
+        if child.is_file():
+            child.unlink()
+        else:
+            rm_tree(child)
+    path.rmdir()
+
+
+from shutil import which
+
+
+def is_tool(name):  # https://stackoverflow.com/a/34177358/173003
+    """Check whether `name` is on PATH and marked as executable."""
+    return which(name) is not None

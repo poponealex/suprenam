@@ -1,7 +1,6 @@
 .DS_Store
 __pycache__
-.mypy_cache
-.pytest_cache
-logs/
-*.log
 private/*
+.suprenam/*
+app_bundle/*
+test/playground/*
