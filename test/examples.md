@@ -6,7 +6,6 @@
   - [Trivial renaming](#trivial-renaming)
     - [Trivial renaming of a leaf](#trivial-renaming-of-a-leaf)
     - [Trivial renaming of a folder](#trivial-renaming-of-a-folder)
-  - [Redundant renaming](#redundant-renaming)
   - [Shifting](#shifting)
     - [Shifting the names of two leaves](#shifting-the-names-of-two-leaves)
     - [Shifting the names of one leaf and one folder](#shifting-the-names-of-one-leaf-and-one-folder)
@@ -43,6 +42,7 @@
     - [Giving a leaf the name of an existing folder renamed into itself](#giving-a-leaf-the-name-of-an-existing-folder-renamed-into-itself)
     - [Giving a folder the name of an existing leaf](#giving-a-folder-the-name-of-an-existing-leaf)
     - [Giving a folder the name of an existing folder](#giving-a-folder-the-name-of-an-existing-folder)
+  - [Redundant renaming](#redundant-renaming)
     - [Redundant renaming of a leaf](#redundant-renaming-of-a-leaf)
     - [Redundant renaming of a folder](#redundant-renaming-of-a-folder)
 
@@ -126,8 +126,6 @@ original path | new path
 /usr/lib/gcc-lib | /usr/foobar/gcc-lib
 /usr/lib/locale | /usr/foobar/locale
 /usr/lib/tls | /usr/foobar/tls
-
-## Redundant renaming
 
 ## Shifting
 
@@ -704,6 +702,8 @@ original path | new name
 #### Result
 
 `SeveralSourcesError("/mnt")`
+
+## Redundant renaming
 
 --------------------------------------------------------------------------------
 
