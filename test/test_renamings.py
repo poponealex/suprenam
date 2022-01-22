@@ -1,4 +1,3 @@
-
 from pathlib import Path
 
 import context
@@ -21,16 +20,14 @@ def test_happy_path():
     ]
     for arc in arcs:
         arc.source.touch()
-    perform_renamings(arcs, Path("test/happy_log.txt"))
+    perform_renamings(arcs)
     try:
         assert set(base.iterdir()) == set(arc.target for arc in arcs)
-        # TODO: uncomment the following lines and try to understand why no logging file
-        #       is created when launched by pytest.
-        # undo_arcs(Path("test/happy_log.txt"))
-        # assert set(base.iterdir()) == set(arc.source for arc in arcs)
+        undo_renamings()
+        assert set(base.iterdir()) == set(arc.source for arc in arcs)
     finally:
         rm_tree(base)
-    
+
 
 def test_rollback_path():
     """Test the case where a renaming fails, and the previous ones are reverted."""
@@ -45,11 +42,15 @@ def test_rollback_path():
     ]
     for arc in arcs:
         arc.source.touch()
-    arcs[2].source.unlink() # delete a source
-    with pytest.raises(SystemExit):
-        perform_renamings(arcs, Path("test/rollback_log.txt"))
+    arcs[2].source.unlink()  # delete a source
+    with pytest.raises(RecoverableRenamingError):
+        perform_renamings(arcs)
     try:
-        assert set(base.iterdir()) == {base / "source_1", base / "source_2", base / "source_4"}
+        assert set(base.iterdir()) == {
+            base / "source_1",
+            base / "source_2",
+            base / "source_4",
+        }
     finally:
         rm_tree(base)
 

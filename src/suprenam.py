@@ -23,8 +23,10 @@ def main():
     args = cli_arguments()
 
     if args.undo:
-        undo_renamings()
-        return print_success("Renamings from the previous sessions were undone successfully.")
+        try:
+            return undo_renamings()
+        except Exception as e:
+            return print_fail(f"Undoing failed: {str(e)}.")
 
     # Construct the list of files to rename.
     paths = []
@@ -34,7 +36,7 @@ def main():
         paths.extend(Path(path) for path in Path(args.file).read_text().split("\n") if path)
     if not paths:
         print_fail("Please provide at least one file to rename.")
-        abort_without_renaming()
+        return abort_without_renaming()
 
     run_on_path_list(paths)
 
@@ -45,46 +47,50 @@ def run_on_path_list(paths: List[Path]):
     try:
         inodes_paths = paths_to_inodes_paths(paths)
     except FileNotFoundError:
-        abort_without_renaming()
+        return abort_without_renaming()
 
     try:
         editable_file_path = Path(NamedTemporaryFile(mode="w+", delete=False, suffix=".txt").name)
     except Exception as e:
         print_fail(str(e))
-        abort_without_renaming()
+        return abort_without_renaming()
 
     try:
         editable_file_path.write_text(get_editable_text(inodes_paths))
     except FileNotFoundError:
-        abort_without_renaming("The editable file was deleted.")
+        return abort_without_renaming("The editable file was deleted.")
 
     try:
         editor_command = get_editor_command(editable_file_path)
     except UnsupportedOSError:
-        abort_without_renaming()
+        return abort_without_renaming()
 
     try:
         subprocess.run(editor_command, check=True)
     except subprocess.CalledProcessError:
-        abort_without_renaming()
+        return abort_without_renaming()
 
     try:
         edited_text = EditedText(editable_file_path.read_text())
     except FileNotFoundError:
-        abort_without_renaming("The editable file was deleted.")
+        return abort_without_renaming("The editable file was deleted.")
 
     try:
         clauses = parse_edited_text(edited_text, inodes_paths)
     except (UnknownInodeError, TabulationError, ValidationError):
-        abort_without_renaming()
+        return abort_without_renaming()
 
     try:
         arcs = secure_clauses(FileSystem(), clauses)
     except (SeveralTargetsError, SeveralSourcesError, DuplicatedClauseError):
-        abort_without_renaming()
+        return abort_without_renaming()
 
-    perform_renamings(arcs)
-    return print_success("Renamings were performed successfully.")
+    try:
+        perform_renamings(arcs)
+    except RecoverableRenamingError:
+        return abort_without_renaming()
+    except Exception as e:
+        print_fail(f"Rollback failed: {str(e)}.")
 
 
 def cli_arguments():
