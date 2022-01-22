@@ -294,7 +294,7 @@ data = [
     (
         "Parse a file which contains several times the same inode with different targets.",
         ["universal"],
-        SeveralTargetsError,
+        "no_exception",
         {
             123: Path("/home/foo"),
         },
@@ -302,12 +302,15 @@ data = [
             123	foobar
             123	barfoo
         """,
-        [],
+        [ # This case will be filtered out by secure_clauses().
+            Clause(Path("/home/foo"), "foobar"),
+            Clause(Path("/home/foo"), "barfoo"),
+        ],
     ),
     (
         "Parse a file which contains several times the same inode with the same target.",
         ["universal"],
-        SeveralTargetsError,
+        "no_exception",
         {
             123: Path("/home/foo"),
         },
@@ -315,7 +318,10 @@ data = [
             123	foobar
             123	foobar
         """,
-        [],
+        [ # This case will be filtered out by secure_clauses().
+            Clause(Path("/home/foo"), "foobar"),
+            Clause(Path("/home/foo"), "foobar"),
+        ],
     ),
     (
         "Parse a file which contains some numerical parents.",

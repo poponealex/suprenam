@@ -75,12 +75,12 @@ def run_on_path_list(paths: List[Path]):
 
     try:
         clauses = parse_edited_text(edited_text, inodes_paths)
-    except (SeveralTargetsError, UnknownInodeError, TabulationError, ValidationError):
+    except (UnknownInodeError, TabulationError, ValidationError):
         abort_without_renaming()
 
     try:
         arcs = secure_clauses(FileSystem(), clauses)
-    except (SeveralTargetsError, SeveralSourcesError):
+    except (SeveralTargetsError, SeveralSourcesError, DuplicatedClauseError):
         abort_without_renaming()
 
     perform_renamings(arcs)

@@ -12,6 +12,7 @@ EXCEPTIONS = {
     "FileNotFoundError": __builtins__["FileNotFoundError"],
     "SeveralTargetsError": getattr(sc, "SeveralTargetsError"),
     "SeveralSourcesError": getattr(sc, "SeveralSourcesError"),
+    "DuplicatedClauseError": getattr(sc, "DuplicatedClauseError"),
 }
 
 PATHS = [Path(line) for line in Path("test/fhs.txt").read_text().strip().split("\n")]

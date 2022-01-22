@@ -34,3 +34,8 @@ class SeveralSourcesError(Exception):
     or a renaming target already exists and has no specified renaming.
     """
 
+
+class DuplicatedClauseError(Exception):
+    """
+    A clause (source, target) is specified more than once.
+    """

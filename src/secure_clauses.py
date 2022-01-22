@@ -3,7 +3,7 @@ from typing import Iterable, List, Tuple
 
 from src.file_system import FileSystem
 from src.user_types import Clause, ClauseMap, Name, Arc
-from src.user_errors import *
+from src.user_errors import DuplicatedClauseError, SeveralTargetsError, SeveralSourcesError
 from src.goodies import print_fail
 
 
@@ -61,28 +61,33 @@ def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Arc]:
 def dict_of_clauses(clauses: Iterable[Clause]) -> ClauseMap:
     """Make a dictionary from the given clauses.
 
-    The result is silently deduplicated. During its construction, a `SeveralTargetsError` is raised
-    iff there exists at least one couple of clauses `(path, new_name_1)` and `(path, new_name_2)`
-    with `new_name_1 != new_name_2`.
+    During its construction, raise an error iff there exists at least one couple of clauses
+    `(path, new_name_1)` and `(path, new_name_2)` (SeveralTargetsError if the new names are
+    distinct, and DuplicatedClauseError otherwise).
 
     Args:
         clauses (List[Clause]): A list of couples of the form `(path, new_name)`.
 
     Raises:
         SeveralTargetsError: Two distinct new names are specified for the same path.
+        DuplicatedClauseError: The same name is specified as least twice for the same path.
 
     Returns:
         ClauseMap: A dictionary associating paths to new names.
     """
     result: ClauseMap = {}
     for (path, new_name) in clauses:
-        if path in result and result[path] != new_name:
-            print_fail(
-                f"At least two distinct renaming targets for {repr(path)}:\n"
-                "    {result[path]}\n"
-                "    {new_name}."
-            )
-            raise SeveralTargetsError(path)
+        if path in result:
+            if result[path] == new_name:
+                print_fail(f"The clause '{path}' -> '{new_name}' is given more than once.")
+                raise DuplicatedClauseError(path)
+            else:
+                print_fail(
+                    f"At least two distinct renaming targets for '{path}':\n"
+                    "    '{result[path]}'\n"
+                    "    '{new_name}'."
+                )
+                raise SeveralTargetsError(path)
         result[path] = new_name
     return result
 
@@ -106,7 +111,7 @@ def check_injectivity(file_system: FileSystem, clauses: ClauseMap):
     for (path, new_name) in clauses.items():
         new_path = path.with_name(new_name)
         if new_path in already_seen or (new_path in file_system and new_path not in clauses):
-            print_fail(f"At least two distinct sources for {repr(new_path)}.")
+            print_fail(f"At least two distinct sources for '{new_path}'.")
             raise SeveralSourcesError(new_path)
         already_seen.add(new_path)
 
