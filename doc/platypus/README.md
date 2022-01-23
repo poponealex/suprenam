@@ -22,7 +22,7 @@
 - Icon: **TODO**
 - Version: 1.0.0 (as of 07/10/2021)
 - Author: Aristide Grange & Alexandre Perlmutter
-- Identifier: org.suprenam.Suprenam
+- Identifier: com.suprenam.Suprenam
 - Script Type: Shell (`/bin/sh`)
 - Script Path: Path to `wrapper.sh`
 - Interface: Text Window
