@@ -1,17 +1,23 @@
 import sys
 from pathlib import Path
 
-# logging
-LOGGING_FORMAT = "%(asctime)s\n%(levelname)s: %(message)s\n"
-LOGGING_DATE_FORMAT = "%d/%m/%Y - %I:%M:%S %p"
 
-
-# ANSI color codes
-OK = "\033[92m"
-WARNING = "\033[1m\033[38;5;166m"
-FAIL = "\033[1m\033[91m"
-INFO = "\033[1;96m"
-RESET = "\033[0m"
+# Optional ANSI color codes
+if Path.cwd().name == "Resources":  # pragma: no cover
+    # We're in the app bundle (macOS)
+    OK = ""
+    WARNING = ""
+    FAIL = ""
+    INFO = ""
+    RESET = ""
+    NEWLINE = "\r\n" # required in the Text Window of Platypus
+else:
+    OK = "\033[92m"
+    WARNING = "\033[1m\033[38;5;166m"
+    FAIL = "\033[1m\033[91m"
+    INFO = "\033[1;96m"
+    RESET = "\033[0m"
+    NEWLINE = "\n"
 
 
 def print_success(message: str):
@@ -37,10 +43,10 @@ def print_exit(message: str):
 def abort_without_renaming(message=None):
     if message:
         print_fail(message)
-    print_warning(f"Aborted: no renamings were performed.")
+    print(f"{WARNING}Aborted: no renamings were performed.{RESET}")
 
 
-def rm_tree(path: Path): # https://stackoverflow.com/a/57892171/173003
+def rm_tree(path: Path):  # https://stackoverflow.com/a/57892171/173003
     if not path.is_dir():
         return
     for child in path.iterdir():

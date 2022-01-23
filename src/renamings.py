@@ -30,7 +30,7 @@ def get_log_path() -> Path:
     return Path(logging.getLoggerClass().root.handlers[0].baseFilename)  # type: ignore
 
 
-def show_log_file(): # pragma: no cover
+def show_log_file():  # pragma: no cover
     """Print the contents of the log file (for testing purposes only)."""
     try:
         log_path = get_log_path()
@@ -55,7 +55,8 @@ def perform_renamings(arcs: List[Arc]):
         for (i, arc) in enumerate(arcs):
             rename_and_log_one_file(arc)
         n = len(arcs)
-        return print_success(f"Successfully renamed all {n} file{'s'[:n^1]}.")
+        print_arcs(arcs)
+        return print_success(f"{NEWLINE}Successfully renamed all {n} item{'s'[:n^1]}.")
     except Exception as e:
         logging.warning(str(e))
         print_fail(str(e))
@@ -70,7 +71,7 @@ def perform_renamings(arcs: List[Arc]):
 
 def perform_inverse_renamings(arcs: List[Arc]):
     for (source, target) in reversed(arcs):
-        rename_and_log_one_file(Arc(Path(target), Path(source)))
+        rename_and_log_one_file(Arc(target, source))
 
 
 def rename_and_log_one_file(arc: Arc):
@@ -85,8 +86,18 @@ def undo_renamings(
     """Read a log file and apply the reversed renamings."""
     print("Undoing the renamings found in the log file...")
     log_path = get_log_path()
-    arcs = list(find_logged_arcs(log_path.read_text()))
+    arcs = [Arc(Path(s), Path(t)) for (s, t) in find_logged_arcs(log_path.read_text())]
     create_new_log_file()
     perform_inverse_renamings(arcs)
     n = len(arcs)
-    print_success(f"Successfully unrenamed all {n} file{'s'[:n^1]}.")
+    print_arcs(arcs)
+    print_success(f"{NEWLINE}Successfully unrenamed all {n} item{'s'[:n^1]}.")
+
+
+def print_arcs(arcs: List[Arc]):
+    previous_parent = Path()
+    for (source, target) in arcs:
+        if source.parent != previous_parent:
+            print(f"{NEWLINE}{source.parent}")
+            previous_parent = source.parent
+        print(f"{source.name} -> {target.name}")
