@@ -23,7 +23,7 @@ OS = {
         "FALLBACK_EDITOR_COMMAND": [
             "open",
             "-n",  # open a new instance of the application even if one is already running
-            "-e",  # open with TextEdit
+            "-t",  # open with the default text editor
             "-W",  # block until the **application** is closed (even if it was already running).
             #        This is far from ideal, but there is currently no per-window way to check
         ],
@@ -86,9 +86,8 @@ def get_editor_command(path: Path) -> list:
         raise e
 
     default_editor_handler = re.findall(str(os_dict["EXTRACT_EDITOR"]), output)  # make mypy happy
-    if default_editor_handler:
+    if default_editor_handler and os_dict.get(default_editor_handler[0]) is not None:
         command = os_dict["DEFAULT_EDITOR_COMMAND"][default_editor_handler[0]]  # type: ignore
     else:
         command = list(os_dict["FALLBACK_EDITOR_COMMAND"])  # make mypy happy
     return command + [str(path)]
-
