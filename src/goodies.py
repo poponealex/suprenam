@@ -37,7 +37,7 @@ def print_exit(message: str):
 def abort_without_renaming(message=None):
     if message:
         print_fail(message)
-    sys.exit(f"{WARNING}Aborted: no renamings were performed.{RESET}")
+    print_warning(f"Aborted: no renamings were performed.")
 
 
 def rm_tree(path: Path): # https://stackoverflow.com/a/57892171/173003

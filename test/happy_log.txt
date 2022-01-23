@@ -1,6 +1,0 @@
-INFO:root:SOURCE:test/happy_path/source_1
-INFO:root:TARGET:test/happy_path/target_1
-INFO:root:SOURCE:test/happy_path/source_2
-INFO:root:TARGET:test/happy_path/target_2
-INFO:root:SOURCE:test/happy_path/source_3
-INFO:root:TARGET:test/happy_path/target_3

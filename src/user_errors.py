@@ -39,3 +39,8 @@ class DuplicatedClauseError(Exception):
     """
     A clause (source, target) is specified more than once.
     """
+
+class RecoverableRenamingError(Exception):
+    """
+    Raised after a successful rollback.
+    """
