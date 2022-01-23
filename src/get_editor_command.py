@@ -86,9 +86,8 @@ def get_editor_command(path: Path, platform: Optional[str]=None) -> list:
         print_fail(str(e))  # make mypy happy
         raise e
 
-    default_editor_handler = re.findall(str(os_dict["EXTRACT_EDITOR"]), output)  # make mypy happy
-    if default_editor_handler and os_dict["DEFAULT_EDITOR_COMMAND"].get(default_editor_handler[0]) is not None:
-        command = os_dict["DEFAULT_EDITOR_COMMAND"][default_editor_handler[0]]  # type: ignore
-    else:
-        command = list(os_dict["FALLBACK_EDITOR_COMMAND"])  # make mypy happy
-    return command + [str(path)]
+    default_editor_handler = re.findall(str(os_dict["EXTRACT_EDITOR"]), output)[0]
+    command = os_dict["DEFAULT_EDITOR_COMMAND"].get(default_editor_handler)  # type: ignore
+    if command: # the user has a default editor and the corresponding command is defined in OS
+        return command + [str(path)]
+    return list(os_dict["FALLBACK_EDITOR_COMMAND"]) + [str(path)]  # make mypy happy
