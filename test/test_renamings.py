@@ -55,5 +55,5 @@ def test_rollback_path():
         rm_tree(base)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pytest.main(["-qq", __import__("sys").argv[0]])

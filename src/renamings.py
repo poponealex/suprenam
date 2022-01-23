@@ -30,7 +30,7 @@ def get_log_path() -> Path:
     return Path(logging.getLoggerClass().root.handlers[0].baseFilename)  # type: ignore
 
 
-def show_log_file():
+def show_log_file(): # pragma: no cover
     """Print the contents of the log file (for testing purposes only)."""
     try:
         log_path = get_log_path()

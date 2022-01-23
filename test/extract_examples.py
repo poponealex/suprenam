@@ -36,11 +36,11 @@ def extract_examples(path):
             }
         )
     if len(result) < len(re.findall("(?m)^### ", text)):
-        print_warning('"examples.md" has more sections than matches.')
+        print_warning('"examples.md" has more sections than matches.')  # pragma: no cover
     return result
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     for (i, test_data) in enumerate(extract_examples(Path("test/examples.md")), 1):
         print("Section {i}: {title}".format(**test_data))
         print("Example: {example}".format(**test_data))

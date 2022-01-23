@@ -6,12 +6,13 @@ from typing import Generator, Iterable, Set, Optional
 
 
 class FileSystem(set):
-    def __init__(self, paths: Optional[Iterable[Path]] = None, platform: str = "auto"):
+    def __init__(self, paths: Optional[Iterable[Path]] = None, platform: Optional[str] = None):
         if paths:  # when some initial paths are provided, the file system is considered as pure
             super().__init__(paths)
             for path in self:
                 validate_filename(
-                    path.name, platform=platform
+                    path.name,
+                    platform=platform or "auto",
                 )  # validate each filename when working with a pure FileSystem
             self.path_exists = lambda path: path in self
             self.siblings = lambda path: self.children(path.parent)

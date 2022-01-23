@@ -44,5 +44,5 @@ def test(i, title, example, expected):
         assert fs - original_fs == additions
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pytest.main(["-qq", __import__("sys").argv[0]])

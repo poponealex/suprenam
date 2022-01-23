@@ -1,7 +1,8 @@
 import re
 import subprocess
 from pathlib import Path
-from platform import platform as get_platform_string
+from platform import platform as get_platform_long_string
+from typing import Optional
 
 from src.goodies import print_fail
 from src.user_errors import *
@@ -49,7 +50,7 @@ OS = {
 }
 
 
-def get_editor_command(path: Path) -> list:
+def get_editor_command(path: Path, platform: Optional[str]=None) -> list:
     """
     Retrieve a command launching a text editor on a given text file.
 
@@ -64,14 +65,14 @@ def get_editor_command(path: Path) -> list:
     Raises:
         UnsupportedOSError: if the OS dictionary defines no key for the given operating system name.
     """
-    platform_string = get_platform_string().split("-")[0]
-    os_dict = OS.get(platform_string)
+    platform = platform or get_platform_long_string().partition("-")[0]
+    os_dict = OS.get(platform)
     if not os_dict:
         print_fail(
-            f"Unsupported operating system: {platform_string}. "
+            f"Unsupported operating system: {platform}. "
             f"Supported operating systems are: {', '.join(OS.keys())}"
         )
-        raise UnsupportedOSError(platform_string)
+        raise UnsupportedOSError(platform)
 
     try:
         output = subprocess.run(
@@ -81,7 +82,7 @@ def get_editor_command(path: Path) -> list:
             stderr=subprocess.PIPE,
             check=True,
         ).stdout
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         print_fail(str(e))  # make mypy happy
         raise e
 

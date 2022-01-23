@@ -78,5 +78,5 @@ def main(path):
     path.write_text(text)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main(Path("test/examples.md"))
