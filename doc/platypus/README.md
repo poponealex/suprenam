@@ -9,8 +9,8 @@
 
 ### `create_macOS_bundle.sh` script
 
-- Instanciate `REPO` variable with suprenam's repo's path.
-- Instanciate `WRAPPER` variable with `wrapper.sh`'s path.
+- Instantiate `REPO` variable with suprenam's repo's path.
+- Instantiate `WRAPPER` variable with `wrapper.sh`'s path.
 - Run `chmod +x create_macOS_bundle.sh`.
 - Run `./create_macOS_bundle.sh`
 
@@ -35,10 +35,10 @@
 <img width="776" alt="screenshot 2021-10-07 at 3 47 22 PM" src="https://user-images.githubusercontent.com/74072635/136402979-02a68ed7-d7ff-437f-aa4d-bf3cb5f5193b.png">
 
 
-### Create App
-
-- Instanciate `APP` variable in `create_log_macOS_app.sh` with the App's path
-- Run `create_log_macOS_app.sh`
+- Click <kbd>Create App</kbd>
+- Instantiate `APP` variable in `create_log_macOS_app.sh` with the App's path
+- Run `chmod a+x create_log_macOS_app.sh`
+- Run `sudo ./create_log_macOS_app.sh`
 
 ## Create a package
 
