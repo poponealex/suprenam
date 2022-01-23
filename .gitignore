@@ -4,3 +4,5 @@ private/*
 .suprenam/*
 app_bundle/*
 test/playground/*
+.coverage
+htmlcov/*
