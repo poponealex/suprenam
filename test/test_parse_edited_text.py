@@ -357,19 +357,20 @@ data = [
 split_startwith_tabs = re.compile(r"(?m)^([ ]{4})*(.*)$").findall
 
 
-@pytest.mark.parametrize("title, platform, exception, inodes_paths, text, expected", data)
-def test_parse_edited_text(title, platform, exception, inodes_paths, text, expected):
+@pytest.mark.parametrize("title, platforms, exception, inodes_paths, text, expected", data)
+def test_parse_edited_text(title, platforms, exception, inodes_paths, text, expected):
     print(title)
     text = "\n".join(line for (_, line) in split_startwith_tabs(text))
-    actual = lambda: parse_edited_text(text, inodes_paths, platform=platform[0])
-    if exception != "no_exception":
-        with pytest.raises(exception):
-            actual()
-    else:
-        print(actual())
-        print(expected)
-        assert actual() == expected
+    for platform in platforms:
+        actual = lambda: parse_edited_text(text, inodes_paths, platform)
+        if exception != "no_exception":
+            with pytest.raises(exception):
+                actual()
+        else:
+            print(actual())
+            print(expected)
+            assert actual() == expected
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pytest.main(["-qq", __import__("sys").argv[0]])

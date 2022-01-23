@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import pathvalidate
 
@@ -10,7 +10,7 @@ from src.user_types import Clause, EditedText, Inode, InodesPaths, Name
 def parse_edited_text(
     text: EditedText,
     inodes_paths: InodesPaths,
-    platform: str = "auto",  # enable testing on different platforms
+    platform: Optional[str] = None,
 ) -> List[Clause]:
     """
     Parse the text in which the user has modified some filenames to specify a renaming.
@@ -18,8 +18,8 @@ def parse_edited_text(
     Args:
         text: the text with the effective renamings.
         inodes_paths: dict containing each path (value) with its inode (key).
-        platform: OS on which the renamings will be performed. The default "auto" means that the
-            platform will be detected automatically.
+        platform: OS on which the renamings will be performed. Without a value `path_validate` will
+            detect the platform automatically.
 
     Raises:
         UnknownInodeError: the edited text contains an inode absent from the source text.
@@ -39,12 +39,12 @@ def parse_edited_text(
         if not head.isdigit():
             continue
         inode = Inode(int(head))
-        
+
         path = inodes_paths.get(inode)
         if path is None:
             print_fail(f"Unknown inode {inode}.")
             raise UnknownInodeError
-        
+
         new_name = tail[0]
         if "\t" in new_name:
             print_fail(f"Illegal tabulation in the new name: '{new_name}'.")
@@ -52,7 +52,7 @@ def parse_edited_text(
         if path.name == new_name:
             continue
         try:
-            pathvalidate.validate_filename(new_name, platform=platform)
+            pathvalidate.validate_filename(new_name, platform=platform or "auto")
         except pathvalidate.ValidationError:
             print_fail(f"Invalid character(s) in the new name: '{new_name}'.")
             raise ValidationError

@@ -194,5 +194,5 @@ def test_sorted_by_level():
     assert result == expected
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pytest.main(["-qq", __import__("sys").argv[0]])

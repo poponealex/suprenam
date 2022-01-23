@@ -21,12 +21,16 @@ def test_constructor(fs):
     assert Path("/usr/local") in fs
 
 
-def test_invalid_pure_filenames():
-    macOS_linux = [Path("/foo/bar\0")]
-    windows = [Path("/foo/bar?")]
+path_and_platform_data = [
+    ([Path("/foo/bar\0")], "linux"),
+    ([Path("/foo/bar\0")], "macOS"),
+    ([Path("/foo/bar?")], "Windows"),
+]
+
+@pytest.mark.parametrize("paths, platform", path_and_platform_data)
+def test_invalid_pure_filenames(paths, platform):
     with pytest.raises(ValidationError):
-        FileSystem(macOS_linux, platform="linux")
-        FileSystem(windows, platform="windows")
+        FileSystem(paths, platform)
 
 
 def test_update_with_source_paths_concrete():
@@ -138,5 +142,5 @@ def test_rename_internal_node(fs):
     }
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pytest.main(["-qq", __import__("sys").argv[0]])

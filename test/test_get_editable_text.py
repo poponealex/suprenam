@@ -160,5 +160,5 @@ def test_get_editable_text(title, inodes_paths, expected):
 
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pytest.main(["-qq", __import__("sys").argv[0]])
