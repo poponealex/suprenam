@@ -34,4 +34,4 @@ for file in $(ls $SRC/*.py); do
     fi
 done
 
-cp -f $SRC/{suprenam.py,__init__.py} $REPO/LICENSE $WRAPPER $BUNDLE
+cp -f $SRC/{suprenam.py,__init__.py} $REPO/LICENSE $BUNDLE
