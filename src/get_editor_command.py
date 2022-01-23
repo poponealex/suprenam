@@ -87,7 +87,7 @@ def get_editor_command(path: Path, platform: Optional[str]=None) -> list:
         raise e
 
     default_editor_handler = re.findall(str(os_dict["EXTRACT_EDITOR"]), output)  # make mypy happy
-    if default_editor_handler and os_dict.get(default_editor_handler[0]) is not None:
+    if default_editor_handler and os_dict["DEFAULT_EDITOR_COMMAND"].get(default_editor_handler[0]) is not None:
         command = os_dict["DEFAULT_EDITOR_COMMAND"][default_editor_handler[0]]  # type: ignore
     else:
         command = list(os_dict["FALLBACK_EDITOR_COMMAND"])  # make mypy happy
