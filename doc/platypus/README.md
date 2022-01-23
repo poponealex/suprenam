@@ -28,7 +28,7 @@
 - Interface: Text Window
 - Check *Accept dropped items*
 - Accept dropped items settings: Check *Accept dropped files*
-- Bundle Files: Select all the files and folders from the bundle folder create by `create_macOS_bundle.sh` (except `wrapper.sh`).
+- Bundle Files: Select all the files and folders from the `app_bundle` folder created by `create_macOS_bundle.sh` (except `wrapper.sh`).
 
 <img width="776" alt="screenshot 2021-10-07 at 4 06 05 PM" src="https://user-images.githubusercontent.com/74072635/136402953-a62e8ff9-b47d-4677-9c95-98265a39863e.png">
 <img width="912" alt="screenshot 2021-10-07 at 3 47 44 PM" src="https://user-images.githubusercontent.com/74072635/136402966-204e1288-d05c-45b4-9ca9-b6e75ed3d7b5.png">

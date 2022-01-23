@@ -4,7 +4,7 @@ APP=# FILL ME
 LOG_DIR=$APP/Contents/Resources/.suprenam
 LOG_FILE=$LOG_DIR/previous_session.log
 
-if [ ! -d $LOG_DIR ]; then
+if [ ! -e $LOG_DIR ]; then
     mkdir $LOG_DIR
 fi
 

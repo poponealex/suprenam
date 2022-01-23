@@ -4,7 +4,7 @@ REPO=# FILL ME
 WRAPPER=# FILL ME 
 SRC=$REPO/src
 BUNDLE=$REPO/app_bundle
-PYTHON_SITE_PACKAGES=$(pip show pathvalidate | grep "^Location" | cut -c 11-)
+PYTHON_SITE_PACKAGES=$(pip3 show pathvalidate | grep "^Location" | cut -c 11-)
 
 if [ ! -d $REPO -o ! -d $SRC ]; then
     echo "FATAL ERROR: CHECK REPO'S PATH"
