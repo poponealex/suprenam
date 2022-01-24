@@ -2,18 +2,20 @@
 
 ## Create the app bundle
 
-## Required pip version and command name
+## Required command line tools
 
-- pip3
+- `pip3`
+- `platypus`
 
 ### Required Python Packages
 
-- pathvalidate
-- natsort
+- `pathvalidate`
+- `natsort`
 
 ### Automatized creation of the Platypus app - `create_platypus_app.sh`
 
-- Instantiate `REPO_ABSOLUTE_PATH` variable with suprenam's repo's path in `build/platypus/create_macOS_bundle.sh`.
+- Instantiate `REPO_ABSOLUTE_PATH` variable with suprenam's repo's absolute path in `build/platypus/create_macOS_bundle.sh`.
+- Instantiate `APP_DESTINATION` with the app's destination **directory**'s absolute path.
 - Run `chmod +x build/platypus/create_macOS_bundle.sh` from repo's root.
 - Run `./build/platypus/create_macOS_bundle.sh` from repo's root.
 
