@@ -13,8 +13,8 @@ PYTHON_SITE_PACKAGES=$($pip_command show pathvalidate | grep "^Location" | cut -
 PLATYPUS_SHARE="/usr/local/share/platypus"
 APP_DESTINATION="$BUILD/Suprenam.app"
 APP_VERSION="1.0.0"
-PKG_DESTINATION="$BUILD/Suprenam.pkgproj"
-
+PKG_PROJECT="$BUILD/Suprenam.pkgproj"
+PKG_DESTINATION="$BUILD/Suprenam.pkg"
 
 if [[ ! -d "$SRC" || ! -d "$BUILD" ]]; then
     echo "FATAL ERROR: check that you're at the Suprenam's root"
@@ -68,7 +68,7 @@ $bundle_files \
 "$WRAPPER" \
 "$APP_DESTINATION"
 
-packagesbuild --build-folder "`pwd`/$BUILD" --package-version "$APP_VERSION" "$PKG_DESTINATION"
+packagesbuild --build-folder "`pwd`/$BUILD" --package-version "$APP_VERSION" "$PKG_PROJECT"
 
 rm -rf "$BUNDLE"
 
