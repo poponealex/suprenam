@@ -1,17 +1,20 @@
 #! /bin/sh
 
-REPO_ABSOLUTE_PATH=# FILL ME
-APP_DESTINATION=# FILL ME
 
-WRAPPER="$REPO_ABSOLUTE_PATH/build/platypus/wrapper.sh"
-SRC="$REPO_ABSOLUTE_PATH/src"
-BUNDLE="$REPO_ABSOLUTE_PATH/build/platypus/app_bundle"
+BUILD="build/platypus"
+WRAPPER="$BUILD/wrapper.sh"
+SRC="src"
+BUNDLE="$BUILD/app_bundle"
 PYTHON_SITE_PACKAGES=$(pip3 show pathvalidate | grep "^Location" | cut -c 11-)
-APP_VERSION="1.0.0"
 PLATYPUS_SHARE="/usr/local/share/platypus"
+APP_DESTINATION="$BUILD/Suprenam.app"
+APP_VERSION="1.0.0"
+PKG_DESTINATION="$BUILD/Suprenam.pkgproj"
 
-if [ ! -d "$REPO_ABSOLUTE_PATH" -o ! -d "$SRC" ]; then
-    echo "FATAL ERROR: CHECK REPO'S PATH"
+
+if [[ ! -d "$SRC" || ! -d "$BUILD" ]]; then
+    echo "FATAL ERROR: check that you're at the Suprenam's root"
+    echo "currently located at: `pwd`"
     exit 2
 fi
 
@@ -21,17 +24,12 @@ if [[ ! -d "$PLATYPUS_SHARE"  || ! -d "$PLATYPUS_SHARE/MainMenu.nib" || ! -f "$P
     exit 2
 fi
 
-if [ ! -d "$BUNDLE" ]; then
-    mkdir "$BUNDLE"
+if [ -e "$BUNDLE" ]; then
+    read -p "$BUNDLE : This has nothing to do here, confirm deletion (y) " del && [[ $del != [yY] ]] && echo "Move or delete $BUNDLE, then try again" && exit 2
+    rm -rf "$BUNDLE"
 fi
 
-if [ ! -d "$BUNDLE/src" ]; then
-    mkdir "$BUNDLE/src"
-fi
-
-if [ ! -d "$BUNDLE/lib" ]; then
-    mkdir "$BUNDLE/lib"
-fi
+mkdir "$BUNDLE" "$BUNDLE"/{src,lib}
 
 for package in $(ls $PYTHON_SITE_PACKAGES | egrep "(pathvalidate|natsort)"); do
     cp -Rf "$PYTHON_SITE_PACKAGES/$package" "$BUNDLE/lib"
@@ -44,7 +42,7 @@ for file in $(ls $SRC/*.py); do
     fi
 done
 
-cp -f "$SRC"/{suprenam.py,__init__.py} "$REPO_ABSOLUTE_PATH/LICENSE" "$BUNDLE"
+cp -f "$SRC"/{suprenam.py,__init__.py} "LICENSE" "$BUNDLE"
 
 for file in $(ls $BUNDLE); do
     bundle_files="$bundle_files --bundled-file $BUNDLE/$file"
@@ -57,14 +55,20 @@ platypus \
 --app-version "$APP_VERSION" \
 --bundle-identifier "com.suprenam.Suprenam" \
 --author "Aristide Grange & Alexandre Perlmutter" \
---interpreter '/bin/sh'  \
---uniform-type-identifiers 'public.item|public.folder' \
+--interpreter "/bin/sh"  \
+--uniform-type-identifiers "public.item|public.folder" \
 $bundle_files \
 --droppable \
 --optimize-nib \
 --overwrite \
 "$WRAPPER" \
-"$APP_DESTINATION/Suprenam.app"
+"$APP_DESTINATION"
+
+packagesbuild --build-folder "`pwd`/$BUILD" --package-version "$APP_VERSION" "$PKG_DESTINATION"
 
 rm -rf "$BUNDLE"
+
+echo
+echo "APP: $APP_DESTINATION"
+echo "PKG: $PKG_DESTINATION"
 exit
