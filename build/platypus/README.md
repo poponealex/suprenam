@@ -1,8 +1,8 @@
 # Suprenam macOS app deployment procedure
 
-## Create the app bundle
+## Create the App
 
-## Required command line tools
+### Required command line tools
 
 - `pip3`
 - `platypus`
@@ -18,6 +18,7 @@
 - Instantiate `APP_DESTINATION` with the app's destination **directory**'s absolute path.
 - Run `chmod +x build/platypus/create_platypus_app.sh` from repo's root.
 - Run `./build/platypus/create_platypus_app.sh` from repo's root.
+- The app will be located at `APP_DESTINATION/Suprenam.app`
 
 #### Current App settings
 
