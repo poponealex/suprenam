@@ -14,10 +14,11 @@
 
 ### Automatized creation of the Platypus app - `create_platypus_app.sh`
 
-- Instantiate `REPO_ABSOLUTE_PATH` variable with suprenam's repo's absolute path in `build/platypus/create_macOS_bundle.sh`.
+- Instantiate `REPO_ABSOLUTE_PATH` variable with suprenam's repo's absolute path in `build/platypus/create_platypus_app.sh`.
 - Instantiate `APP_DESTINATION` with the app's destination **directory**'s absolute path.
-- Run `chmod +x build/platypus/create_macOS_bundle.sh` from repo's root.
-- Run `./build/platypus/create_macOS_bundle.sh` from repo's root.
+- Run `chmod +x build/platypus/create_platypus_app.sh` from repo's root.
+- Run `./build/platypus/create_platypus_app.sh` from repo's root.
+- The app will be located at `APP_DESTINATION/Suprenam.app`
 
 #### Current App settings
 
