@@ -2,43 +2,32 @@
 
 ## Create the app bundle
 
+## Required pip version and command name
+
+- pip3
+
 ### Required Python Packages
 
 - pathvalidate
 - natsort
 
-### `create_macOS_bundle.sh` script
+### Automatized creation of the Platypus app - `create_platypus_app.sh`
 
-- Instantiate `REPO` variable with suprenam's repo's path.
-- Instantiate `WRAPPER` variable with `wrapper.sh`'s path.
-- Run `chmod +x create_macOS_bundle.sh`.
-- Run `./create_macOS_bundle.sh`
+- Instantiate `REPO_ABSOLUTE_PATH` variable with suprenam's repo's path in `build/platypus/create_macOS_bundle.sh`.
+- Run `chmod +x build/platypus/create_macOS_bundle.sh` from repo's root.
+- Run `./build/platypus/create_macOS_bundle.sh` from repo's root.
 
-## Create the app with Platypus
+#### Current App settings
 
-### Settings
+- App Name: `Suprenam`
+- Icon: `**TODO**`
+- Version: `1.0.0 (as of 24/01/2022)`
+- Author: `Aristide Grange & Alexandre Perlmutter`
+- Bundle Identifier: `com.suprenam.Suprenam`
+- Script Path: `build/platypus/wrapper.sh`
+- Interface: `Text Window`
+- uniform-type-identifiers: `public.item|public.folder`
 
-- App Name: Suprenam
-- Icon: **TODO**
-- Version: 1.0.0 (as of 07/10/2021)
-- Author: Aristide Grange & Alexandre Perlmutter
-- Identifier: com.suprenam.Suprenam
-- Script Type: Shell (`/bin/sh`)
-- Script Path: Path to `wrapper.sh`
-- Interface: Text Window
-- Check *Accept dropped items*
-- Accept dropped items settings: Check *Accept dropped files*
-- Bundle Files: Select all the files and folders from the `app_bundle` folder created by `create_macOS_bundle.sh` (except `wrapper.sh`).
-
-<img width="776" alt="screenshot 2021-10-07 at 4 06 05 PM" src="https://user-images.githubusercontent.com/74072635/136402953-a62e8ff9-b47d-4677-9c95-98265a39863e.png">
-<img width="912" alt="screenshot 2021-10-07 at 3 47 44 PM" src="https://user-images.githubusercontent.com/74072635/136402966-204e1288-d05c-45b4-9ca9-b6e75ed3d7b5.png">
-<img width="776" alt="screenshot 2021-10-07 at 3 47 22 PM" src="https://user-images.githubusercontent.com/74072635/136402979-02a68ed7-d7ff-437f-aa4d-bf3cb5f5193b.png">
-
-
-- Click <kbd>Create App</kbd>
-- Instantiate `APP` variable in `create_log_macOS_app.sh` with the App's path
-- Run `chmod a+x create_log_macOS_app.sh`
-- Run `sudo ./create_log_macOS_app.sh`
 
 ## Create a package
 
