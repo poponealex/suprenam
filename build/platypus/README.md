@@ -1,8 +1,8 @@
 # Suprenam macOS app deployment procedure
 
-## Create the app bundle
+## Create the App
 
-## Required command line tools
+### Required command line tools
 
 - `pip3`
 - `platypus`
