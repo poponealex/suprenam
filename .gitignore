@@ -6,3 +6,5 @@ app_bundle/*
 test/playground/*
 .coverage
 htmlcov/*
+*.app
+*.pkg
