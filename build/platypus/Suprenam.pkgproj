@@ -36,11 +36,11 @@
 									<key>CHILDREN</key>
 									<array/>
 									<key>GID</key>
-									<integer>20</integer>
+									<integer>80</integer>
 									<key>PATH</key>
-									<string>/Users/alexandre/Desktop/Suprenam.app</string>
+									<string>Suprenam.app</string>
 									<key>PATH_TYPE</key>
-									<integer>0</integer>
+									<integer>1</integer>
 									<key>PERMISSIONS</key>
 									<integer>493</integer>
 									<key>TYPE</key>
@@ -459,6 +459,21 @@
 				<key>VERSION</key>
 				<integer>5</integer>
 			</dict>
+			<key>PACKAGE_SCRIPTS</key>
+			<dict>
+				<key>POSTINSTALL_PATH</key>
+				<dict>
+					<key>PATH_TYPE</key>
+					<integer>0</integer>
+				</dict>
+				<key>PREINSTALL_PATH</key>
+				<dict>
+					<key>PATH_TYPE</key>
+					<integer>0</integer>
+				</dict>
+				<key>RESOURCES</key>
+				<array/>
+			</dict>
 			<key>PACKAGE_SETTINGS</key>
 			<dict>
 				<key>AUTHENTICATION</key>
@@ -524,7 +539,7 @@
 			<key>BUILD_PATH</key>
 			<dict>
 				<key>PATH</key>
-				<string>build</string>
+				<string>.</string>
 				<key>PATH_TYPE</key>
 				<integer>1</integer>
 			</dict>
@@ -701,7 +716,7 @@
 			<key>PAYLOAD_ONLY</key>
 			<false/>
 			<key>REFERENCE_FOLDER_PATH</key>
-			<string>/Users/alexandre/Documents/GitHub/suprenam/build/platypus</string>
+			<string>build/platypus</string>
 			<key>TREAT_MISSING_PRESENTATION_DOCUMENTS_AS_WARNING</key>
 			<false/>
 		</dict>
