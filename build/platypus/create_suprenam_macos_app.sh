@@ -1,11 +1,15 @@
 #! /bin/sh
 
+pip_command=pip3
+if ! command -v pip3 &> /dev/null; then
+    pip_command=pip
+fi
 
 BUILD="build/platypus"
 WRAPPER="$BUILD/wrapper.sh"
 SRC="src"
 BUNDLE="$BUILD/app_bundle"
-PYTHON_SITE_PACKAGES=$(pip3 show pathvalidate | grep "^Location" | cut -c 11-)
+PYTHON_SITE_PACKAGES=$($pip_command show pathvalidate | grep "^Location" | cut -c 11-)
 PLATYPUS_SHARE="/usr/local/share/platypus"
 APP_DESTINATION="$BUILD/Suprenam.app"
 APP_VERSION="1.0.0"
@@ -69,6 +73,7 @@ packagesbuild --build-folder "`pwd`/$BUILD" --package-version "$APP_VERSION" "$P
 rm -rf "$BUNDLE"
 
 echo
-echo "APP: $APP_DESTINATION"
-echo "PKG: $PKG_DESTINATION"
+echo "APP -> $APP_DESTINATION"
+echo "PKG -> $PKG_DESTINATION"
+
 exit
