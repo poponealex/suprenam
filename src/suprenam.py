@@ -28,9 +28,9 @@ def main():
         except Exception as e:
             return print_.fail(f"Undoing failed: {str(e)}.")
 
-    # Construct the list of files to rename.
+    # Construct the list of items to rename.
     paths = []
-    if args.paths:  # a list of files to rename was provided
+    if args.paths:  # a list of items to rename was provided
         paths.extend(map(Path, args.paths))
     if args.file:  # a file containing the paths to rename was provided
         paths.extend(Path(path) for path in Path(args.file).read_text().split("\n") if path)
