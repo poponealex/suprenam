@@ -8,7 +8,7 @@
 
 ### Required command line tools
 
-- `pip3`
+- `pip` or `pip3`
 - `platypus`
 
 ### Required Python Packages

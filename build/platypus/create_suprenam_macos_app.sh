@@ -25,6 +25,7 @@ fi
 if [[ ! -d "$PLATYPUS_SHARE"  || ! -d "$PLATYPUS_SHARE/MainMenu.nib" || ! -f "$PLATYPUS_SHARE/ScriptExec" ]]; then
     echo "FIX YOUR PLATYPUS INSTALL"
     echo "Platypus share files ('MainMenu.nib' (dir) AND 'ScriptExec' (file)) have to be located at $PLATYPUS_SHARE"
+    echo "Check in the Platypus' Preferences that its command line is installed"
     exit 2
 fi
 
@@ -55,7 +56,7 @@ done
 platypus \
 --app-icon "/Applications/Platypus.app/Contents/Resources/PlatypusDefault.icns" \
 --name "Suprenam" \
---interface-type "Text Window" \
+--interface-type "None" \
 --app-version "$APP_VERSION" \
 --bundle-identifier "com.suprenam.Suprenam" \
 --author "Aristide Grange & Alexandre Perlmutter" \

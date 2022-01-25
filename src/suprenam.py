@@ -87,9 +87,10 @@ def run_on_path_list(paths: List[Path]):
     try:
         perform_renamings(arcs)
     except RecoverableRenamingError:
-        return print_.no_renamings()
+        print_.no_renamings()
     except Exception as e:
         print_.fail(f"Rollback failed: {str(e)}.")
+    print_.flush_buffer_and_exit()
 
 
 def cli_arguments():

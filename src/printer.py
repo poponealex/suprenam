@@ -43,10 +43,10 @@ class PlatypusPrinter:
         self.buffer = []
 
     def __call__(self, message: str):
-        print(message)
+        self.buffer.append(message)
 
     def newline(self):
-        print("\r")
+        self.buffer.append("\r")
 
     def success(self, message: str):
         self.buffer.append(f"Success: {message}")
@@ -64,12 +64,12 @@ class PlatypusPrinter:
 
     def flush_buffer_and_exit(self):
         title = self.buffer.pop()
-        message = "\n".join(self.buffer)
-        print("NOTIFICATION:title|message\n")
+        message = " ".join(self.buffer)
+        print(f"ALERT:{title}|{message}\n")
         print("QUITAPP\n")
 
 
 print_ = ColorPrinter()
 if Path.cwd().name == "Resources":
     # We are in the app bundle (macOS)
-    PlatypusPrinter()  # type: ignore
+    print_ = PlatypusPrinter()  # type: ignore

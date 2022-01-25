@@ -58,7 +58,7 @@ def perform_renamings(arcs: List[Arc]):
             rename_and_log_one_file(arc)
         print_arcs(arcs)
         print_.newline()
-        return print_.success(f"Successfully renamed all {n} item{'s'[:n^1]}.")
+        return print_.success(f"All {n} item{'s'[:n^1]} were renamed.")
     except Exception as e:
         logging.warning(str(e))
         print_.fail(str(e))
@@ -89,8 +89,7 @@ def undo_renamings(get_arcs=re.compile(r"(?m)^\w+:\w+:SOURCE:(.+)\n\w+:\w+:TARGE
         rename_and_log_one_file(arc)
     print_arcs(arcs)
     print_.newline()
-    print_.success(f"Successfully unrenamed all {n} item{'s'[:n^1]}.")
-
+    print_.success(f"All {n} item{'s'[:n^1]} were unrenamed.")
 
 def print_arcs(arcs: List[Arc]):
     previous_parent = Path()
