@@ -69,7 +69,7 @@ done
 platypus \
 --app-icon "/Applications/Platypus.app/Contents/Resources/PlatypusDefault.icns" \
 --name "Suprenam" \
---interface-type "Text Window" \
+--interface-type "None" \
 --app-version "$APP_VERSION" \
 --bundle-identifier "com.suprenam.Suprenam" \
 --author "Aristide Grange & Alexandre Perlmutter" \
