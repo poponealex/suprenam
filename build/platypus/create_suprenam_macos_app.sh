@@ -1,5 +1,15 @@
 #! /bin/sh
 
+if ! command -v platypus &> /dev/null; then
+    echo "Install Platypus! -> brew install platypus"
+    exit 2
+fi
+
+if ! command -v packagesbuild &> /dev/null; then
+    echo "Install Packages! -> http://s.sudre.free.fr/Software/Packages/about.html"
+    exit 2
+fi
+
 pip_command=pip3
 if ! command -v pip3 &> /dev/null; then
     pip_command=pip
@@ -29,7 +39,11 @@ if [[ ! -d "$PLATYPUS_SHARE"  || ! -d "$PLATYPUS_SHARE/MainMenu.nib" || ! -f "$P
 fi
 
 if [ -e "$BUNDLE" ]; then
-    read -p "$BUNDLE : This has nothing to do here, confirm deletion (y) " del && [[ $del != [yY] ]] && echo "Move or delete $BUNDLE, then try again" && exit 2
+    read -p "$BUNDLE : This has nothing to do here, confirm deletion (y) " del \
+    && [[ $del != [yY] ]] \
+    && echo "Move or delete $BUNDLE, then try again" \
+    && exit 2
+
     rm -rf "$BUNDLE"
 fi
 
@@ -66,14 +80,11 @@ $bundle_files \
 --optimize-nib \
 --overwrite \
 "$WRAPPER" \
-"$APP_DESTINATION"
-
-packagesbuild --build-folder "`pwd`/$BUILD" --package-version "$APP_VERSION" "$PKG_PROJECT"
+"$APP_DESTINATION" \
+&& echo "\nAPP -> $APP_DESTINATION\n" \
+&& packagesbuild --build-folder "`pwd`/$BUILD" --package-version "$APP_VERSION" "$PKG_PROJECT" \
+&& echo "\nPKG -> $PKG_DESTINATION"
 
 rm -rf "$BUNDLE"
-
-echo
-echo "APP -> $APP_DESTINATION"
-echo "PKG -> $PKG_DESTINATION"
 
 exit
