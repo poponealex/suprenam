@@ -1,7 +1,6 @@
 from pathlib import Path
 import re
 import context
-from src.goodies import print_warning
 
 SECTION_PATTERN = r"""(?m)^### (.+)\n
 #### Example\n
@@ -35,8 +34,8 @@ def extract_examples(path):
                 "expected": extract_rows(expected),
             }
         )
-    if len(result) < len(re.findall("(?m)^### ", text)):
-        print_warning('"examples.md" has more sections than matches.')  # pragma: no cover
+    if len(result) < len(re.findall("(?m)^### ", text)):  # pragma: no cover
+        raise ValueError("examples.md has more sections than matches.")
     return result
 
 

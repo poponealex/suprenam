@@ -5,7 +5,7 @@ from platform import platform as get_platform_long_string
 from shutil import which
 from typing import Optional
 
-from src.goodies import print_fail
+from src.printer import print_
 from src.user_errors import *
 
 
@@ -59,22 +59,19 @@ def is_tool(name):  # https://stackoverflow.com/a/34177358/173003
 def get_editor_command(path: Path, platform: Optional[str] = None) -> list:
     """
     Retrieve a command launching a text editor on a given text file.
-
     Args:
         path: the path to the text file to edit.
-
     Returns:
         A list of strings representing the command to launch the system's default text editor
         on the given text file. If no default text editor is defined, a suitable fallback command
         is returned.
-
     Raises:
         UnsupportedOSError: if the OS dictionary defines no key for the given operating system name.
     """
     platform = platform or get_platform_long_string().partition("-")[0]
     os_dict = OS.get(platform)
     if not os_dict:
-        print_fail(
+        print_.fail(
             f"Unsupported operating system: {platform}. "
             f"Supported operating systems are: {', '.join(OS.keys())}"
         )
@@ -89,7 +86,7 @@ def get_editor_command(path: Path, platform: Optional[str] = None) -> list:
             check=True,
         ).stdout
     except Exception as e:
-        print_fail(str(e))  # make mypy happy
+        print_.fail(str(e))  # make mypy happy
         raise e
 
     custom_editor_handler = re.findall(str(os_dict["EXTRACT_EDITOR"]), output)[0] # first match
