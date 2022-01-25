@@ -24,6 +24,8 @@ def test_happy_path():
     try:
         assert set(base.iterdir()) == set(arc.target for arc in arcs)
         undo_renamings()
+        print(set(arc.source for arc in arcs))
+        print(set(base.iterdir()))
         assert set(base.iterdir()) == set(arc.source for arc in arcs)
     finally:
         rm_tree(base)

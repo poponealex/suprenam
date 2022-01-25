@@ -2,7 +2,7 @@ from typing import List, Optional
 
 import pathvalidate
 
-from src.goodies import print_fail
+from src.printer import print_
 from src.user_errors import *
 from src.user_types import Clause, EditedText, Inode, InodesPaths, Name
 
@@ -42,19 +42,19 @@ def parse_edited_text(
 
         path = inodes_paths.get(inode)
         if path is None:
-            print_fail(f"Unknown inode {inode}.")
+            print_.fail(f"Unknown inode {inode}.")
             raise UnknownInodeError
 
         new_name = tail[0]
         if "\t" in new_name:
-            print_fail(f"Illegal tabulation in the new name: '{new_name}'.")
+            print_.fail(f"Illegal tabulation in the new name: '{new_name}'.")
             raise TabulationError
         if path.name == new_name:
             continue
         try:
             pathvalidate.validate_filename(new_name, platform=platform or "auto")
         except pathvalidate.ValidationError:
-            print_fail(f"Invalid character(s) in the new name: '{new_name}'.")
+            print_.fail(f"Invalid character(s) in the new name: '{new_name}'.")
             raise ValidationError
         result.append(Clause(path, Name(new_name)))
     return result

@@ -4,7 +4,7 @@ from typing import Iterable, List, Tuple
 from src.file_system import FileSystem
 from src.user_types import Clause, ClauseMap, Name, Arc
 from src.user_errors import DuplicatedClauseError, SeveralTargetsError, SeveralSourcesError
-from src.goodies import print_fail
+from src.printer import print_
 
 
 def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Arc]:
@@ -79,10 +79,10 @@ def dict_of_clauses(clauses: Iterable[Clause]) -> ClauseMap:
     for (path, new_name) in clauses:
         if path in result:
             if result[path] == new_name:
-                print_fail(f"The clause '{path}' -> '{new_name}' is given more than once.")
+                print_.fail(f"The clause '{path}' -> '{new_name}' is given more than once.")
                 raise DuplicatedClauseError(path)
             else:
-                print_fail(
+                print_.fail(
                     f"At least two distinct renaming targets for '{path}':\n"
                     "    '{result[path]}'\n"
                     "    '{new_name}'."
@@ -111,7 +111,7 @@ def check_injectivity(file_system: FileSystem, clauses: ClauseMap):
     for (path, new_name) in clauses.items():
         new_path = path.with_name(new_name)
         if new_path in already_seen or (new_path in file_system and new_path not in clauses):
-            print_fail(f"At least two distinct sources for '{new_path}'.")
+            print_.fail(f"At least two distinct sources for '{new_path}'.")
             raise SeveralSourcesError(new_path)
         already_seen.add(new_path)
 

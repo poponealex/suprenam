@@ -2,9 +2,10 @@ import re
 import subprocess
 from pathlib import Path
 from platform import platform as get_platform_long_string
+from shutil import which
 from typing import Optional
 
-from src.goodies import print_fail
+from src.printer import print_
 from src.user_errors import *
 
 
@@ -17,7 +18,7 @@ OS = {
             "LSHandlers",
         ],
         "EXTRACT_EDITOR": r'(?ms)\s*\{\s*LSHandlerContentType = "public\.plain-text";\s*LSHandlerPreferredVersions =\s*\{\s*LSHandlerRoleAll = "-";\s*\};\s*LSHandlerRoleAll = "([\w.]+)";',
-        "DEFAULT_EDITOR_COMMAND": {
+        "CUSTOM_EDITOR_COMMAND": {
             "com.microsoft.vscode": ["code", "-w"],
             "com.sublimetext.3": ["subl", "-w"],
         },  # TODO: add different versions of Sublime Text
@@ -37,10 +38,10 @@ OS = {
             "text/plain",
         ],
         "EXTRACT_EDITOR": r"^(.*)\.desktop$",
-        "DEFAULT_EDITOR_COMMAND": {
+        "CUSTOM_EDITOR_COMMAND": {
             "code": [
                 "code",
-                "-w", # wait for the file to be closed before returning
+                "-w",  # wait for the file to be closed before returning
             ],
             "sublime_text": ["subl", "-w"],
         },
@@ -50,25 +51,27 @@ OS = {
 }
 
 
-def get_editor_command(path: Path, platform: Optional[str]=None) -> list:
+def is_tool(name):  # https://stackoverflow.com/a/34177358/173003
+    """Check whether `name` is on PATH and marked as executable."""
+    return which(name) is not None
+
+
+def get_editor_command(path: Path, platform: Optional[str] = None) -> list:
     """
     Retrieve a command launching a text editor on a given text file.
-
     Args:
         path: the path to the text file to edit.
-
     Returns:
         A list of strings representing the command to launch the system's default text editor
         on the given text file. If no default text editor is defined, a suitable fallback command
         is returned.
-
     Raises:
         UnsupportedOSError: if the OS dictionary defines no key for the given operating system name.
     """
     platform = platform or get_platform_long_string().partition("-")[0]
     os_dict = OS.get(platform)
     if not os_dict:
-        print_fail(
+        print_.fail(
             f"Unsupported operating system: {platform}. "
             f"Supported operating systems are: {', '.join(OS.keys())}"
         )
@@ -83,12 +86,21 @@ def get_editor_command(path: Path, platform: Optional[str]=None) -> list:
             check=True,
         ).stdout
     except Exception as e:
-        print_fail(str(e))  # make mypy happy
+        print_.fail(str(e))  # make mypy happy
         raise e
 
-    default_editor_handler = re.findall(str(os_dict["EXTRACT_EDITOR"]), output)  # make mypy happy
-    if default_editor_handler and os_dict.get(default_editor_handler[0]) is not None:
-        command = os_dict["DEFAULT_EDITOR_COMMAND"][default_editor_handler[0]]  # type: ignore
-    else:
-        command = list(os_dict["FALLBACK_EDITOR_COMMAND"])  # make mypy happy
-    return command + [str(path)]
+    custom_editor_handler = re.findall(str(os_dict["EXTRACT_EDITOR"]), output)[0] # first match
+
+    # Check whether the user has defined a custom editor, and the corresponding command is known
+    command = os_dict["CUSTOM_EDITOR_COMMAND"].get(custom_editor_handler)  # type: ignore
+    if command:
+        return command + [str(path)]
+    
+    # Otherwise, try to find another editor which is both known and installed on the system
+    for command in os_dict["CUSTOM_EDITOR_COMMAND"].values():  # type: ignore
+        if is_tool(command[0]):
+            return command + [str(path)]
+    
+    # Otherwise, return the fallback command defined by the system
+    # (on macOS, this is TextEdit, which lacks an option to wait for the file to be closed)
+    return list(os_dict["FALLBACK_EDITOR_COMMAND"]) + [str(path)]  # make mypy happy

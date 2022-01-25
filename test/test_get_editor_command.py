@@ -1,5 +1,4 @@
 import pytest
-from platform import platform as get_platform_long_string
 
 import context
 from src.get_editor_command import *

@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path[0:0] = ["."]
 
-from src.goodies import *
+from src.goodies import rm_tree
 from src.suprenam import run_on_path_list
 from src.renamings import show_log_file, undo_renamings
 
@@ -43,7 +43,7 @@ print("Playground recreated. Now, have fun renaming some files and folders...")
 try:
     run_on_path_list(paths)
 except Exception as e:
-    print_fail(f"Something else went wrong: {e}.")
+    print(f"Something else went wrong: {e}.")
 
 input("Press Enter to show the log file...")
 show_log_file()
