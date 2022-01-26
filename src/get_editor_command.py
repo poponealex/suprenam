@@ -89,7 +89,8 @@ def get_editor_command(path: Path, platform: Optional[str] = None) -> list:
         print_.fail(str(e))  # make mypy happy
         raise e
 
-    custom_editor_handler = re.findall(str(os_dict["EXTRACT_EDITOR"]), output)[0] # first match
+    match = re.search(os_dict["EXTRACT_EDITOR"], output) # make mypy happy
+    custom_editor_handler = match.group(1) if match else ""
 
     # Check whether the user has defined a custom editor, and the corresponding command is known
     command = os_dict["CUSTOM_EDITOR_COMMAND"].get(custom_editor_handler)  # type: ignore
