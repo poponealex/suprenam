@@ -6,7 +6,7 @@ sys.path[0:0] = ["."]
 
 from src.goodies import rm_tree
 from src.suprenam import run_on_path_list
-from src.renamings import show_log_file, undo_renamings
+from src.renamings import Renamer
 
 
 playground = Path("test/playground")
@@ -45,14 +45,16 @@ try:
 except Exception as e:
     print(f"Something else went wrong: {e}.")
 
+renamer = Renamer()
+
 input("Press Enter to show the log file...")
-show_log_file()
+print(renamer.get_log_contents())
 
 input("Press Enter to revert the previous renamings...")
-undo_renamings()
+renamer.undo_renamings()
 
 input("Press Enter to show the log file...")
-show_log_file()
+print(renamer.get_log_contents())
 
 input("Press Enter to erase the playground...")
 rm_tree(playground)

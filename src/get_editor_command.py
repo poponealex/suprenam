@@ -73,7 +73,7 @@ def get_editor_command(path: Path, platform: Optional[str] = None) -> list:
     if not os_dict:
         print_.fail(
             f"Unsupported operating system: {platform}. "
-            f"Supported operating systems are: {', '.join(OS.keys())}"
+            f"Supported operating systems are: {', '.join(OS.keys())}."
         )
         raise UnsupportedOSError(platform)
 

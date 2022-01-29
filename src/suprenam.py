@@ -13,7 +13,7 @@ from src.get_editor_command import get_editor_command
 from src.printer import print_
 from src.parse_edited_text import parse_edited_text
 from src.paths_to_inodes_paths import paths_to_inodes_paths
-from src.renamings import perform_renamings, undo_renamings
+from src.renamings import Renamer
 from src.secure_clauses import secure_clauses
 from src.user_errors import *
 from src.user_types import EditedText
@@ -23,10 +23,18 @@ def main():
     args = cli_arguments()
 
     if args.undo:
+        renamer = Renamer()
         try:
-            return undo_renamings()
-        except Exception as e:
-            return print_.fail(f"Undoing failed: {str(e)}.")
+            renamer.undo_renamings()
+        except RecoverableRenamingError:
+            try:
+                renamer.rollback_renamings()
+                print_.no_renamings()
+            except: # Unknow error during rollback.
+                print_.fail("Rollback failed.")
+        except: # Unknown problem with the log file, e.g. not found
+            print_.fail("Undo failed.")
+        return print_.flush_buffer_and_exit()
 
     # Construct the list of items to rename.
     paths = []
@@ -38,6 +46,7 @@ def main():
         return print_.no_renamings("Please provide at least one file to rename.")
 
     run_on_path_list(paths)
+    return print_.flush_buffer_and_exit()
 
 
 def run_on_path_list(paths: List[Path]):
@@ -84,13 +93,15 @@ def run_on_path_list(paths: List[Path]):
     except (SeveralTargetsError, SeveralSourcesError, DuplicatedClauseError):
         return print_.no_renamings()
 
+    renamer = Renamer()
     try:
-        perform_renamings(arcs)
+        renamer.perform_renamings(arcs)
     except RecoverableRenamingError:
-        print_.no_renamings()
-    except Exception as e:
-        print_.fail(f"Rollback failed: {str(e)}.")
-    print_.flush_buffer_and_exit()
+        try:
+            renamer.rollback_renamings()
+            return print_.no_renamings()
+        except: # Unknow error during rollback.
+            return print_.fail("Rollback failed.")
 
 
 def cli_arguments():
