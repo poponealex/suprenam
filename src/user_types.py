@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Literal, NamedTuple, NewType
+from typing import Dict, NamedTuple, NewType
 
 Name = NewType("Name", str)
 
