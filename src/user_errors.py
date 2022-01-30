@@ -1,12 +1,12 @@
 class UnsupportedOSError(Exception):
-    """
-    
-    """
+    pass
+
 
 class UnknownInodeError(ValueError):
     """
     The edited text contains an inode absent from the source text.
     """
+
 
 class TabulationError(ValueError):
     """
@@ -40,7 +40,8 @@ class DuplicatedClauseError(Exception):
     A clause (source, target) is specified more than once.
     """
 
+
 class RecoverableRenamingError(Exception):
     """
-    Raised after a successful rollback.
+    Raised after a failed renaming, with the goal of triggering a rollback.
     """
