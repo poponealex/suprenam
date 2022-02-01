@@ -268,6 +268,18 @@ data = [
         [],
     ),
     (
+        "Parse a file whose name refers to the parent directory.",
+        ["universal"],
+        ValidationError,
+        {
+            123: Path("/home/foo"),
+        },
+        """
+            123	../foo
+        """,
+        [],
+    ),
+    (
         "Parse a file which contains a non-existent inode.",
         ["universal"],
         UnknownInodeError,
