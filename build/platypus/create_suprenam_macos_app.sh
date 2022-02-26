@@ -67,7 +67,7 @@ for file in $(ls $BUNDLE); do
 done
 
 platypus \
---app-icon "/Applications/Platypus.app/Contents/Resources/PlatypusDefault.icns" \
+--app-icon "$BUILD/../logo.icns" \
 --name "Suprenam" \
 --interface-type "None" \
 --app-version "$APP_VERSION" \

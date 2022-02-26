@@ -26,7 +26,7 @@
 #### Current App settings
 
 - App Name: `Suprenam`
-- Icon: `**TODO**`
+- Icon: cf. `build/logo.icns`
 - Version: `1.0.0 (as of 24/01/2022)`
 - Author: `Aristide Grange & Alexandre Perlmutter`
 - Bundle Identifier: `com.suprenam.Suprenam`
