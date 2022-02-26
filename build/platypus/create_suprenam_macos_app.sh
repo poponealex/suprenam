@@ -11,7 +11,9 @@ if ! command -v packagesbuild &> /dev/null; then
 fi
 
 pip_command=pip3
+echo "Select pip3 as pip command"
 if ! command -v pip3 &> /dev/null; then
+    echo "pip3 not found: fall back on pip"
     pip_command=pip
 fi
 
@@ -49,9 +51,8 @@ fi
 
 mkdir "$BUNDLE" "$BUNDLE"/{src,lib}
 
-for package in $(ls $PYTHON_SITE_PACKAGES | egrep "(pathvalidate|natsort)"); do
-    cp -Rf "$PYTHON_SITE_PACKAGES/$package" "$BUNDLE/lib"
-done
+cp -Rf "$PYTHON_SITE_PACKAGES/pathvalidate" "$BUNDLE/lib"
+cp -Rf "$PYTHON_SITE_PACKAGES/natsort" "$BUNDLE/lib"
 
 for file in $(ls $SRC/*.py); do
     file=$(basename $file)
