@@ -10,18 +10,18 @@ if ! command -v packagesbuild &> /dev/null; then
     exit 2
 fi
 
-pip_command=pip3
-echo "Select pip3 as pip command"
-if ! command -v pip3 &> /dev/null; then
-    echo "pip3 not found: fall back on pip"
-    pip_command=pip
+python_command=python3
+echo "Select python3 as pip command"
+if ! command -v python3 &> /dev/null; then
+    echo "python3 not found: fall back on python"
+    python_command=python
 fi
 
 BUILD="build/platypus"
 WRAPPER="$BUILD/wrapper.sh"
 SRC="src"
 BUNDLE="$BUILD/app_bundle"
-PYTHON_SITE_PACKAGES=$($pip_command show pathvalidate | grep "^Location" | cut -c 11-)
+PYTHON_SITE_PACKAGES=$($python_command -c "import site; print(site.getsitepackages()[0])")
 PLATYPUS_SHARE="/usr/local/share/platypus"
 APP_DESTINATION="$BUILD/Suprenam.app"
 APP_VERSION="1.0.0"
