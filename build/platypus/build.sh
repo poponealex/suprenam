@@ -11,7 +11,7 @@ if ! command -v packagesbuild &> /dev/null; then
 fi
 
 python_command=python3
-echo "Select python3 as pip command"
+echo "Select python3 as python command"
 if ! command -v python3 &> /dev/null; then
     echo "python3 not found: fall back on python"
     python_command=python
