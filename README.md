@@ -1,4 +1,4 @@
-![Logo](/misc/logo.png)
+![Logo](/build/logo.icns)
 
 ## Introduction
 Suprenam is a batch renaming program/app designed to use with your favorite super editor.
