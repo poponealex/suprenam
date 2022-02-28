@@ -42,7 +42,12 @@ class Renamer:
         print_(f"Renaming {n} items...")
         try:
             self.rename_and_log_all_files(arcs)
-            return print_.success(f"All {n} item{'s'[:n^1]} were renamed.")
+            if n == 0:
+                return print_.success(f"Nothing to rename.")
+            elif n == 1:
+                return print_.success(f"1 item was renamed.")
+            else:
+                return print_.success(f"All {n} items were renamed.")
         except Exception as e:
             logging.warning(str(e))
             print_.fail(str(e))
@@ -60,7 +65,12 @@ class Renamer:
         try:
             self.rename_and_log_all_files(self.arcs_to_rollback)
             self.log_path.write_text("")  # no need to keep a symmetric sequence of renamings!
-            print_.success(f"All {n} item{'s'[:n^1]} renamings were rolled back.")
+            if n == 0:
+                return print_.success(f"Nothing to rollback.")
+            elif n == 1:
+                return print_.success(f"1 renaming was rolled back.")
+            else:
+                return print_.success(f"All {n} renamings were rolled back.")
         except Exception as e:
             logging.error(f"rollback:{e}")
             print_.fail(str(e))
