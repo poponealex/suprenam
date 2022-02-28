@@ -24,18 +24,18 @@ class Logger:
 
     def get_contents(self):  # pragma: no cover
         return self.path.read_text().strip()
-    
+
     def erase_contents(self):
         self.path.write_text("")
-    
+
     def warning(self, *args, **kwargs):
         logging.warning(*args, **kwargs)
-    
+
     def info(self, *args, **kwargs):
         logging.info(*args, **kwargs)
-    
+
     def error(self, *args, **kwargs):
         logging.error(*args, **kwargs)
-    
+
 
 logger = Logger()
