@@ -1,5 +1,4 @@
 from pathlib import Path
-from platform import platform as get_platform_long_string
 
 
 def rm_tree(path: Path):  # https://stackoverflow.com/a/57892171/173003

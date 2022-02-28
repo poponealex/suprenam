@@ -20,7 +20,7 @@ OS = {
         "FALLBACK_EDITOR_COMMAND": [
             "open",
             "-n",  # open a new instance of the application even if one is already running
-            "-t",  # open with the default text editor
+            "-e",  # open with TextEdit
             "-W",  # block until the **application** is closed (even if it was already running).
             #        This is far from ideal, but there is currently no per-window way to check
         ],
