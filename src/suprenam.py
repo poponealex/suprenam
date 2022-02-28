@@ -40,24 +40,21 @@ def main():
         except: # Unknown problem with the log file, e.g. not found
             print_.fail("Undo failed.")
         logger.info("Undoing renamings done.")
-        return print_.flush_buffer_and_exit()
-
-    logger.info("Constructing the list of items to rename.")
-    paths = []
-    if args.paths:
-        logger.info("A list of items to rename was provided.")
-        paths.extend(map(Path, args.paths))
-    if args.file:
-        logger.info("A file containing the paths to rename was provided.")
-        paths.extend(Path(path) for path in Path(args.file).read_text().split("\n") if path)
-    if not paths:
-        logger.info("No paths to rename were provided.")
-        return print_.no_renamings("Please provide at least one file to rename.")
-
-    logger.info("Running on path list.")
-    run_on_path_list(paths)
-    logger.info("Running on path list done.")
-    return print_.flush_buffer_and_exit()
+    else:
+        logger.info("Constructing the list of items to rename.")
+        paths = []
+        if args.paths:
+            logger.info("A list of items to rename was provided.")
+            paths.extend(map(Path, args.paths))
+        if args.file:
+            logger.info("A file containing the paths to rename was provided.")
+            paths.extend(Path(path) for path in Path(args.file).read_text().split("\n") if path)
+        if not paths:
+            logger.info("No paths to rename were provided.")
+            return print_.no_renamings("Please provide at least one file to rename.")
+        logger.info("Running on path list.")
+        run_on_path_list(paths)
+        logger.info("Running on path list done.")
 
 
 def run_on_path_list(paths: List[Path]):
@@ -100,7 +97,7 @@ def run_on_path_list(paths: List[Path]):
     logger.info("Retrieving the content of the edited text file.")
     try:
         edited_text = EditedText(editable_file_path.read_text())
-        logger.info("Line count in the edited text file:,", edited_text.count('\n'))
+        logger.info("Line count in the edited text file: %s." % edited_text.count('\n'))
     except FileNotFoundError:
         return print_.no_renamings("The editable file was deleted.")
 
