@@ -11,12 +11,7 @@ from src.user_errors import *
 
 OS = {
     "macOS": {
-        "QUERY_ALL_DEFAULTS_COMMAND": [
-            "defaults",
-            "read",
-            "com.apple.LaunchServices/com.apple.launchservices.secure",
-            "LSHandlers",
-        ],
+        "QUERY_ALL_DEFAULTS_COMMAND": "defaults read com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers",
         "EXTRACT_EDITOR": r'(?ms)\s*\{\s*LSHandlerContentType = "public\.plain-text";\s*LSHandlerPreferredVersions =\s*\{\s*LSHandlerRoleAll = "-";\s*\};\s*LSHandlerRoleAll = "([\w.]+)";',
         "CUSTOM_EDITOR_COMMAND": {
             "com.microsoft.vscode": ["code", "-w"],
@@ -31,12 +26,7 @@ OS = {
         ],
     },
     "Linux": {
-        "QUERY_ALL_DEFAULTS_COMMAND": [
-            "xdg-mime",
-            "query",
-            "default",
-            "text/plain",
-        ],
+        "QUERY_ALL_DEFAULTS_COMMAND": "xdg-mime query default text/plain",
         "EXTRACT_EDITOR": r"^(.*)\.desktop$",
         "CUSTOM_EDITOR_COMMAND": {
             "code": [
@@ -79,7 +69,7 @@ def get_editor_command(path: Path, platform: Optional[str] = None) -> list:
 
     try:
         output = subprocess.run(
-            list(os_dict["QUERY_ALL_DEFAULTS_COMMAND"]),  # make mypy happy
+            str(os_dict["QUERY_ALL_DEFAULTS_COMMAND"]).split(),  # make mypy happy
             encoding="utf-8",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -89,19 +79,19 @@ def get_editor_command(path: Path, platform: Optional[str] = None) -> list:
         print_.fail(str(e))  # make mypy happy
         raise e
 
-    match = re.search(str(os_dict["EXTRACT_EDITOR"]), output) # make mypy happy
+    match = re.search(str(os_dict["EXTRACT_EDITOR"]), output)  # make mypy happy
     custom_editor_handler = match.group(1) if match else ""
 
     # Check whether the user has defined a custom editor, and the corresponding command is known
     command = os_dict["CUSTOM_EDITOR_COMMAND"].get(custom_editor_handler)  # type: ignore
     if command:
         return command + [str(path)]
-    
+
     # Otherwise, try to find another editor which is both known and installed on the system
     for command in os_dict["CUSTOM_EDITOR_COMMAND"].values():  # type: ignore
         if is_tool(command[0]):
             return command + [str(path)]
-    
+
     # Otherwise, return the fallback command defined by the system
     # (on macOS, this is TextEdit, which lacks an option to wait for the file to be closed)
     return list(os_dict["FALLBACK_EDITOR_COMMAND"]) + [str(path)]  # make mypy happy
