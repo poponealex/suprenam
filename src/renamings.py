@@ -1,4 +1,3 @@
-import logging
 import re
 from pathlib import Path
 from typing import List
@@ -6,28 +5,16 @@ from typing import List
 from src.printer import print_
 from src.user_errors import RecoverableRenamingError
 from src.user_types import Arc
+from src.logger import logger
 
 
 class Renamer:
 
-    LOG_DIR = Path.home() / ".suprenam"
-    LOG_NAME = "previous_session.log"
-    get_logged_arcs = re.compile(r"(?m)^\w+:\w+:SOURCE:(.+)\n\w+:\w+:TARGET:(.+)").findall
+    get_logged_arcs = re.compile(r"(?m)^\w+:\w+:SOURCE:(.+)\tTARGET:(.+)").findall
 
-    def __init__(self, log_path: Path = LOG_DIR / LOG_NAME):
-        """Create a log file at the specified path."""
-        # Ensure the log directory exists.
-        log_path.parent.mkdir(
-            parents=True,  # any missing parents of this path are created as needed
-            exist_ok=True,  # if the directory already exists, do not raise an exception
-        )
-        self.log_path = log_path
-
-    def create_new_log_file(self):
-        """Remove all handlers associated with the root logger object and create a NEW log file."""
-        for handler in logging.root.handlers[:]:
-            logging.root.removeHandler(handler)
-        logging.basicConfig(filename=self.log_path, filemode="w", level=logging.DEBUG)
+    def __init__(self, testing: bool=False):
+        if testing:
+            logger.create_new_log_file()
 
     def perform_renamings(self, arcs: List[Arc]):
         """
@@ -37,11 +24,12 @@ class Renamer:
         Args:
             arcs: list of couples (source_path, target_path)
         """
-        self.create_new_log_file()
         n = len(arcs)
         print_(f"Renaming {n} items...")
+        logger.info(f"{n} file{'s'[:n^1]} to rename.")
         try:
             self.rename_and_log_all_files(arcs)
+            logger.info(f"{n} file{'s'[:n^1]} renamed.")
             if n == 0:
                 return print_.success(f"Nothing to rename.")
             elif n == 1:
@@ -49,7 +37,7 @@ class Renamer:
             else:
                 return print_.success(f"All {n} items were renamed.")
         except Exception as e:
-            logging.warning(str(e))
+            logger.warning(str(e))
             print_.fail(str(e))
             raise RecoverableRenamingError
 
@@ -61,43 +49,43 @@ class Renamer:
         """
         n = len(self.arcs_to_rollback)
         print_(f"Rolling back the first {n} renaming{'s'[:n^1]}...")
-        logging.info("rollback")
+        logger.info(f"{n} renaming{'s'[:n^1]} to roll back.")
         try:
             self.rename_and_log_all_files(self.arcs_to_rollback)
-            self.log_path.write_text("")  # no need to keep a symmetric sequence of renamings!
+            logger.info(f"{n} renaming{'s'[:n^1]} rolled back.")
             if n == 0:
-                return print_.success(f"Nothing to rollback.")
+                return print_.success(f"Nothing to roll back.")
             elif n == 1:
                 return print_.success(f"1 renaming was rolled back.")
             else:
                 return print_.success(f"All {n} renamings were rolled back.")
         except Exception as e:
-            logging.error(f"rollback:{e}")
+            logger.error(f"rollback:{e}")
             print_.fail(str(e))
             raise
 
-    def undo_renamings(self):
-        """Read a log file and apply the reversed renamings."""
+    def get_arcs_for_undoing(self):
+        """Read a log file and calculate the reversed renamings."""
         try:
-            log_text = self.log_path.read_text()
+            log_text = logger.get_contents()
         except Exception as e:
             print_.fail(str(e))
             raise
         if re.search(r"(?m)^ERROR:", log_text):
+            logger.warning(f"The log file contains an error. Aborting.")
             print_.fail("The previous rollback failed. Undoing is not possible.")
             raise ValueError
         arcs = []
         for (source, target) in reversed(self.get_logged_arcs(log_text)):
             arcs.append(Arc(Path(target), Path(source)))
-        self.perform_renamings(arcs)
+        return arcs
 
     def rename_and_log_all_files(self, arcs: List[Arc]):
         self.arcs_to_rollback: List[Arc] = []
         for (source, target) in arcs:
             source.rename(target)
             self.arcs_to_rollback.insert(0, Arc(target, source))
-            logging.info(f"SOURCE:{source}")
-            logging.info(f"TARGET:{target}")
+            logger.info(f"SOURCE:{source}\tTARGET:{target}")
         self.print_arcs(arcs)
         print_.newline()
 
@@ -109,7 +97,3 @@ class Renamer:
                 print_(f"{source.parent}")
                 previous_parent = source.parent
             print_(f"{source.name} -> {target.name}")
-
-    def get_log_contents(self):  # pragma: no cover
-        """get the contents of the log file (for testing purposes only)."""
-        return self.log_path.read_text().strip()
