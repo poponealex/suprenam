@@ -70,7 +70,6 @@ done
 platypus \
 --app-icon "$BUILD/../logo.icns" \
 --name "Suprenam" \
---interface-type "None" \
 --app-version "$APP_VERSION" \
 --bundle-identifier "com.suprenam.Suprenam" \
 --author "Aristide Grange & Alexandre Perlmutter" \
@@ -80,6 +79,8 @@ $bundle_files \
 --droppable \
 --optimize-nib \
 --overwrite \
+--quit-after-execution \
+--background \
 "$WRAPPER" \
 "$APP_DESTINATION" \
 && echo "\nAPP -> $APP_DESTINATION\n" \

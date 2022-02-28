@@ -32,9 +32,6 @@ class ColorPrinter:
             self.fail(message)
         print(f"{self.WARNING}Aborted: no renamings were performed.{self.RESET}")
 
-    def flush_buffer_and_exit(self):
-        pass  # ignored
-
 
 class PlatypusPrinter:
     """Print uncolorized messages on the standard output."""
@@ -43,30 +40,24 @@ class PlatypusPrinter:
         self.buffer = []
 
     def __call__(self, message: str):
-        self.buffer.append(message)
+        print(message)
 
     def newline(self):
-        self.buffer.append("\r")
+        print("\r")
 
     def success(self, message: str):
-        self.buffer.append(f"Success: {message}")
+        print(f"ALERT:Success|{message}")
 
     def warning(self, message: str):
-        self.buffer.append(f"Warning: {message}")
+        print(f"ALERT:Warning|{message}")
 
     def fail(self, message: str):
-        self.buffer.append(f"Error: {message}")
+        print(f"ALERT:Error|{message}")
 
     def no_renamings(self, message=None):
+        print("Aborted: no renamings were performed.")
         if message:
             self.fail(message)
-        self.buffer.append("Aborted: no renamings were performed.")
-
-    def flush_buffer_and_exit(self):
-        title = self.buffer.pop()
-        message = " ".join(self.buffer)
-        print(f"ALERT:{title}|{message}\n")
-        print("QUITAPP\n")
 
 
 print_ = ColorPrinter()
