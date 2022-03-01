@@ -59,7 +59,7 @@ data = [  # NB: in the triple-quoted strings, inodes and names are tab-separated
         {
             2612647906: Path("/usr/lib/gcc-lib"),
             3263123972: Path("/usr/lib/locale"),
-            1549534358: Path("/usr/lib/X11"),
+            549534358: Path("/usr/lib/X11"),
             1582956841: Path("/usr/lib/tls"),
             1981263235: Path("/usr/lib/games"),
         },
@@ -68,7 +68,7 @@ data = [  # NB: in the triple-quoted strings, inodes and names are tab-separated
             2612647906	gcc-lib
             3263123972	locale
             1582956841	tls
-            1549534358	X11
+            0549534358	X11
         """,
     ),
     (
@@ -79,7 +79,7 @@ data = [  # NB: in the triple-quoted strings, inodes and names are tab-separated
             2784148792: Path("/usr/lib"),
             3263123972: Path("/usr/lib/locale"),
             1482466386: Path("/usr/bin"),
-            1549534358: Path("/usr/lib/X11"),
+            549534358: Path("/usr/lib/X11"),
             1582956841: Path("/usr/lib/tls"),
             1981263235: Path("/usr/lib/games"),
         },
@@ -96,7 +96,7 @@ data = [  # NB: in the triple-quoted strings, inodes and names are tab-separated
             2612647906	gcc-lib
             3263123972	locale
             1582956841	tls
-            1549534358	X11
+            0549534358	X11
         """,
     ),
     (
@@ -108,7 +108,7 @@ data = [  # NB: in the triple-quoted strings, inodes and names are tab-separated
             1482466380: Path("/usr/lib/Banana_b"),
             3263123972: Path("/usr/lib/banana_a"),
             1482466386: Path("/usr/lib/banana_c"),
-            1549534358: Path("/usr/lib/version-1.10"),
+            549534358: Path("/usr/lib/version-1.10"),
             1582956841: Path("/usr/lib/version-1.11"),
             1981263235: Path("/usr/lib/version-1.9"),
             1981263299: Path("/usr/lib/version-2.0"),
@@ -121,7 +121,7 @@ data = [  # NB: in the triple-quoted strings, inodes and names are tab-separated
             1482466380	Banana_b
             1482466386	banana_c
             1981263235	version-1.9
-            1549534358	version-1.10
+            0549534358	version-1.10
             1582956841	version-1.11
             1981263299	version-2.0
         """,

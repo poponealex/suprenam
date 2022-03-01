@@ -32,12 +32,15 @@ def get_editable_text(inodes_paths: InodesPaths) -> EditableText:
                 ...
 
     """
+    # Calculate the number of digits in the largest inode (base 10), or 0 if there are no inodes
+    inode_size = len(str(max(inodes_paths.keys(), default=0)))
+
     # Create a naturally sorted list of triples (parent, name, inode) with null paths filtered out
     parents_names_inodes = os_sorted(  # natural sort by parent, then name, then (useless) inode
         (
             f"\n{path.parent}",  # the prefix '\n' adds an empty line for maximal consistency
             path.name,
-            inode,
+            str(inode).zfill(inode_size),
         )
         for (inode, path) in inodes_paths.items()
         if path.name  # null paths (empty or root) would make os_sorted raise a ValueError
