@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from src.logger import logger
 
 
 class ColorPrinter:
@@ -9,7 +10,6 @@ class ColorPrinter:
     OK = "\033[92m"
     WARNING = "\033[1m\033[38;5;166m"
     FAIL = "\033[1m\033[91m"
-    INFO = "\033[1;96m"
     RESET = "\033[0m"
 
     def __call__(self, message: str):
@@ -19,22 +19,20 @@ class ColorPrinter:
         print()
 
     def success(self, message: str):
-        print(f"{self.OK}Success: {message}{self.RESET}")
+        logger.info(f"Success: {message}")
+        print(f"{self.OK}Success: {message}{self.RESET}", file=sys.stderr)
 
-    def warning(self, message: str):
-        print(f"{self.WARNING}Warning: {message}{self.RESET}", file=sys.stderr)
+    def abort(self, message: str):
+        logger.warning(f"Abort: {message}")
+        print(f"{self.WARNING}No renamings were performed: {message}{self.RESET}", file=sys.stderr)
 
     def fail(self, message: str):
-        print(f"{self.FAIL}Error: {message}{self.RESET}", file=sys.stderr)
-
-    def no_renamings(self, message=None):
-        if message:
-            self.fail(message)
-        print(f"{self.WARNING}Aborted: no renamings were performed.{self.RESET}")
+        logger.error(f"Fail: {message}")
+        print(f"{self.FAIL}Fatal error: {message}{self.RESET}", file=sys.stderr)
 
 
 class PlatypusPrinter:
-    """Print uncolorized messages on the standard output."""
+    """Print uncolorized messages on the standard output and Platypus' alert."""
 
     def __init__(self):
         self.buffer = []
@@ -46,18 +44,16 @@ class PlatypusPrinter:
         print("\r")
 
     def success(self, message: str):
+        logger.info(f"Success: {message}")
         print(f"ALERT:Success|{message}")
 
-    def warning(self, message: str):
-        print(f"ALERT:Warning|{message}")
+    def abort(self, message: str):
+        logger.warning(f"Abort: {message}")
+        print(f"ALERT:No renamings were performed|{message}")
 
     def fail(self, message: str):
-        print(f"ALERT:Error|{message}")
-
-    def no_renamings(self, message=None):
-        print("Aborted: no renamings were performed.")
-        if message:
-            self.fail(message)
+        logger.error(f"Fail: {message}")
+        print(f"ALERT:Fatal error|{message}")
 
 
 print_ = ColorPrinter()

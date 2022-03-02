@@ -31,15 +31,14 @@ class Renamer:
             self.rename_and_log_all_files(arcs)
             logger.info(f"{n} file{'s'[:n^1]} renamed.")
             if n == 0:
-                return print_.success(f"Nothing to rename.")
+                return f"Nothing to rename."
             elif n == 1:
-                return print_.success(f"1 item was renamed.")
+                return f"1 item was renamed."
             else:
-                return print_.success(f"All {n} items were renamed.")
+                return f"All {n} items were renamed."
         except Exception as e:
-            logger.warning(str(e))
-            print_.fail(str(e))
-            raise RecoverableRenamingError
+            logger.warning(f"perform_renamings: {e}")
+            raise RecoverableRenamingError(f"{e}.")
 
     def rollback_renamings(self):
         """
@@ -54,27 +53,20 @@ class Renamer:
             self.rename_and_log_all_files(self.arcs_to_rollback)
             logger.info(f"{n} renaming{'s'[:n^1]} rolled back.")
             if n == 0:
-                return print_.success(f"Nothing to roll back.")
+                return f"there was nothing to roll back."
             elif n == 1:
-                return print_.success(f"1 renaming was rolled back.")
+                return f"the only renaming was rolled back."
             else:
-                return print_.success(f"All {n} renamings were rolled back.")
+                return f"all {n} renamings were rolled back."
         except Exception as e:
-            logger.error(f"rollback:{e}")
-            print_.fail(str(e))
+            logger.error(f"rollback_renamings: {e}")
             raise
 
     def get_arcs_for_undoing(self):
         """Read a log file and calculate the reversed renamings."""
-        try:
-            log_text = logger.get_contents()
-        except Exception as e:
-            print_.fail(str(e))
-            raise
-        if re.search(r"(?m)^ERROR:", log_text):
-            logger.warning(f"The log file contains an error. Aborting.")
-            print_.fail("The previous rollback failed. Undoing is not possible.")
-            raise ValueError
+        log_text = logger.get_contents()
+        if re.search(r"(?m)^ERROR:", log_text): # The log file contains an error.
+            raise ValueError("The previous rollback failed. Undoing is not possible.")
         arcs = []
         for (source, target) in reversed(self.get_logged_arcs(log_text)):
             arcs.append(Arc(Path(target), Path(source)))

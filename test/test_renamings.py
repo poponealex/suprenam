@@ -91,17 +91,6 @@ def test_rename_and_undo_fail_after_target_deletion():
         arcs[2].source, # correctly undone
         arcs[0].target, # failed to be undone
     }
-    print(logger.get_contents())
-    assert logger.get_contents() == "\n".join([
-        "INFO:root:3 files to rename.",
-        "INFO:root:SOURCE:test/happy_path/source_0\tTARGET:test/happy_path/target_0",
-        "INFO:root:SOURCE:test/happy_path/source_1\tTARGET:test/happy_path/target_1",
-        "INFO:root:SOURCE:test/happy_path/source_2\tTARGET:test/happy_path/target_2",
-        "INFO:root:3 files renamed.",
-        "INFO:root:3 files to rename.",
-        "INFO:root:SOURCE:test/happy_path/target_2\tTARGET:test/happy_path/source_2",
-        "WARNING:root:[Errno 2] No such file or directory: 'test/happy_path/target_1' -> 'test/happy_path/source_1'",
-    ])
     renamer.rollback_renamings()
     print(set(base.iterdir()))
     assert set(base.iterdir()) == {
@@ -117,7 +106,7 @@ def test_rename_and_undo_fail_after_target_deletion():
         "INFO:root:3 files renamed.",
         "INFO:root:3 files to rename.",
         "INFO:root:SOURCE:test/happy_path/target_2\tTARGET:test/happy_path/source_2",
-        "WARNING:root:[Errno 2] No such file or directory: 'test/happy_path/target_1' -> 'test/happy_path/source_1'",
+        "WARNING:root:perform_renamings: [Errno 2] No such file or directory: 'test/happy_path/target_1' -> 'test/happy_path/source_1'",
         "INFO:root:1 renaming to roll back.",
         "INFO:root:SOURCE:test/happy_path/source_2\tTARGET:test/happy_path/target_2",
         "INFO:root:1 renaming rolled back.",
@@ -175,7 +164,7 @@ def test_rename_fail_and_rollback():
         "INFO:root:4 files to rename.",
         "INFO:root:SOURCE:test/rollback_path/source_0\tTARGET:test/rollback_path/target_0",
         "INFO:root:SOURCE:test/rollback_path/source_1\tTARGET:test/rollback_path/target_1",
-        "WARNING:root:[Errno 2] No such file or directory: 'test/rollback_path/source_2' -> 'test/rollback_path/target_2'",
+        "WARNING:root:perform_renamings: [Errno 2] No such file or directory: 'test/rollback_path/source_2' -> 'test/rollback_path/target_2'",
         "INFO:root:2 renamings to roll back.",
         "INFO:root:SOURCE:test/rollback_path/target_1\tTARGET:test/rollback_path/source_1",
         "INFO:root:SOURCE:test/rollback_path/target_0\tTARGET:test/rollback_path/source_0",
@@ -214,7 +203,7 @@ def test_rename_fail_and_rollback_and_undo():
         "INFO:root:4 files to rename.",
         "INFO:root:SOURCE:test/rollback_path/source_0\tTARGET:test/rollback_path/target_0",
         "INFO:root:SOURCE:test/rollback_path/source_1\tTARGET:test/rollback_path/target_1",
-        "WARNING:root:[Errno 2] No such file or directory: 'test/rollback_path/source_2' -> 'test/rollback_path/target_2'",
+        "WARNING:root:perform_renamings: [Errno 2] No such file or directory: 'test/rollback_path/source_2' -> 'test/rollback_path/target_2'",
         "INFO:root:2 renamings to roll back.",
         "INFO:root:SOURCE:test/rollback_path/target_1\tTARGET:test/rollback_path/source_1",
         "INFO:root:SOURCE:test/rollback_path/target_0\tTARGET:test/rollback_path/source_0",
@@ -254,9 +243,9 @@ def test_rename_fail_and_rollback_fail():
         "INFO:root:4 files to rename.",
         "INFO:root:SOURCE:test/rollback_path/source_0\tTARGET:test/rollback_path/target_0",
         "INFO:root:SOURCE:test/rollback_path/source_1\tTARGET:test/rollback_path/target_1",
-        "WARNING:root:[Errno 2] No such file or directory: 'test/rollback_path/source_2' -> 'test/rollback_path/target_2'",
+        "WARNING:root:perform_renamings: [Errno 2] No such file or directory: 'test/rollback_path/source_2' -> 'test/rollback_path/target_2'",
         "INFO:root:2 renamings to roll back.",
-        "ERROR:root:rollback:[Errno 2] No such file or directory: 'test/rollback_path/target_1' -> 'test/rollback_path/source_1'",
+        "ERROR:root:rollback_renamings: [Errno 2] No such file or directory: 'test/rollback_path/target_1' -> 'test/rollback_path/source_1'",
     ])
     with pytest.raises(Exception):
         renamer.undo_renamings() # The previous rollback failed. Undoing is not possible.

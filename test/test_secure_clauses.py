@@ -97,7 +97,7 @@ def test_dict_of_clauses():
     ]
     with pytest.raises(DuplicatedClauseError) as offending_path:
         dict_of_clauses(clauses)
-    assert offending_path.value.args[0] == Path("/ping")
+    assert offending_path.value.args[0] == "The clause '/ping' -> 'pong' is given twice."
 
 
 def test_dict_of_clauses_when_not_a_function():
@@ -108,7 +108,7 @@ def test_dict_of_clauses_when_not_a_function():
     ]
     with pytest.raises(SeveralTargetsError) as offending_path:
         dict_of_clauses(clauses)
-    assert offending_path.value.args[0] == Path("/ping")
+    assert offending_path.value.args[0] == "Two distinct renaming targets for '/ping': 'pong' and 'fail'."
 
 
 def test_check_injectivity(fs):
@@ -128,7 +128,7 @@ def test_check_injectivity_with_internal_problem(fs):
     }
     with pytest.raises(SeveralSourcesError) as offending_path:
         check_injectivity(fs, clauses)
-    assert offending_path.value.args[0] == Path("/usr/lib/foobar")
+    assert offending_path.value.args[0] == "At least two distinct sources for '/usr/lib/foobar'."
 
 
 def test_check_injectivity_with_external_problem(fs):
@@ -137,7 +137,7 @@ def test_check_injectivity_with_external_problem(fs):
     }
     with pytest.raises(SeveralSourcesError) as offending_path:
         check_injectivity(fs, clauses)
-    assert offending_path.value.args[0] == Path("/usr/lib/X11")
+    assert offending_path.value.args[0] == "At least two distinct sources for '/usr/lib/X11'."
 
 
 def test_sorted_by_level():

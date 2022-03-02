@@ -39,7 +39,10 @@ def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Arc]:
             source and target paths.
     """
     clause_dict = dict_of_clauses(clauses)
-    file_system.update_with_source_paths(clause_dict.keys())
+    try:
+        file_system.update_with_source_paths(clause_dict.keys())
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"File not found: '{e}'.")
     check_injectivity(file_system, clause_dict)
     clauses_by_levels = sorted_by_level(clause_dict)
     safe_clauses = []
@@ -79,15 +82,12 @@ def dict_of_clauses(clauses: Iterable[Clause]) -> ClauseMap:
     for (path, new_name) in clauses:
         if path in result:
             if result[path] == new_name:
-                print_.fail(f"The clause '{path}' -> '{new_name}' is given more than once.")
-                raise DuplicatedClauseError(path)
+                raise DuplicatedClauseError(f"The clause '{path}' -> '{new_name}' is given twice.")
             else:
-                print_.fail(
-                    f"At least two distinct renaming targets for '{path}':\n"
-                    "    '{result[path]}'\n"
-                    "    '{new_name}'."
+                raise SeveralTargetsError(
+                    f"Two distinct renaming targets for '{path}': "
+                    f"'{result[path]}' and '{new_name}'."
                 )
-                raise SeveralTargetsError(path)
         result[path] = new_name
     return result
 
@@ -111,8 +111,7 @@ def check_injectivity(file_system: FileSystem, clauses: ClauseMap):
     for (path, new_name) in clauses.items():
         new_path = path.with_name(new_name)
         if new_path in already_seen or (new_path in file_system and new_path not in clauses):
-            print_.fail(f"At least two distinct sources for '{new_path}'.")
-            raise SeveralSourcesError(new_path)
+            raise SeveralSourcesError(f"At least two distinct sources for '{new_path}'.")
         already_seen.add(new_path)
 
 

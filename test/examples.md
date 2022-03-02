@@ -521,7 +521,7 @@ original path | new name
 
 #### Result
 
-`FileNotFoundError("/usr/foo")`
+`FileNotFoundError("File not found: '/usr/foo'.")`
 
 ## Name clash among renaming clauses
 
@@ -538,7 +538,7 @@ original path | new name
 
 #### Result
 
-`SeveralTargetsError("/bin")`
+`SeveralTargetsError("Two distinct renaming targets for '/bin': 'trash' and 'boom'.")`
 
 --------------------------------------------------------------------------------
 
@@ -553,7 +553,7 @@ original path | new name
 
 #### Result
 
-`SeveralTargetsError("/etc")`
+`SeveralTargetsError("Two distinct renaming targets for '/etc': 'etera' and 'esc'.")`
 
 --------------------------------------------------------------------------------
 
@@ -568,7 +568,7 @@ original path | new name
 
 #### Result
 
-`SeveralTargetsError("/bin")`
+`SeveralTargetsError("Two distinct renaming targets for '/bin': 'bin' and 'boom'.")`
 
 --------------------------------------------------------------------------------
 
@@ -583,7 +583,7 @@ original path | new name
 
 #### Result
 
-`SeveralTargetsError("/etc")`
+`SeveralTargetsError("Two distinct renaming targets for '/etc': 'etc' and 'esc'.")`
 
 --------------------------------------------------------------------------------
 
@@ -598,7 +598,7 @@ original path | new name
 
 #### Result
 
-`SeveralSourcesError("/usr/lib/foobar")`
+`SeveralSourcesError("At least two distinct sources for '/usr/lib/foobar'.")`
 
 --------------------------------------------------------------------------------
 
@@ -613,7 +613,7 @@ original path | new name
 
 #### Result
 
-`SeveralSourcesError("/usr/foobar")`
+`SeveralSourcesError("At least two distinct sources for '/usr/foobar'.")`
 
 --------------------------------------------------------------------------------
 
@@ -628,7 +628,7 @@ original path | new name
 
 #### Result
 
-`SeveralSourcesError("/usr/foobar")`
+`SeveralSourcesError("At least two distinct sources for '/usr/foobar'.")`
 
 ## Name clash outside renaming clauses
 
@@ -644,7 +644,7 @@ original path | new name
 
 #### Result
 
-`SeveralSourcesError("/usr/share/man/man2")`
+`SeveralSourcesError("At least two distinct sources for '/usr/share/man/man2'.")`
 
 --------------------------------------------------------------------------------
 
@@ -658,7 +658,7 @@ original path | new name
 
 #### Result
 
-`SeveralSourcesError("/mnt")`
+`SeveralSourcesError("At least two distinct sources for '/mnt'.")`
 
 --------------------------------------------------------------------------------
 
@@ -673,7 +673,7 @@ original path | new name
 
 #### Result
 
-`SeveralSourcesError("/mnt")`
+`SeveralSourcesError("At least two distinct sources for '/mnt'.")`
 
 --------------------------------------------------------------------------------
 
@@ -687,7 +687,7 @@ original path | new name
 
 #### Result
 
-`SeveralSourcesError("/opt")`
+`SeveralSourcesError("At least two distinct sources for '/opt'.")`
 
 --------------------------------------------------------------------------------
 
@@ -701,7 +701,7 @@ original path | new name
 
 #### Result
 
-`SeveralSourcesError("/mnt")`
+`SeveralSourcesError("At least two distinct sources for '/mnt'.")`
 
 ## Redundant renaming
 
@@ -718,7 +718,7 @@ original path | new name
 
 #### Result
 
-`DuplicatedClauseError("/usr/libexec")`
+`DuplicatedClauseError("The clause '/usr/libexec' -> 'foobar' is given twice.")`
 
 --------------------------------------------------------------------------------
 
@@ -733,5 +733,5 @@ original path | new name
 
 #### Result
 
-`DuplicatedClauseError("/usr/lib")`
+`DuplicatedClauseError("The clause '/usr/lib' -> 'foobar' is given twice.")`
 
