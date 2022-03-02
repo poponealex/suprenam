@@ -88,7 +88,7 @@ def run_on_path_list(paths: List[Path]):
     except UnsupportedOSError:
         return
 
-    logger.info("Opening the editable text file in the editor and waiting it is closed.")
+    logger.info("Opening the editable text file in the editor and waiting it to be closed.")
     try:
         subprocess.run(editor_command, check=True)
         logger.info("Command executed without process error.")
@@ -122,7 +122,7 @@ def run_on_path_list(paths: List[Path]):
         message = renamer.perform_renamings(arcs)
         return print_.success(message)
     except RecoverableRenamingError:
-        logger.warning("Renaming performed with recoverable errors.")
+        logger.warning("Renaming performed with a recoverable error.")
         try:
             message = renamer.rollback_renamings()
             return print_.abort(f"The renamings failed, but don't worry: {message}.")
