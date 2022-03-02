@@ -26,10 +26,11 @@ class Renamer:
         """
         n = len(arcs)
         print_(f"Renaming {n} items...")
-        logger.info(f"{n} file{'s'[:n^1]} to rename.")
+        logger.info(f"{n} item{'s'[:n^1]} to rename.")
         try:
             self.rename_and_log_all_files(arcs)
-            logger.info(f"{n} file{'s'[:n^1]} renamed.")
+            logger.info(f"{n} item{'s'[:n^1]} renamed.")
+            print_(f"{n} item{'s'[:n^1]} renamed.")
             if n == 0:
                 return f"Nothing to rename."
             elif n == 1:
