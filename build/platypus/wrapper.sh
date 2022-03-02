@@ -20,6 +20,8 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -f "$TEMP_FILE" ]; then
-    $python_command suprenam.py -f "$TEMP_FILE"
+    $python_command suprenam.py --file "$TEMP_FILE"
     rm -f "$TEMP_FILE"
+else
+    $python_command suprenam.py --undo
 fi

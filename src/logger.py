@@ -8,8 +8,7 @@ class Logger:
     LOG_NAME = "log.txt"
 
     def __init__(self, path: Path = LOG_DIR / LOG_NAME):
-        """Create a log file at the specified path."""
-        # Ensure the log directory exists.
+        """Ensure the log directory exists."""
         path.parent.mkdir(
             parents=True,  # any missing parents of this path are created as needed
             exist_ok=True,  # if the directory already exists, do not raise an exception
@@ -23,7 +22,10 @@ class Logger:
         logging.basicConfig(filename=self.path, filemode="w", level=logging.DEBUG)
 
     def get_contents(self):  # pragma: no cover
-        return self.path.read_text().strip()
+        if self.path.is_file():
+            return self.path.read_text().strip()
+        else:
+            return ""
 
     def erase_contents(self):
         self.path.write_text("")
