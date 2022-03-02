@@ -125,7 +125,7 @@ def run_on_path_list(paths: List[Path]):
         logger.warning("Renaming performed with recoverable errors.")
         try:
             message = renamer.rollback_renamings()
-            return print._abort(f"The renamings failed, but don't worry: {message}.")
+            return print_.abort(f"The renamings failed, but don't worry: {message}.")
         except Exception as e:
             return print_.fail(
                 f"Unrecoverable failure during rollback: {e}"
