@@ -26,6 +26,14 @@ def main(previous_log_text: str):
     logger.info("Parsing arguments done.")
 
     if args.undo:
+        if not previous_log_text:
+            logger.info("Missing or empty log file. Display usage and quit.")
+            return print_.usage(
+                "Looks like it's the first time you launch Suprenam. "
+                "Drag and drop some files onto its icon to rename them. "
+                "Clicking the icon is also possible, "
+                "but would undo the previous renaming session (if any)."
+            )
         logger.info("Undoing renamings.")
         renamer = Renamer()
         try:
