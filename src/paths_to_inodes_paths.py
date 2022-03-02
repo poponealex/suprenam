@@ -26,7 +26,6 @@ def paths_to_inodes_paths(paths: List[Path]) -> InodesPaths:
         else:
             missing_paths.append(path)
     if missing_paths:
-        print_.fail(f"The following items are missing: {missing_paths}.")
-        raise FileNotFoundError
+        raise FileNotFoundError(f"The following items are missing: {missing_paths}.")
     else:    
         return result

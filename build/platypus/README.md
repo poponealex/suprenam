@@ -19,7 +19,7 @@
 ## Create the App and the Package - `build.sh` 
 
 - Run `chmod +x build/platypus/build.sh` from **repo's root**.
-- Run `./build/platypus/build.sh` from **repo's root**.
+- Run `build/platypus/build.sh` from **repo's root**.
 - The app will be located at `build/platypus/Suprenam.app`
 - The package will be located at `build/platypus/Suprenam.pkg`
 

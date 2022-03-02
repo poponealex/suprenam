@@ -45,3 +45,8 @@ class RecoverableRenamingError(Exception):
     """
     Raised after a failed renaming, with the goal of triggering a rollback.
     """
+
+class RetrieveDefaultsError(Exception):
+    """
+    Raised when the command for retrieving all defaults fail.
+    """

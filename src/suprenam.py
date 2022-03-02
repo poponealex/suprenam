@@ -31,14 +31,15 @@ def main():
         try:
             arcs_for_undoing = renamer.get_arcs_for_undoing()
             renamer.perform_renamings(arcs_for_undoing)
+            print._success("Undoing renamings done.")
         except RecoverableRenamingError:
             try:
                 renamer.rollback_renamings()
-                print_.no_renamings()
-            except: # Unknow error during rollback.
-                print_.fail("Rollback failed.")
-        except: # Unknown problem with the log file, e.g. not found
-            print_.fail("Undo failed.")
+                print_.abort("The renamings failed, but were successfully rolled back.")
+            except Exception as e:
+                return print_.fail(f"Unrecoverable failure during rollback: {e}")
+        except Exception as e:  # Unknown problem with the log file, e.g. not found
+            return print_.fail(f"Unrecoverable failure during undo: {e}")
         logger.info("Undoing renamings done.")
     else:
         logger.info("Constructing the list of items to rename.")
@@ -51,7 +52,7 @@ def main():
             paths.extend(Path(path) for path in Path(args.file).read_text().split("\n") if path)
         if not paths:
             logger.info("No paths to rename were provided.")
-            return print_.no_renamings("Please provide at least one file to rename.")
+            return print_.abort("Please provide at least one file to rename.")
         logger.info("Running on path list.")
         run_on_path_list(paths)
         logger.info("Running on path list done.")
@@ -62,72 +63,75 @@ def run_on_path_list(paths: List[Path]):
     logger.info("Creating a mapping from inodes to paths.")
     try:
         inodes_paths = paths_to_inodes_paths(paths)
-    except FileNotFoundError:
-        return print_.no_renamings()
+        logger.info("Creating a mapping from inodes to paths done.")
+    except Exception as e:
+        return print_.abort(str(e))
 
     logger.info("Creating a temporary text file for the list to be edited.")
     try:
         editable_file_path = Path(NamedTemporaryFile(mode="w+", delete=False, suffix=".txt").name)
         logger.info(f"Editable file path: {repr(editable_file_path)}.")
     except Exception as e:
-        print_.fail(str(e))
-        return print_.no_renamings()
+        return print_.abort(f"Failed to create a temporary file: {e}")
 
     logger.info("Populating the temporary text file with the list to be edited.")
     try:
         editable_file_path.write_text(get_editable_text(inodes_paths))
         logger.info(f"Editable file content: populated.")
-    except FileNotFoundError:
-        return print_.no_renamings("The editable file was deleted.")
+    except Exception as e:
+        return print_.abort(f"Failed to populate the temporary file: {e}")
 
     logger.info("Retrieving a command to edit the temporary text file.")
     try:
         editor_command = get_editor_command(editable_file_path)
         logger.info(f"The command is {' '.join(editor_command)}.")
     except UnsupportedOSError:
-        return print_.no_renamings()
+        return
 
-    logger.info("Opening the editable text file in the editor and waiting it is closed.")
+    logger.info("Opening the editable text file in the editor and waiting it to be closed.")
     try:
         subprocess.run(editor_command, check=True)
         logger.info("Command executed without process error.")
     except subprocess.CalledProcessError:
-        return print_.no_renamings()
+        return print_.abort(f"The command {' '.join(editor_command)} failed.")
 
     logger.info("Retrieving the content of the edited text file.")
     try:
         edited_text = EditedText(editable_file_path.read_text())
-        logger.info("Line count in the edited text file: %s." % edited_text.count('\n'))
-    except FileNotFoundError:
-        return print_.no_renamings("The editable file was deleted.")
+        logger.info("Line count in the edited text file: %s." % edited_text.count("\n"))
+    except Exception as e:
+        return print_.abort(f"Failed to read the edited text file: {e}")
 
     logger.info("Parsing the edited text into renaming clauses.")
     try:
         clauses = parse_edited_text(edited_text, inodes_paths)
         logger.info(f"Parsed edited text into {len(clauses)} clauses.")
-    except (UnknownInodeError, TabulationError, ValidationError):
-        return print_.no_renamings()
+    except Exception as e:
+        return print_.abort(str(e))
 
     logger.info("Converting the clauses into a 'safe' sequence of renamings.")
     try:
         arcs = secure_clauses(FileSystem(), clauses)
         logger.info(f"Converted clauses into {len(arcs)} arcs.")
-    except (SeveralTargetsError, SeveralSourcesError, DuplicatedClauseError):
-        return print_.no_renamings()
+    except Exception as e:
+        return print_.abort(str(e))
 
     logger.info("Performing the actual renamings.")
     renamer = Renamer()
     try:
-        renamer.perform_renamings(arcs)
-        logger.info("Renaming performed without errors.")
+        message = renamer.perform_renamings(arcs)
+        return print_.success(message)
     except RecoverableRenamingError:
-        logger.info("Renaming performed with recoverable errors.")
+        logger.warning("Renaming performed with a recoverable error.")
         try:
-            renamer.rollback_renamings()
-            return print_.no_renamings()
-        except:
-            logger.info("Unknown error during rollback.")
-            return print_.fail("Rollback failed.")
+            message = renamer.rollback_renamings()
+            return print_.abort(f"The renamings failed, but don't worry: {message}.")
+        except Exception as e:
+            return print_.fail(
+                f"Unrecoverable failure during rollback: {e}"
+                "Some files may have been renamed, some not."
+                "Please check the log file at `~/.suprenam/log.txt`."
+            )
 
 
 def cli_arguments():

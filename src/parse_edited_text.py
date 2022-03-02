@@ -42,19 +42,16 @@ def parse_edited_text(
 
         path = inodes_paths.get(inode)
         if path is None:
-            print_.fail(f"Unknown inode {inode}.")
-            raise UnknownInodeError
+            raise UnknownInodeError(f"Unknown inode {inode}.")
 
         new_name = tail[0]
         if "\t" in new_name:
-            print_.fail(f"Illegal tabulation in the new name: '{new_name}'.")
-            raise TabulationError
+            raise TabulationError(f"Illegal tabulation in the new name: '{new_name}'.")
         if path.name == new_name:
             continue
         try:
             pathvalidate.validate_filename(new_name, platform=platform or "auto")
         except pathvalidate.ValidationError:
-            print_.fail(f"Invalid character(s) in the new name: '{new_name}'.")
-            raise ValidationError
+            raise ValidationError(f"Invalid character(s) in the new name: '{new_name}'.")
         result.append(Clause(path, Name(new_name)))
     return result

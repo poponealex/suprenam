@@ -33,7 +33,7 @@ def test(i, title, example, expected):
         (exception_name, expected_culprit) = expected
         with pytest.raises(EXCEPTIONS[exception_name]) as culprit:
             sc.secure_clauses(fs, clauses)
-        assert culprit.value.args[0] == Path(expected_culprit)
+        assert culprit.value.args[0] == expected_culprit
         assert fs == original_fs
     else:
         safe_clauses = sc.secure_clauses(fs, clauses)

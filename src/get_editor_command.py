@@ -61,11 +61,10 @@ def get_editor_command(path: Path, platform: Optional[str] = None) -> list:
     platform = platform or get_platform_long_string().partition("-")[0]
     os_dict = OS.get(platform)
     if not os_dict:
-        print_.fail(
+        raise UnsupportedOSError(
             f"Unsupported operating system: {platform}. "
             f"Supported operating systems are: {', '.join(OS.keys())}."
         )
-        raise UnsupportedOSError(platform)
 
     try:
         output = subprocess.run(
@@ -76,8 +75,7 @@ def get_editor_command(path: Path, platform: Optional[str] = None) -> list:
             check=True,
         ).stdout
     except Exception as e:
-        print_.fail(str(e))  # make mypy happy
-        raise e
+        raise RetrieveDefaultsError(f"Failed to retrieve the defaults: {e}.")
 
     match = re.search(str(os_dict["EXTRACT_EDITOR"]), output)  # make mypy happy
     custom_editor_handler = match.group(1) if match else ""
