@@ -68,6 +68,7 @@ for file in $(ls $BUNDLE); do
 done
 
 platypus \
+--interface-type 'Text Window' \
 --app-icon "$BUILD/../logo.icns" \
 --name "Suprenam" \
 --app-version "$APP_VERSION" \

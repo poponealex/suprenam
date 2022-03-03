@@ -23,6 +23,15 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -f "$TEMP_FILE" ]; then
-    $python_command suprenam.py -f "$TEMP_FILE"
+    $python_command suprenam.py --file "$TEMP_FILE"
     rm -f "$TEMP_FILE"
+else
+    if [ -e ~/.suprenam/log.txt ]; then
+        $python_command suprenam.py --undo
+    else
+        echo "ALERT:Usage|"`
+            `"Drag and drop onto the Suprenam's icon a bunch of files you want to rename. "`
+            `"Clicking the icon will be used to undo the previous renaming session (if any)."
+        exit 2
+    fi
 fi
