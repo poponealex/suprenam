@@ -9,8 +9,11 @@ if ! command -v python3 &> /dev/null; then # https://stackoverflow.com/questions
     python_command=python
 fi
 
-if ! [[ `$python_command --version | cut -f 2` > "3.6" ]]; then
-    echo "Python 3.6+ is required."
+# Launch Python to get the version of Python, and concatenate its two parts
+# (major and minor) on 4 digits (e.g. 3.6 -> "0306") for easier comparison.
+# This will work until Python 99.99, which ought to be enough for anybody.
+if [[ `$python_command -c "import sys; print('{0[0]:02}{0[1]:02}'.format(sys.version_info))"` < "0306" ]]; then
+    echo "ALERT:Fatal error|Python 3.6 or higher is required. Yours is `$python_command --version | cut -f 2`."
     exit 2
 fi
 
