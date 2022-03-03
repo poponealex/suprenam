@@ -11,9 +11,6 @@ class ColorPrinter:
     WARNING = "\033[1m\033[38;5;166m"
     FAIL = "\033[1m\033[91m"
     RESET = "\033[0m"
-    
-    def usage(self, message: str):
-        print(f"Usage: {message}", file=sys.stderr)
 
     def __call__(self, message: str):
         print(message)
@@ -39,9 +36,6 @@ class PlatypusPrinter:
 
     def __init__(self):
         self.buffer = []
-    
-    def usage(self, message: str):
-        print(f"ALERT:Usage|{message}")
 
     def __call__(self, message: str):
         print(message)

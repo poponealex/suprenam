@@ -30,8 +30,8 @@ else
         $python_command suprenam.py --undo
     else
         echo "ALERT:Usage|"`
-            `"Drag and drop onto the Suprenam's icon the files you want to rename. "`
-            `"Clicking the icon is just used to undo the previous renaming session (if any)."
+            `"Drag and drop onto the Suprenam's icon a bunch of files you want to rename. "`
+            `"Clicking the icon will be used to undo the previous renaming session (if any)."
         exit 2
     fi
 fi
