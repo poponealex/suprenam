@@ -20,7 +20,7 @@ from src.user_errors import *
 from src.user_types import EditedText
 
 
-def main():
+def main(previous_log_text: str):
     logger.info("Parsing arguments.")
     args = cli_arguments()
     logger.info("Parsing arguments done.")
@@ -29,7 +29,8 @@ def main():
         logger.info("Undoing renamings.")
         renamer = Renamer()
         try:
-            arcs_for_undoing = renamer.get_arcs_for_undoing()
+            arcs_for_undoing = renamer.get_arcs_for_undoing(previous_log_text)
+            logger.info(str(arcs_for_undoing))
             message = renamer.perform_renamings(arcs_for_undoing)
             print_.success(
                 f"The previous renaming session was undone. {message} "
@@ -176,7 +177,8 @@ def cli_arguments():
 
 
 if __name__ == "__main__":  # pragma: no cover
+    previous_log_text = logger.get_contents()
     logger.create_new_log_file()
     logger.info("Starting the program.")
-    main()
+    main(previous_log_text)
     logger.info("Exiting the program.")

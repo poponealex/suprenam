@@ -49,7 +49,7 @@ def test_rename_and_undo():
         arc.source.touch()
     logger.create_new_log_file()
     renamer.perform_renamings(arcs)
-    arcs_for_undoing = renamer.get_arcs_for_undoing()
+    arcs_for_undoing = renamer.get_arcs_for_undoing(logger.get_contents())
     renamer.perform_renamings(arcs_for_undoing)
     assert set(base.iterdir()) == set(arc.source for arc in arcs)
     print(logger.get_contents())
@@ -84,7 +84,7 @@ def test_rename_and_undo_fail_after_target_deletion():
     renamer.perform_renamings(arcs)
     assert set(base.iterdir()) == set(arc.target for arc in arcs)
     arcs[1].target.unlink()  # delete a renamed file
-    arcs_for_undoing = renamer.get_arcs_for_undoing()
+    arcs_for_undoing = renamer.get_arcs_for_undoing(logger.get_contents())
     with pytest.raises(RecoverableRenamingError):
         renamer.perform_renamings(arcs_for_undoing)
     assert set(base.iterdir()) == {
@@ -130,7 +130,7 @@ def test_rename_and_undo_fail_after_log_file_deletion():
     renamer.perform_renamings(arcs)
     assert set(base.iterdir()) == set(arc.target for arc in arcs)
     logger.path.unlink()  # delete the log file
-    arcs_for_undoing = renamer.get_arcs_for_undoing()
+    arcs_for_undoing = renamer.get_arcs_for_undoing(logger.get_contents())
     assert arcs_for_undoing == []
     assert set(base.iterdir()) == set(arc.target for arc in arcs)
     rm_tree(base)
@@ -191,7 +191,7 @@ def test_rename_fail_and_rollback_and_undo():
     with pytest.raises(RecoverableRenamingError):
         renamer.perform_renamings(arcs) # the renaming fails
     renamer.rollback_renamings() # but we can roll back the previous ones
-    arcs_for_undoing = renamer.get_arcs_for_undoing()
+    arcs_for_undoing = renamer.get_arcs_for_undoing(logger.get_contents())
     renamer.perform_renamings(arcs_for_undoing)
     assert set(base.iterdir()) == {
         base / "source_0", # rolled back
@@ -254,7 +254,7 @@ def test_rename_fail_and_rollback_fail():
 
 def test_undo_with_empty_log_file():
     renamer = Renamer(testing=True)
-    arcs_for_undoing = renamer.get_arcs_for_undoing() # doesn't raise an exception
+    arcs_for_undoing = renamer.get_arcs_for_undoing(logger.get_contents()) # doesn't raise an exception
     assert arcs_for_undoing == []
 
 if __name__ == "__main__":  # pragma: no cover

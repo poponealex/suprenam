@@ -62,14 +62,14 @@ class Renamer:
 
     def get_arcs_for_undoing(
         self,
+        previous_log_text: str,
         get_logged_arcs=re.compile(r"(?m)^\w+:\w+:SOURCE:(.+)\tTARGET:(.+)").findall,
     ):
         """Read a log file and calculate the reversed renamings."""
-        log_text = logger.get_contents()
-        if re.search(r"(?m)^ERROR:", log_text):  # The log file contains an error.
+        if re.search(r"(?m)^ERROR:", previous_log_text):  # The log file contains an error.
             raise ValueError("The previous rollback failed. Undoing is not possible.")
         arcs = []
-        for (source, target) in reversed(get_logged_arcs(log_text)):
+        for (source, target) in reversed(get_logged_arcs(previous_log_text)):
             arcs.append(Arc(Path(target), Path(source)))
         return arcs
 
