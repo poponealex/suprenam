@@ -48,7 +48,7 @@
 
 # Foreword
 
-This text documents the result of the renaming of one or more nodes (leaf: either a file or a folder; internal node: a folder) of `fhs.txt` in a variety of normal cases and edge cases.
+This text documents the result of the renaming of one or more nodes (leaf: either a file or a folder; internal node: a folder) of a virtual file tree ([`fhs.txt`](/test/fhs.txt)) in a variety of normal cases and edge cases.
 
 Moreover, it is parsed by `test_examples.py`, which runs the renaming algorithm on every example and checks the expected results. When an example consists in several renaming clauses, since their order is not important, all permutations of these clauses are automatically tested.
 

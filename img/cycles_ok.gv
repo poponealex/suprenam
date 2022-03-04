@@ -1,0 +1,35 @@
+# Sketchy drawing from https://sketchviz.com/new
+
+digraph G {
+    graph [
+        fontname = "Handlee";
+        layout = "neato";
+    ];
+    node [
+        fontname = "Handlee"
+        shape=circle
+        penwidth=2
+    ];
+    edge [
+        penwidth=2
+        color = "green4"
+    ]
+
+    bgcolor=transparent;
+
+    a [pos="0,0!"];
+    b [pos="1.5,0.66!"]
+    c [pos="1.5,-0.66!"]
+    d [pos="3,0.66!"];
+    e [pos="4,0!"];
+    f [pos="3,-0.66!"];
+    g [pos="5.5,0!"]
+    h [pos="6.5,0.66!"]
+    i [pos="6.5,-0.66!"]
+
+    a -> a
+    b -> c -> b
+    d -> e -> f
+    g -> h -> i -> g
+    
+}

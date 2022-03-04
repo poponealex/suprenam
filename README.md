@@ -1,5 +1,5 @@
 
-<img align="left" width="120" src="/misc/logo.png">
+<img align="left" src="/img/logo_small.png">
 
 ## It's a bird... It's a plane...
 
@@ -7,26 +7,18 @@ It's **Suprenam**, a batch renaming utility which relies on the tool you know be
 
 ----
 
-### Easy to use, but powerful
+### Sweet, but powerful
 
-Suprenam is intended to sit in the **Finder toolbar**.
+Suprenam sits in the Finder Toolbar, waiting for you to **drag and drop** items (any selection of files and folders) onto it.
 
-_To stick it there, press and hold <kbd>cmd</kbd> while dragging its icon to the desired location._
-
-![Toolbar](/misc/toolbar.gif)
+<p align="center"><img src="/img/drag_and_drop.gif"></p>
 
 ----
 
-Afterwards, you can **drag and drop** items (any selection of files and folders) onto it.
-
-![Drag and drop](/misc/drag_and_drop.gif)
-
-----
-
-Your favorite **text editor** will open with a list of names.
+Then, it will open your favorite **text editor** with a list of names.
 Make use of all your superpowers to modify them: multi-cursors, Find and Replace, regular expressions, you (re)name it.
 
-![Edition](/misc/edition.gif)
+<p align="center"><img src="/img/edition.gif"></p>
 
 When you're done, save and close.
 
@@ -34,9 +26,9 @@ When you're done, save and close.
 
 The modifications are instantly applied on the selected items.
 
-![Success](/misc/success.png)
+<p align="center"><img src="/img/success.png"></p>
 
-Bam! Yet another achievement for Suprenam. 🎉
+Well, yet another achievement for Suprenam, I guess. 🎉
 
 ----
 
@@ -50,17 +42,58 @@ Suprenam is not as straightforward as it seems. It supports:
 
 ----
 
-## Installation
+## Installation (GUI)
 
-Currently, a single-file installation is available for macOS.
+### MacOS
+
+#### Installing Suprenam
+
+TODO.
+
+#### Putting Suprenam in the Finder toolbar
+
+<p align="center"><img src="/img/toolbar.gif"></p>
+
+Press and hold <kbd>cmd</kbd> while dragging the Suprenam icon to the desired location.
+
+#### Setting up your default text editor (if needed)
+
+By default, Suprenam will fall back on TextEdit, which is currently not able to send a signal when an editing window is closed, forcing you to quit it to proceed. This is a major annoyance, and we recommend you to set a more capable Text Editor as default.
+
+To this end, right click on a `.txt` file and select `Get Info`. In the Info window, select your favorite text editor and click on the `Change All...` button.
+
+<p align="center"><img src="/img/mac_set_default_text_editor.png"></p>
 
 
-### Text Editor
+### Linux
 
-#### MacOS
+TODO.
 
-__Right click on a `.txt` file and select `Get Info`.__
-> ![FileContextualMenuMac](/misc/right_click_contextual_menu_mac.png)
+### Windows
 
-__Select your favorite text editor and click on the `Change All...` button.__
-> ![GetInfoWindowMac](/misc/get_info_dialog_mac.png)
+## Installation (command line)
+
+## How it works
+
+- Being given a list of files and folders, Suprenam begins by retrieving their [**inodes**](https://en.wikipedia.org/wiki/Inode). These unique numeric identifiers will serve as an invariant throughout the renaming process.
+- It creates a temporary text file associating each inode with its name. In case all items are siblings (i.e., have the same parent), the list is flat ; otherwise, a section is created for each parent.
+- Suprenam opens this list in a text editor, and waits for you to carry out your modifications.
+- When the temporary file is closed, its content is parsed.
+  - Suprenam ignores any change or deletion to non-inodes lines.
+  - It  tolerates the deletion of one, several or even all ot the inodes.
+  - However, any inode creation or duplication is considered as a typo, and makes it to abort.
+- The new names are checked for validity with respect to the actual file system (courtesy of the [`pathvalidate`](https://github.com/thombashi/pathvalidate) package).
+- This results in a list of bindings between existing inodes and modified names. These bindings cannot be directly translated into renaming commands, as they may lead to name clashes.
+  
+  Below, for instance, `"c"` has two “target“ names, which will cause Suprenam to abort…
+
+  <p align="center"><img src="/img/cycles_nope.png"></p>
+
+  However, some desired bindings can be resolved along a “safe” path of renamings. For instance, the following renamings (from left to right: null, swapping, shifting, rolling) can always be obtained with careful intermediate renamings.
+
+  <p align="center"><img src="/img/cycles_ok.png"></p>
+
+  A lot of accepted and rejected renaming schemes are documented (and tested) [here](test/examples.md).  
+- So, whenever possible, the desired bindings have been silently converted into a “safe” sequence. The new bindings are then processed in order, and the corresponding renamings commands executed. At this stage, the only remaining possible errors should result from hardware failures or from modifications that have occurred in the file tree during the edition stage. Should such rare cases arise, all the completed renaming commands will be readily rolled back.
+- If your fate (or your footgun propensity) is relentless, and this fails too, the program will have no other choice but to leave the file system in a state which is neither the original nor the desired one. You should open the log file at `~/.suprenam/log.txt` to see what went wrong and what you can do about it.
+- Suprenam can also use this log file to “undo” the previous renaming session by executing the sequence of arcs backwards. Obviously, a reversed sequence of safe renamings is still safe. Note, however, that a failed rollback cannot be automatically salvaged.
