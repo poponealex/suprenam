@@ -25,7 +25,22 @@ def main(previous_log_text: str):
     args = cli_arguments()
     logger.info("Parsing arguments done.")
 
-    if args.undo:
+    if not args.undo:
+        logger.info("Constructing the list of items to rename.")
+        paths = []
+        if args.paths:
+            logger.info("A list of items to rename was provided.")
+            paths.extend(map(Path, args.paths))
+        if args.file:
+            logger.info("A file containing the paths to rename was provided.")
+            paths.extend(Path(path) for path in Path(args.file).read_text().split("\n") if path)
+        if not paths:
+            logger.info("No paths to rename were provided.")
+            return print_.abort("Please provide at least one file to rename.")
+        logger.info("Running on path list.")
+        run_on_path_list(paths)
+        logger.info("Running on path list done.")
+    else:
         logger.info("Undoing renamings.")
         renamer = Renamer()
         try:
@@ -45,21 +60,6 @@ def main(previous_log_text: str):
         except Exception as e:  # Unknown problem with the log file, e.g. not found
             return print_.fail(f"Unrecoverable failure during undo: {e}")
         logger.info("Undoing renamings done.")
-    else:
-        logger.info("Constructing the list of items to rename.")
-        paths = []
-        if args.paths:
-            logger.info("A list of items to rename was provided.")
-            paths.extend(map(Path, args.paths))
-        if args.file:
-            logger.info("A file containing the paths to rename was provided.")
-            paths.extend(Path(path) for path in Path(args.file).read_text().split("\n") if path)
-        if not paths:
-            logger.info("No paths to rename were provided.")
-            return print_.abort("Please provide at least one file to rename.")
-        logger.info("Running on path list.")
-        run_on_path_list(paths)
-        logger.info("Running on path list done.")
 
 
 def run_on_path_list(paths: List[Path]):
