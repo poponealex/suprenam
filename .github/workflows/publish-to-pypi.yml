@@ -24,7 +24,6 @@ jobs:
           build
           --user
       - name: Build a binary wheel and a source tarball
-        if: github.ref == 'refs/heads/master'
         run: >-
           python -m
           build
