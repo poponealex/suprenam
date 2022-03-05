@@ -1,11 +1,13 @@
 import logging
 from pathlib import Path
+import os, datetime, shutil
 
 
 class Logger:
 
     LOG_DIR = Path.home() / ".suprenam"
     LOG_NAME = "log.txt"
+    LOGS_TO_KEEP = 10
 
     def __init__(self, path: Path = LOG_DIR / LOG_NAME):
         """Ensure the log directory exists."""
@@ -17,9 +19,27 @@ class Logger:
 
     def create_new_log_file(self):
         """Remove all handlers associated with the root logger object and create a NEW log file."""
+        self.backup_current_log_file()
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
         logging.basicConfig(filename=self.path, filemode="w", level=logging.DEBUG)
+
+    def backup_current_log_file(self):
+        """
+        Copy the current log file with a timestamp appended.
+        Clean up the directory by keeping only the last copies.
+        """
+        if self.LOGS_TO_KEEP == 0:
+            return
+        try:
+            modified = os.path.getmtime(self.path)
+        except FileNotFoundError:
+            return
+        suffix = datetime.datetime.fromtimestamp(modified).strftime("%Y-%m-%d_%H-%M-%S.%f")
+        destination = f"{self.path.parent}/log_{suffix}.txt"
+        shutil.copy2(self.path, destination)
+        for file in sorted(self.LOG_DIR.glob("log_*.txt"), reverse=True)[self.LOGS_TO_KEEP :]:
+            file.unlink()
 
     def get_contents(self):  # pragma: no cover
         if self.path.is_file():

@@ -47,7 +47,6 @@ def test_rename_and_undo():
     ]
     for arc in arcs:
         arc.source.touch()
-    logger.create_new_log_file()
     renamer.perform_renamings(arcs)
     arcs_for_undoing = renamer.get_arcs_for_undoing(logger.get_contents())
     renamer.perform_renamings(arcs_for_undoing)
