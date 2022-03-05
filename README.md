@@ -64,8 +64,8 @@ Suprenam is not as straightforward as it seems. It supports:
 
 ##### Setting up your default text editor (if needed)
 
-- By default, Suprenam will fall back on TextEdit, which is currently not able to send a signal when an editing window is closed, forcing you to quit it to proceed. This is a major annoyance, and we recommend you to set a more capable Text Editor as default.
-- To this end, right click on a `.txt` file and select `Get Info`. In the Info window, select your favorite text editor and click on the `Change All...` button.
+- By default, Suprenam may fall back on TextEdit, which is currently not able to send a signal when an editing window is closed, forcing you to quit it to proceed. This is a major annoyance, and we recommend you to set a more capable Text Editor as default.
+- To this end, right-click on a `.tsv` file, press <kbd>alt</kbd>, select `Always Open With` and choose your favorite text editor.
   <p align="center"><img src="/img/mac_set_default_text_editor.png"></p>
 
 
