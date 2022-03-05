@@ -3,13 +3,15 @@
 
 name: Publish Suprenam to PyPI and TestPyPI
 on: push
+env:
+  RELEASE_VERSION: ${{ github.ref_name }}
 jobs:
   build-n-publish:
     runs-on: ubuntu-latest
+    env:
     steps:
       - uses: actions/checkout@master
-      - name: Set RELEASE_VERSION env variable
-        run: echo "RELEASE_VERSION=${{github.ref_name}}" >> $GITHUB_ENV
+      - name 
       - name: Set up Python 3.6
         uses: actions/setup-python@v1
         with:
