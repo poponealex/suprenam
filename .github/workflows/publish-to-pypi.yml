@@ -5,7 +5,7 @@ name: Publish Suprenam to PyPI and TestPyPI
 on: 
   push:
     branches:
-      - master
+      - main
 env:
   RELEASE_VERSION: ${{ github.ref_name }}
 jobs:
