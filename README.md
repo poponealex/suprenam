@@ -42,7 +42,7 @@ Suprenam is not as straightforward as it seems. It supports:
 
 ----
 
-## Installing
+## Installation
 
 ### Installing the app
 

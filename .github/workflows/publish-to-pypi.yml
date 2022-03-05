@@ -2,7 +2,10 @@
 # https://stackoverflow.com/a/58178121/17396362
 
 name: Publish Suprenam to PyPI and TestPyPI
-on: push
+on: 
+  push:
+    branches:
+      - main
 env:
   RELEASE_VERSION: ${{ github.ref_name }}
 jobs:
