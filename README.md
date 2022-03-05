@@ -50,25 +50,23 @@ Suprenam is not as straightforward as it seems. It supports:
 
 ##### Retrieving or building the installer
 
-Download the latest installer from [Releases](https://github.com/poponealex/suprenam/releases) under the name `Suprenam.pkg`. It is unsigned: that means that you'll need to right-click or <kbd>ctrl</kbd>-click it and select “Open”.
+- Download the latest installer from [Releases](https://github.com/poponealex/suprenam/releases) under the name `Suprenam.pkg`. It is unsigned: that means that you'll need to right-click or <kbd>ctrl</kbd>-click it and select “Open”.
 
-If you prefer to build it manually, follow [these instructions](build/platypus/instructions.md).
+- If you prefer to build it manually, follow [these instructions](build/platypus/instructions.md).
 
-In both cases, Suprenam requires Python 3.6 or later. You may have to [install it](https://www.python.org/downloads/).
+- In both cases, Suprenam requires Python 3.6 or later. You may have to [install it](https://www.python.org/downloads/).
 
 ##### Putting Suprenam in the Finder toolbar
 
-<p align="center"><img src="/img/toolbar.gif"></p>
+- Press and hold <kbd>cmd</kbd> while dragging the Suprenam icon to the desired location.
 
-Press and hold <kbd>cmd</kbd> while dragging the Suprenam icon to the desired location.
+  <p align="center"><img src="/img/toolbar.gif"></p>
 
 ##### Setting up your default text editor (if needed)
 
-By default, Suprenam will fall back on TextEdit, which is currently not able to send a signal when an editing window is closed, forcing you to quit it to proceed. This is a major annoyance, and we recommend you to set a more capable Text Editor as default.
-
-To this end, right click on a `.txt` file and select `Get Info`. In the Info window, select your favorite text editor and click on the `Change All...` button.
-
-<p align="center"><img src="/img/mac_set_default_text_editor.png"></p>
+- By default, Suprenam will fall back on TextEdit, which is currently not able to send a signal when an editing window is closed, forcing you to quit it to proceed. This is a major annoyance, and we recommend you to set a more capable Text Editor as default.
+- To this end, right click on a `.txt` file and select `Get Info`. In the Info window, select your favorite text editor and click on the `Change All...` button.
+  <p align="center"><img src="/img/mac_set_default_text_editor.png"></p>
 
 
 #### Linux
@@ -98,7 +96,7 @@ If this fails, try `pip3` instead of `pip`.
   - Suprenam ignores any change or deletion to non-inodes lines.
   - It  tolerates the deletion of one, several or even all ot the inodes.
   - However, any inode creation or duplication is considered as a typo, and makes it to abort.
-- The new names are checked for validity with respect to the actual file system (courtesy of the [`pathvalidate`](https://github.com/thombashi/pathvalidate) package).
+- The new names are checked for validity with respect to the actual file system.
 - This results in a list of bindings between existing inodes and modified names. These bindings cannot be directly translated into renaming commands, as they may lead to name clashes.
   
   Below, for instance, `"c"` has two “target“ names, which will cause Suprenam to abort…
@@ -109,7 +107,14 @@ If this fails, try `pip3` instead of `pip`.
 
   <p align="center"><img src="/img/cycles_ok.png"></p>
 
-  A lot of accepted and rejected renaming schemes are documented (and tested) [here](test/examples.md).  
+  A handful of accepted and rejected renaming schemes are documented (and tested) [here](test/examples.md).  
 - So, whenever possible, the desired bindings have been silently converted into a “safe” sequence. The new bindings are then processed in order, and the corresponding renaming commands executed. At this stage, the only remaining possible errors should result from hardware failures or from modifications that have occurred in the file tree during the edition stage. Should such rare cases arise, all the completed renaming commands will be readily rolled back.
 - If your fate (or your footgun propensity) is relentless, and this fails too, the program will have no other choice but to leave the file system in a state which is neither the original nor the desired one. You should open the log file at `~/.suprenam/log.txt` to see what went wrong and what you can do about it.
 - Suprenam can also use this log file to “undo” the previous renaming session by executing the sequence backwards. Obviously, a reversed sequence of safe renamings is still safe. Note, however, that a failed rollback cannot be automatically salvaged.
+
+## Credits
+
+- Authors: Aristide Grange and Alexandre Perlmutter.
+- macOS GUI: [Platypus](https://github.com/sveinbjornt/Platypus), by Sveinbjorn Thordarson.
+- Cross-plaform filename check: Python library [`pathvalidate`](https://github.com/thombashi/pathvalidate), by Tsuyoshi Hombashi.
+- Natural sorting: Python library [`natsort`](https://github.com/SethMMorton/natsort), by Seth M. Morton.
