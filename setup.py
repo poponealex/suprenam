@@ -19,5 +19,5 @@ setuptools.setup(
     ],
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
-    entry_points={"[console_scripts]": ["suprenam=src.suprenam:main"]},
+    entry_points={"console_scripts": ["suprenam=suprenam:main"]},
 )
