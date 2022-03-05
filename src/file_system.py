@@ -1,8 +1,9 @@
 from base64 import b32encode
 from itertools import count
 from pathlib import Path
+from typing import Generator, Iterable, Optional, Set
+
 from pathvalidate import validate_filename
-from typing import Generator, Iterable, Set, Optional
 
 
 class FileSystem(set):

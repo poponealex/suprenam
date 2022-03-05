@@ -5,7 +5,6 @@ from platform import platform as get_platform_long_string
 from shutil import which
 from typing import Optional
 
-from src.printer import print_
 from src.user_errors import *
 
 

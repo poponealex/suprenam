@@ -1,7 +1,8 @@
 from itertools import groupby
+
 from natsort import os_sorted  # type: ignore
 
-from src.user_types import InodesPaths, EditableText
+from src.user_types import EditableText, InodesPaths
 
 
 def get_editable_text(inodes_paths: InodesPaths) -> EditableText:

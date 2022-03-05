@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import List
 
-from src.printer import print_
 from src.user_types import Inode, InodesPaths
 
 
