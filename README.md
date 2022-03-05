@@ -36,7 +36,7 @@ Well, yet another achievement for Suprenam, I guess. 🎉
 
 Suprenam is not as straightforward as it seems. It supports:
 
-- **Complex renamings.** As long as the desired final state is possible (e.g. no name clash), Suprenam will proceed. Under the hood, this may require it to go through intermediate names (e.g. for swapping `"foo.pdf"` and `"bar.pdf"`).
+- **Complex renamings.** As long as the desired final state is possible (e.g. no name clash), Suprenam will abide. Under the hood, this may require it to go through intermediate names (e.g. for swapping `"foo.pdf"` and `"bar.pdf"`).
 - **Rollback.** If something goes wrong during the actual process (e.g. a file is moved), don't worry: the work already completed will automatically be rolled back to the initial state.
 - **Undo.** Likewise, you can always undo the previous renaming session. To that end, simply click the Suprenam icon without dropping anything on it.
 
