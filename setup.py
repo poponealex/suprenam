@@ -17,8 +17,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_dir={'':'suprenam/src'},
-    packages=setuptools.find_packages(where="suprenam/src"),
+    packages=setuptools.find_packages(include=['src', 'src.*']),
     python_requires=">=3.6",
-    entry_points={"console_scripts": ["suprenam=suprenam:main"]},
+    entry_points={"console_scripts": ["suprenam=src.suprenam:main"]},
 )
