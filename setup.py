@@ -1,10 +1,11 @@
 import os
 import setuptools
 from pathlib import Path
+from time import time
 
 setuptools.setup(
     name="suprenam",
-    version=os.environ.get("RELEASE_VERSION") if os.environ.get("RELEASE_VERSION") != "main" else "0.9.9-beta.1",
+    version=os.environ.get("RELEASE_VERSION") if os.environ.get("RELEASE_VERSION") != "main" else f"0.9.9-beta.{int(time())}",
     author="Aristide Grange & Alexandre Perlmutter",
     author_email="alexandre.perlmutter@gmail.com",
     description="Easily rename files and folders via your favorite text editor.",
@@ -19,4 +20,8 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
+    entry_points='''
+        [console_scripts]
+        suprenam=src.suprenam:main
+    ''',
 )
