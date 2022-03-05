@@ -1,7 +1,7 @@
 # https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
 # https://stackoverflow.com/a/58178121/17396362
 
-name: Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+name: Publish Suprenam to PyPI and TestPyPI
 on: push
 jobs:
   build-n-publish:
