@@ -4,7 +4,7 @@ from pathlib import Path
 
 setuptools.setup(
     name="suprenam",
-    version=os.environ.get("RELEASE_VERSION")[1:],
+    version=os.environ.get("RELEASE_VERSION")[1:] if os.environ.get("RELEASE_VERSION") != "main" else "0.9.9-beta.1",
     author="Aristide Grange & Alexandre Perlmutter",
     author_email="alexandre.perlmutter@gmail.com",
     description="Easily rename files and folders via your favorite text editor.",
