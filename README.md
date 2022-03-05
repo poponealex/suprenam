@@ -42,21 +42,27 @@ Suprenam is not as straightforward as it seems. It supports:
 
 ----
 
-## Installation (GUI)
+## Installing
 
-### MacOS
+### Installing the app
 
-#### Installing Suprenam
+#### MacOS
 
-TODO.
+##### Retrieving or building the installer
 
-#### Putting Suprenam in the Finder toolbar
+Download the latest installer from [Releases](https://github.com/poponealex/suprenam/releases) under the name `Suprenam.pkg`. It is unsigned: that means that you'll need to right-click or <kbd>ctrl</kbd>-click it and select “Open”.
+
+If you prefer to build it manually, follow [these instructions](build/platypus/instructions.md).
+
+In both cases, Suprenam requires Python 3.6 or later. You may have to [install it](https://www.python.org/downloads/).
+
+##### Putting Suprenam in the Finder toolbar
 
 <p align="center"><img src="/img/toolbar.gif"></p>
 
 Press and hold <kbd>cmd</kbd> while dragging the Suprenam icon to the desired location.
 
-#### Setting up your default text editor (if needed)
+##### Setting up your default text editor (if needed)
 
 By default, Suprenam will fall back on TextEdit, which is currently not able to send a signal when an editing window is closed, forcing you to quit it to proceed. This is a major annoyance, and we recommend you to set a more capable Text Editor as default.
 
@@ -65,13 +71,23 @@ To this end, right click on a `.txt` file and select `Get Info`. In the Info win
 <p align="center"><img src="/img/mac_set_default_text_editor.png"></p>
 
 
-### Linux
+#### Linux
 
-TODO.
+Coming soon.
 
-### Windows
+#### Windows
 
-## Installation (command line)
+Coming soon.
+
+### Installing the command line tool
+
+Although dragging and dropping the items to rename them is far more convenient, you can also launch Suprenam from the terminal. Install it with:
+
+```
+pip install suprenam
+```
+
+If this fails, try `pip3` instead of `pip`.
 
 ## How it works
 
