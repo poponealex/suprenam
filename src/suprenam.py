@@ -20,7 +20,10 @@ from src.user_errors import *
 from src.user_types import EditedText
 
 
-def main(previous_log_text: str):
+def main():
+    previous_log_text = logger.get_contents()
+    logger.create_new_log_file()
+    logger.info("Starting the program.")
     logger.info("Parsing arguments.")
     args = cli_arguments()
     logger.info("Parsing arguments done.")
@@ -47,10 +50,7 @@ def main(previous_log_text: str):
             arcs_for_undoing = renamer.get_arcs_for_undoing(previous_log_text)
             logger.info(str(arcs_for_undoing))
             message = renamer.perform_renamings(arcs_for_undoing)
-            print_.success(
-                f"The previous renaming session was undone. {message} "
-                "Launch Suprenam again to restore."
-            )
+            print_.success(f"The previous renaming session was undone. {message} " "Launch Suprenam again to restore.")
         except RecoverableRenamingError:
             try:
                 renamer.rollback_renamings()
@@ -60,6 +60,7 @@ def main(previous_log_text: str):
         except Exception as e:  # Unknown problem with the log file, e.g. not found
             return print_.fail(f"Unrecoverable failure during undo: {e}")
         logger.info("Undoing renamings done.")
+    logger.info("Exiting the program.")
 
 
 def run_on_path_list(paths: List[Path]):
@@ -177,8 +178,4 @@ def cli_arguments():
 
 
 if __name__ == "__main__":  # pragma: no cover
-    previous_log_text = logger.get_contents()
-    logger.create_new_log_file()
-    logger.info("Starting the program.")
-    main(previous_log_text)
-    logger.info("Exiting the program.")
+    main()
