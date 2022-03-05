@@ -9,7 +9,7 @@ It's **Suprenam**, a batch renaming utility which relies on the tool you know be
 
 ### Sweet, but powerful
 
-Suprenam sits in the Finder Toolbar, waiting for you to **drag and drop** items (any selection of files and folders) onto it.
+Suprenam sits in the Finder Toolbar, waiting for you to **drag and drop** any selection of files and folders onto it.
 
 <p align="center"><img src="/img/drag_and_drop.gif"></p>
 
