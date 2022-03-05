@@ -11,9 +11,9 @@ from src.file_system import FileSystem
 from src.get_editable_text import get_editable_text
 from src.get_editor_command import get_editor_command
 from src.logger import logger
-from src.printer import print_
 from src.parse_edited_text import parse_edited_text
 from src.paths_to_inodes_paths import paths_to_inodes_paths
+from src.printer import print_
 from src.renamings import Renamer
 from src.secure_clauses import secure_clauses
 from src.user_errors import *
