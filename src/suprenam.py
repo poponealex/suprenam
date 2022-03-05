@@ -27,7 +27,7 @@ def main(previous_log_text: str):
 
     if not args.undo:
         logger.info("Constructing the list of items to rename.")
-        paths = []
+        paths: List[Path] = []
         if args.paths:
             logger.info("A list of items to rename was provided.")
             paths.extend(map(Path, args.paths))
@@ -73,7 +73,7 @@ def run_on_path_list(paths: List[Path]):
 
     logger.info("Creating a temporary text file for the list to be edited.")
     try:
-        editable_file_path = Path(NamedTemporaryFile(mode="w+", delete=False, suffix=".txt").name)
+        editable_file_path = Path(NamedTemporaryFile(mode="w+", delete=False, suffix=".tsv").name)
         logger.info(f"Editable file path: {repr(editable_file_path)}.")
     except Exception as e:
         return print_.abort(f"Failed to create a temporary file: {e}")
