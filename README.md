@@ -1,5 +1,5 @@
 
-<img align="left" src="/img/logo_small.png">
+<img align="left" src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/logo_small.png">
 
 ## It's a bird... It's a plane...
 
@@ -11,14 +11,14 @@ It's **Suprenam**, a batch renaming utility which relies on the tool you know be
 
 Suprenam sits in the Finder Toolbar, waiting for you to **drag and drop** any selection of files and folders onto it.
 
-<p align="center"><img src="/img/drag_and_drop.gif"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/drag_and_drop.gif"></p>
 
 ----
 
 Then, it will open your favorite **text editor** with a list of names.
 Make use of all your superpowers to modify them: multi-cursors, Find and Replace, regular expressions, you (re)name it.
 
-<p align="center"><img src="/img/edition.gif"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/edition.gif"></p>
 
 When you're done, save and close.
 
@@ -26,7 +26,7 @@ When you're done, save and close.
 
 The modifications are instantly applied on the selected items.
 
-<p align="center"><img src="/img/success.png"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/success.png"></p>
 
 Well, yet another achievement for Suprenam, I guess. 🎉
 
@@ -36,7 +36,7 @@ Well, yet another achievement for Suprenam, I guess. 🎉
 
 Suprenam is not as straightforward as it seems. It supports:
 
-- **Complex renamings.** As long as the desired final state is possible (e.g. no name clash), Suprenam will proceed. Under the hood, this may require it to go through intermediate names (e.g. for swapping `"foo.pdf"` and `"bar.pdf"`).
+- **Complex renamings.** As long as the desired final state is possible (e.g. no name clash), Suprenam will abide. Under the hood, this may require it to go through intermediate names (e.g. for swapping `"foo.pdf"` and `"bar.pdf"`).
 - **Rollback.** If something goes wrong during the actual process (e.g. a file is moved), don't worry: the work already completed will automatically be rolled back to the initial state.
 - **Undo.** Likewise, you can always undo the previous renaming session. To that end, simply click the Suprenam icon without dropping anything on it.
 
@@ -60,13 +60,13 @@ Suprenam is not as straightforward as it seems. It supports:
 
 - Press and hold <kbd>cmd</kbd> while dragging the Suprenam icon to the desired location.
 
-  <p align="center"><img src="/img/toolbar.gif"></p>
+  <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/toolbar.gif"></p>
 
 ##### Setting up your default text editor (if needed)
 
 - By default, Suprenam may fall back on TextEdit, which is currently not able to send a signal when an editing window is closed, forcing you to quit it to proceed. This is a major annoyance, and we recommend you to set a more capable Text Editor as default.
 - To this end, right-click on a `.tsv` file, press <kbd>alt</kbd>, select `Always Open With` and choose your favorite text editor.
-  <p align="center"><img src="/img/mac_set_default_text_editor.png"></p>
+  <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/mac_set_default_text_editor.png"></p>
 
 
 #### Linux
@@ -101,11 +101,11 @@ If this fails, try `pip3` instead of `pip`.
   
   Below, for instance, `"c"` has two “target“ names, which will cause Suprenam to abort…
 
-  <p align="center"><img src="/img/cycles_nope.png"></p>
+  <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_nope.png"></p>
 
   However, some desired bindings can be resolved along a “safe” path of renamings. For instance, the following renamings (from left to right: null, swapping, shifting, rolling) can always be obtained with careful intermediate renamings.
 
-  <p align="center"><img src="/img/cycles_ok.png"></p>
+  <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_ok.png"></p>
 
   A handful of accepted and rejected renaming schemes are documented (and tested) [here](test/examples.md).  
 - So, whenever possible, the desired bindings have been silently converted into a “safe” sequence. The new bindings are then processed in order, and the corresponding renaming commands executed. At this stage, the only remaining possible errors should result from hardware failures or from modifications that have occurred in the file tree during the edition stage. Should such rare cases arise, all the completed renaming commands will be readily rolled back.
