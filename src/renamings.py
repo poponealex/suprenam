@@ -1,4 +1,5 @@
 import re
+import subprocess
 from pathlib import Path
 from typing import List
 
@@ -76,7 +77,10 @@ class Renamer:
     def rename_and_log_all_files(self, arcs: List[Arc]):
         self.arcs_to_rollback: List[Arc] = []
         for (source, target) in arcs:
-            source.rename(target)
+            try:
+                subprocess.run(["git", "-C", source.parent, "mv", source.name, target.name], check=True, stderr=subprocess.DEVNULL)
+            except subprocess.CalledProcessError:
+                source.rename(target)
             self.arcs_to_rollback.insert(0, Arc(target, source))
             logger.info(f"SOURCE:{source}\tTARGET:{target}")
         self.print_arcs(arcs)
