@@ -2,9 +2,9 @@ from itertools import groupby
 from typing import Iterable, List, Tuple
 
 from src.file_system import FileSystem
-from src.user_types import Clause, ClauseMap, Name, Arc
-from src.user_errors import DuplicatedClauseError, SeveralTargetsError, SeveralSourcesError
-from src.printer import print_
+from src.user_errors import (DuplicatedClauseError, SeveralSourcesError,
+                             SeveralTargetsError)
+from src.user_types import Arc, Clause, ClauseMap, Name
 
 
 def secure_clauses(file_system: FileSystem, clauses: List[Clause]) -> List[Arc]:

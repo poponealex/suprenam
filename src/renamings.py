@@ -2,10 +2,10 @@ import re
 from pathlib import Path
 from typing import List
 
+from src.logger import logger
 from src.printer import print_
 from src.user_errors import RecoverableRenamingError
 from src.user_types import Arc
-from src.logger import logger
 
 
 class Renamer:

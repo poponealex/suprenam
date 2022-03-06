@@ -7,7 +7,6 @@ from typing import Optional
 
 from src.user_errors import *
 
-
 OS = {
     "macOS": {
         "QUERY_ALL_DEFAULTS_COMMAND": "defaults read com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers",
