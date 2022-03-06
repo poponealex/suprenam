@@ -78,7 +78,18 @@ class Renamer:
         self.arcs_to_rollback: List[Arc] = []
         for (source, target) in arcs:
             try:
-                subprocess.run(["git", "-C", source.parent, "mv", source.name, target.name], check=True, stderr=subprocess.DEVNULL)
+                subprocess.run(
+                    [
+                        "git", # git fails when launched from a non-versioned directory.
+                        "-C", # This option runs git as if it was started...
+                        source.parent, #  ... in the source's parent directory.
+                        "mv",
+                        source.name,
+                        target.name,
+                    ],
+                    check=True,
+                    stderr=subprocess.DEVNULL,
+                )
             except subprocess.CalledProcessError:
                 source.rename(target)
             self.arcs_to_rollback.insert(0, Arc(target, source))
