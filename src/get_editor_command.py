@@ -10,11 +10,12 @@ from src.user_errors import *
 OS = {
     "macOS": {
         "QUERY_ALL_DEFAULTS_COMMAND": "defaults read com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers",
-        "EXTRACT_EDITOR": r'(?ms)\s*\{\s*LSHandlerContentType = "public\.plain-text";\s*LSHandlerPreferredVersions =\s*\{\s*LSHandlerRoleAll = "-";\s*\};\s*LSHandlerRoleAll = "([\w.]+)";',
+        "EXTRACT_EDITOR": r'(?ms)\s*\{\s*LSHandlerContentType = "public\.tab-separated-values-text";\s*LSHandlerPreferredVersions =\s*\{\s*LSHandlerRoleAll = "-";\s*\};\s*LSHandlerRoleAll = "([\w.]+)";',
         "CUSTOM_EDITOR_COMMAND": {
             "com.microsoft.vscode": ["code", "-w"],
-            "com.sublimetext.3": ["subl", "-w"],
-        },  # TODO: add different versions of Sublime Text
+            "com.sublimetext.3": ["subl", "-w"],  # TODO: add different versions of Sublime Text
+            "com.macromates.textmate": ["mate", "-w"],
+        },
         "FALLBACK_EDITOR_COMMAND": [
             "open",
             "-n",  # open a new instance of the application even if one is already running
@@ -24,13 +25,10 @@ OS = {
         ],
     },
     "Linux": {
-        "QUERY_ALL_DEFAULTS_COMMAND": "xdg-mime query default text/plain",
+        "QUERY_ALL_DEFAULTS_COMMAND": "xdg-mime query default text/tab-separated-values",
         "EXTRACT_EDITOR": r"^(.*)\.desktop$",
         "CUSTOM_EDITOR_COMMAND": {
-            "code": [
-                "code",
-                "-w",  # wait for the file to be closed before returning
-            ],
+            "code": ["code", "-w"],
             "sublime_text": ["subl", "-w"],
         },
         "FALLBACK_EDITOR_COMMAND": ["open", "-w"],
@@ -80,7 +78,7 @@ def get_editor_command(path: Path, platform: Optional[str] = None) -> list:
 
     # Check whether the user has defined a custom editor
     command = os_dict["CUSTOM_EDITOR_COMMAND"].get(custom_editor_handler)  # type: ignore
-    if command and is_tool(command[0]): # is the command both known and installed on the system?
+    if command and is_tool(command[0]):  # is the command both known and installed on the system?
         return command + [str(path)]
 
     # Otherwise, try to find another editor which is both known and installed on the system
