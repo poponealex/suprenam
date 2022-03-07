@@ -19,6 +19,6 @@ setuptools.setup(
     ],
     packages=setuptools.find_packages(include=['src', 'src.*']),
     python_requires=">=3.6",
-    install_requires=Path("requirements.txt").read_text().split("\n"),
+    install_requires=Path("requirements.txt").read_text().split("\n")[:-1],
     entry_points={"console_scripts": ["suprenam=src.suprenam:main_wrapper"]},
 )
