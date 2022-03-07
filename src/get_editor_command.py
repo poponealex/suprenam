@@ -13,7 +13,8 @@ OS = {
         "EXTRACT_EDITOR": r'(?ms)\s*\{\s*LSHandlerContentType = "public\.tab-separated-values-text";\s*LSHandlerPreferredVersions =\s*\{\s*LSHandlerRoleAll = "-";\s*\};\s*LSHandlerRoleAll = "([\w.]+)";',
         "CUSTOM_EDITOR_COMMAND": {
             "com.microsoft.vscode": ["code", "-w"],
-            "com.sublimetext.3": ["subl", "-w"],  # TODO: add different versions of Sublime Text
+            "com.sublimetext.3": ["subl", "-w"],
+            "com.sublimetext.4": ["subl", "-w"],
             "com.macromates.textmate": ["mate", "-w"],
         },
         "FALLBACK_EDITOR_COMMAND": [
