@@ -71,15 +71,21 @@ Coming soon.
 
 Coming soon.
 
-### Setting up your preferred text editor (if needed)
+### Setting up your favorite text editor (if needed)
 
-If you are not happy with the text editor Suprenam opens the editable file with, you can set another one up as an environment variable. For instance, if VS-Code is installed on your system, it will be the default choice for Suprenam. If you prefer to use Sublime Text, you can execute under a macOS or Linux terminal:
+If you are not happy with the text editor Suprenam opens the editable file with, you can set up another one. For instance, if VS-Code is installed on your system, it will be the default choice for Suprenam. If you prefer to use Sublime Text, you can execute under a macOS or Linux terminal:
 
 ```sh
-export SUPRENAM_EDITOR="subl -w"
+echo "subl -w" > ~/.suprenam/FAVORITE_EDITOR
 ```
 
-On Windows, add a new System variable called `SUPRENAM_EDITOR` with value `subl.exe -w`.
+On Windows' command prompt:
+
+```bat
+echo "subl.exe -w" > %HOMEPATH%\.suprenam\FAVORITE_EDITOR
+```
+
+A list of many such commands is provided in [editor_commands.md](build/editor_commands.md), but nothing prevents you from writing your own.
 
 ### Installing the command line tool
 
@@ -96,7 +102,7 @@ If this fails, try `pip3` instead of `pip`.
 - Being given a list of files and folders, Suprenam begins by retrieving their [**inodes**](https://en.wikipedia.org/wiki/Inode). These unique numeric identifiers will serve as an invariant throughout the renaming process.
 - It creates a temporary text file associating each inode with its name. In case all items are siblings (i.e., have the same parent), the list is flat ; otherwise, a section is created for each parent.
 - To find out how to open this file, Suprenam will use the following heuristics:
-  - If a command opening a text editor is defined by the environment variable [`SUPRENAM_EDITOR`](#setting-up-your-preferred-text-editor-if-needed), it will be used.
+  - If a command opening a text editor is defined in [`FAVORITE_EDITOR`](#setting-up-your-favorite-text-editor-if-needed), it will be used.
   - Otherwise, Suprenam will parse the list defined in [`editor_commands.md`](/src/editor_commands.md) (which is sorted by decreasing popularity), and use the first one that works on your system.
 - Once the TSV file is opened, Suprenam waits for you to make the desired changes.
 - When the temporary file is closed, its content is parsed.

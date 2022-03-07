@@ -10,14 +10,14 @@ SUPPORTED_OS = ("Windows", "Linux", "macOS", "mockOS")  # mockOS is for testing 
 
 def get_editor_command(
     editable_file_path: Path,
-    default_editor: str = "DEFAULT_EDITOR",
+    favorite_editor_filename: str = "FAVORITE_EDITOR",
     platform: str = "",
 ) -> str:
     """
     Retrieve a command launching a text editor on a given text file.
     Args:
         editable_file_path: the path to the text file to edit.
-        default_editor: the name of the file defining the default editor to use (for testing only).
+        favorite_editor_filename: the name of the file defining the favorite editor (for testing only).
         platform: the OS on which the text file will be edited (automatic, for testing only).
     Returns:
         A string representing the complete command to open this file in a text editor.
@@ -26,18 +26,18 @@ def get_editor_command(
         NoEditorCommandsFileError: if `editor_commands.md` is not found.
         NoEditorError: if no command-line capable editor is installed.
     """
-    # Check whether the user has defined a default editor.
-    default_editor_path = Path.home() / ".suprenam" / default_editor
-    if default_editor_path.is_file():
-        command = default_editor_path.read_text().strip()
+    # Check whether the user has defined a favorite editor and it is installed.
+    favorite_editor_path = Path.home() / ".suprenam" / favorite_editor_filename
+    if favorite_editor_path.is_file():
+        command = favorite_editor_path.read_text().strip()
         name = str(command).partition(" ")[0]  # make mypy happy
         if platform == "mockOS" or which(name):  # https://stackoverflow.com/a/34177358/173003
             return f"{command} {editable_file_path}"
         else:
-            raise UninstalledEditorSet(
+            raise UninstalledFavoriteEditor(
                 f"The editor command `{name}` is not found. "
                 "You can either install the corresponding application "
-                f"or delete the file `~/.suprenam/{default_editor}`."
+                f"or delete the file `~/.suprenam/{favorite_editor_filename}`."
             )
 
     # Otherwise, calculate the platform name (during tests, ).
