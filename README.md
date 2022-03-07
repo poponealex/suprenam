@@ -61,14 +61,13 @@ Suprenam is not as straightforward as it seems. It supports:
 
 - Press and hold <kbd>cmd</kbd> while dragging the Suprenam icon to the desired location.
 
-  <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/toolbar.gif"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/toolbar.gif"></p>
 
-##### Setting up your default text editor (if needed)
+##### Setting up your text editor (if needed)
 
-- By default, Suprenam may fall back on TextEdit, which is currently not able to send a signal when an editing window is closed, forcing you to quit it to proceed. This is a major annoyance, and we recommend you to set a more capable Text Editor as default.
-- To this end, right-click on a `.tsv` file, press <kbd>alt</kbd>, select `Always Open With` and choose your favorite text editor.
-  <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/mac_set_default_text_editor.png"></p>
+If Suprenam insists to make you edit the names in TextEdit, don't let it ruin your life! Indeed, the TextEdit's associated command is currently unable to return when the file is closed, forcing you to quit it to proceed. This is a real pain in the OS, and we urge you to install and/or set as default a more capable text editor, for instance [Visual Studio Code](https://code.visualstudio.com/download). Assuming Suprenam knows how to deal with it, right-click on a `.tsv` file, press <kbd>alt</kbd>, and select it in `Always Open With`.
 
+<p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/mac_set_default_text_editor.png"></p>
 
 #### Linux
 
@@ -92,21 +91,25 @@ If this fails, try `pip3` instead of `pip`.
 
 - Being given a list of files and folders, Suprenam begins by retrieving their [**inodes**](https://en.wikipedia.org/wiki/Inode). These unique numeric identifiers will serve as an invariant throughout the renaming process.
 - It creates a temporary text file associating each inode with its name. In case all items are siblings (i.e., have the same parent), the list is flat ; otherwise, a section is created for each parent.
-- Suprenam opens this list in a text editor, and waits for you to carry out your modifications.
+- To find out how to open this file, Suprenam will use the following heuristics:
+  - Retrieve the text editor that you have set as the default for opening TSV files.
+  - If there is none, or Suprenam doesn't know the associated command, check for the presence of the ones that it actually supports, starting with VS-Code.
+  - If this fails too, fall back to the default text editor of your operating system.
+- Once the TSV file is opened, Suprenam waits for you to carry your modifications out.
 - When the temporary file is closed, its content is parsed.
   - Suprenam ignores any change or deletion to non-inodes lines.
-  - It  tolerates the deletion of one, several or even all ot the inodes.
+  - It  tolerates the deletion of one, several or even all of the inodes.
   - However, any inode creation or duplication is considered as a typo, and makes it to abort.
 - The new names are checked for validity with respect to the actual file system.
 - This results in a list of bindings between existing inodes and modified names. These bindings cannot be directly translated into renaming commands, as they may lead to name clashes.
   
   Below, for instance, `"c"` has two “target“ names, which will cause Suprenam to abort…
 
-  <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_nope.png"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_nope.png"></p>
 
   However, some desired bindings can be resolved along a “safe” path of renamings. For instance, the following renamings (from left to right: null, swapping, shifting, rolling) can always be obtained with careful intermediate renamings.
 
-  <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_ok.png"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_ok.png"></p>
 
   A handful of accepted and rejected renaming schemes are documented (and tested) [here](test/examples.md).  
 - So, whenever possible, the desired bindings have been silently converted into a “safe” sequence. The new bindings are then processed in order, and the corresponding renaming commands executed. At this stage, the only remaining possible errors should result from hardware failures or from modifications that have occurred in the file tree during the edition stage. Should such rare cases arise, all the completed renaming commands will be readily rolled back.
