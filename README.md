@@ -63,12 +63,6 @@ Suprenam is not as straightforward as it seems. It supports:
 
 <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/toolbar.gif"></p>
 
-##### Setting up your text editor (if needed)
-
-If Suprenam insists to make you edit the names in TextEdit, don't let it ruin your life! Indeed, the TextEdit's associated command is currently unable to return when the file is closed, forcing you to quit it to proceed. This is a real pain in the OS, and we urge you to install and/or set as default a more capable text editor, for instance [Visual Studio Code](https://code.visualstudio.com/download). Assuming Suprenam knows how to deal with it, right-click on a `.tsv` file, press <kbd>alt</kbd>, and select it in `Always Open With`.
-
-<p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/mac_set_default_text_editor.png"></p>
-
 #### Linux
 
 Coming soon.
@@ -76,6 +70,16 @@ Coming soon.
 #### Windows
 
 Coming soon.
+
+### Setting up your preferred text editor (if needed)
+
+If you are not happy with the text editor Suprenam opens the editable file with, you can set another one up as an environment variable. For instance, if VS-Code is installed on your system, it will be the default choice for Suprenam. If you prefer to use Sublime Text, you can execute under a macOS or Linux terminal:
+
+```sh
+export SUPRENAM_EDITOR="subl -w"
+```
+
+On Windows, add a new System variable called `SUPRENAM_EDITOR` with value `subl.exe -w`.
 
 ### Installing the command line tool
 
@@ -92,10 +96,9 @@ If this fails, try `pip3` instead of `pip`.
 - Being given a list of files and folders, Suprenam begins by retrieving their [**inodes**](https://en.wikipedia.org/wiki/Inode). These unique numeric identifiers will serve as an invariant throughout the renaming process.
 - It creates a temporary text file associating each inode with its name. In case all items are siblings (i.e., have the same parent), the list is flat ; otherwise, a section is created for each parent.
 - To find out how to open this file, Suprenam will use the following heuristics:
-  - Retrieve the text editor that you have set as the default for opening TSV files.
-  - If there is none, or Suprenam doesn't know the associated command, check for the presence of the ones that it actually supports, starting with VS-Code.
-  - If this fails too, fall back to the default text editor of your operating system.
-- Once the TSV file is opened, Suprenam waits for you to carry your modifications out.
+  - If a command opening a text editor is defined by the environment variable [`SUPRENAM_EDITOR`](#setting-up-your-preferred-text-editor-if-needed), it will be used.
+  - Otherwise, Suprenam will parse the list defined in [`editor_commands.md`](/src/editor_commands.md) (which is sorted by decreasing popularity), and use the first one that works on your system.
+- Once the TSV file is opened, Suprenam waits for you to make the desired changes.
 - When the temporary file is closed, its content is parsed.
   - Suprenam ignores any change or deletion to non-inodes lines.
   - It  tolerates the deletion of one, several or even all of the inodes.

@@ -5,6 +5,7 @@ from pathlib import Path
 sys.path[0:0] = ["."]
 
 from src.goodies import rm_tree
+from src.logger import logger
 from src.suprenam import run_on_path_list
 from src.renamings import Renamer
 
@@ -40,21 +41,20 @@ for path in paths:
         path.touch()
 
 print("Playground recreated. Now, have fun renaming some files and folders...")
-try:
-    run_on_path_list(paths)
-except Exception as e:
-    print(f"Something else went wrong: {e}.")
+logger.create_new_log_file()
+run_on_path_list(paths)
 
 renamer = Renamer()
 
 input("Press Enter to show the log file...")
-print(renamer.get_log_contents())
+print(logger.get_contents())
 
 input("Press Enter to revert the previous renamings...")
-renamer.undo_renamings()
+arcs_for_undoing = renamer.get_arcs_for_undoing(logger.get_contents())
+renamer.perform_renamings(arcs_for_undoing)
 
 input("Press Enter to show the log file...")
-print(renamer.get_log_contents())
+print(logger.get_contents())
 
 input("Press Enter to erase the playground...")
 rm_tree(playground)
