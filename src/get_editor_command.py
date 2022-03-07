@@ -7,15 +7,47 @@ from typing import Optional
 
 from src.user_errors import *
 
+# NB: The sub-dictionary CUSTOM_EDITOR_COMMAND should be ordered by IDE decreasing popularity:
+#
+#  1:  Visual Studio Code
+#  2:  Visual Studio
+#  3:  IntelliJ
+#  4:  Notepad++
+#  5:  Vim
+#  6:  Android Studio
+#  7:  Sublime Text
+#  8:  PyCharm
+#  9:  Eclipse
+# 10:  Xcode
+# 11:  Atom
+# 12:  IPython/Jupyter
+# 13:  Webstorm
+# 14:  PHPStorm
+# 15:  NetBeans
+# 16:  Emacs
+# 17:  Neovim
+# 18:  Rider
+# 19:  RStudio
+# 20:  RubyMine
+# 21:  TextMate
+#
+# Source: https://insights.stackoverflow.com/survey/2021
+
+
 OS = {
     "macOS": {
         "QUERY_ALL_DEFAULTS_COMMAND": "defaults read com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers",
         "EXTRACT_EDITOR": r'(?ms)\s*\{\s*LSHandlerContentType = "public\.tab-separated-values-text";\s*LSHandlerPreferredVersions =\s*\{\s*LSHandlerRoleAll = "-";\s*\};\s*LSHandlerRoleAll = "([\w.]+)";',
+        # The keys of the following dictionary can be retrieved with AppleScript.
+        # For instance:    osascript -e 'id of app "MacVim"'
         "CUSTOM_EDITOR_COMMAND": {
             "com.microsoft.vscode": ["code", "-w"],
-            "com.sublimetext.3": ["subl", "-w"],
+            "org.vim.MacVim": ["/Applications/MacVim.app/Contents/bin/mvim", "-f", "-g"],
             "com.sublimetext.4": ["subl", "-w"],
+            "com.sublimetext.3": ["subl", "-w"],
+            "com.jetbrains.pycharm": ["open", "-a", "PyCharm CE.app", "--wait"],
             "com.macromates.textmate": ["mate", "-w"],
+            "com.apple.TextEdit": ["open", "-neW"], # open a new instance of TextEdit
         },
         "FALLBACK_EDITOR_COMMAND": [
             "open",
