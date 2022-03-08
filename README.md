@@ -100,7 +100,7 @@ If this fails, try `pip3` instead of `pip`.
 ## How it works
 
 - Being given a list of files and folders, Suprenam begins by retrieving their [**inodes**](https://en.wikipedia.org/wiki/Inode). These unique numeric identifiers will serve as an invariant throughout the renaming process.
-- It creates a temporary text file associating each inode with its name. In case all items are siblings (i.e., have the same parent), the list is flat ; otherwise, a section is created for each parent.
+- It creates a temporary text file associating each inode with its name. In case all items are siblings (i.e., have the same parent), the list is flat ; otherwise, a section is created for each parent. The list should be sorted in “natural order” (e.g., _foobar9_ before _foobar10_, and _[cote, coteau, crottez, crotté, côte, côté]_ as _[cote, côte, côté, coteau, crotté, crottez]_).
 - To find out how to open this file, Suprenam will use the following heuristics:
   - If a command opening a text editor is defined in [`FAVORITE_EDITOR`](#setting-up-your-favorite-text-editor-if-needed), it will be used.
   - Otherwise, Suprenam will parse the list defined in [`editor_commands.md`](/src/editor_commands.md) (which is sorted by decreasing popularity), and use the first one that works on your system.
