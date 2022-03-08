@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from unicodedata import normalize, combining
+from unicodedata import combining, normalize
 
 OUTLIERS = str.maketrans(
     {
