@@ -31,6 +31,10 @@ remove_diacritics_data = [
         "Kæmi ný öxi hér ykist þjófum nú bæði víl og ádrepa.",
         "kaemi ny oexi her ykist þjofum nu baedi vil og adrepa.",
     ),
+    (
+        "Glāžšķūņa rūķīši dzērumā čiepj Baha koncertflīģeļu vākus.",
+        "glazskuna rukisi dzeruma ciepj baha koncertfligelu vakus.",
+    )
 ]
 
 
