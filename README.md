@@ -130,4 +130,3 @@ If this fails, try `pip3` instead of `pip`.
 - Authors: Aristide Grange and Alexandre Perlmutter.
 - macOS GUI: [Platypus](https://github.com/sveinbjornt/Platypus), by Sveinbjorn Thordarson.
 - Cross-plaform filename check: Python library [`pathvalidate`](https://github.com/thombashi/pathvalidate), by Tsuyoshi Hombashi.
-- Natural sorting: Python library [`natsort`](https://github.com/SethMMorton/natsort), by Seth M. Morton.
