@@ -61,7 +61,6 @@ for file in $(ls $SRC/*.py); do
     fi
 done
 
-cp -f "$SRC"/editor_commands.md "$BUNDLE/src"
 cp -f "$SRC"/{suprenam.py,__init__.py} "LICENSE" "$BUNDLE"
 
 for file in $(ls $BUNDLE); do
