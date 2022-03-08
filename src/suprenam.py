@@ -96,16 +96,16 @@ def run_on_path_list(paths: List[Path]):
     logger.info("Retrieving a command to edit the temporary text file.")
     try:
         editor_command = get_editor_command(editable_file_path)
-        logger.info(f"The command is {editor_command}.")
-    except Exception as e:
-        return print_.abort(str(e))
+        logger.info(f"The command is {' '.join(editor_command)}.")
+    except UnsupportedOSError:
+        return
 
     logger.info("Opening the editable text file in the editor and waiting it to be closed.")
     try:
-        subprocess.run(editor_command, shell=True, check=True)
+        subprocess.run(editor_command, check=True)
         logger.info("Command executed without process error.")
     except subprocess.CalledProcessError:
-        return print_.abort(f"The command `{editor_command}` failed.")
+        return print_.abort(f"The command {' '.join(editor_command)} failed.")
 
     logger.info("Retrieving the content of the edited text file.")
     try:
