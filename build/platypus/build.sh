@@ -52,7 +52,6 @@ fi
 mkdir "$BUNDLE" "$BUNDLE"/{src,lib}
 
 cp -Rf "$PYTHON_SITE_PACKAGES/pathvalidate" "$BUNDLE/lib"
-cp -Rf "$PYTHON_SITE_PACKAGES/natsort" "$BUNDLE/lib"
 
 for file in $(ls $SRC/*.py); do
     file=$(basename $file)

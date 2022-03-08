@@ -1,8 +1,6 @@
 from itertools import groupby
 
-from natsort import os_sorted  # type: ignore
-# TODO: replace this dependance with something like this: https://stackoverflow.com/a/4836734/173003
-
+from src.goodies import remove_diacritics, string_to_pairs
 from src.user_types import EditableText, InodesPaths
 
 
@@ -38,14 +36,17 @@ def get_editable_text(inodes_paths: InodesPaths) -> EditableText:
     inode_size = len(str(max(inodes_paths.keys(), default=0)))
 
     # Create a naturally sorted list of triples (parent, name, inode) with null paths filtered out
-    parents_names_inodes = os_sorted(  # natural sort by parent, then name, then (useless) inode
-        (
-            f"\n{path.parent}",  # the prefix '\n' adds an empty line for maximal consistency
-            path.name,
-            str(inode).zfill(inode_size),
-        )
-        for (inode, path) in inodes_paths.items()
-        if path.name  # null paths (empty or root) would make os_sorted raise a ValueError
+    parents_names_inodes = sorted(
+        [  # natural sort by parent, then name, then (useless) inode
+            (
+                f"\n{path.parent}",  # the prefix '\n' adds an empty line for maximal consistency
+                path.name,
+                str(inode).zfill(inode_size),
+            )
+            for (inode, path) in inodes_paths.items()
+            if path.name  # null paths (empty or root) would make os_sorted raise a ValueError
+        ],
+        key=lambda triple: (string_to_pairs(remove_diacritics(f"{triple[0]} {triple[1]}"))),
     )
 
     # Group them by common parents
