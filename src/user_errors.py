@@ -2,6 +2,18 @@ class UnsupportedOSError(Exception):
     pass
 
 
+class NoEditorError(Exception):
+    pass
+
+
+class NoEditorCommandsFileError(Exception):
+    pass
+
+
+class UninstalledFavoriteEditor(Exception):
+    pass
+
+
 class UnknownInodeError(ValueError):
     """
     The edited text contains an inode absent from the source text.
@@ -45,6 +57,7 @@ class RecoverableRenamingError(Exception):
     """
     Raised after a failed renaming, with the goal of triggering a rollback.
     """
+
 
 class RetrieveDefaultsError(Exception):
     """

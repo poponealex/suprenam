@@ -1,6 +1,7 @@
 from itertools import groupby
 
 from natsort import os_sorted  # type: ignore
+# TODO: replace this dependance with something like this: https://stackoverflow.com/a/4836734/173003
 
 from src.user_types import EditableText, InodesPaths
 
