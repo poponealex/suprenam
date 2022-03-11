@@ -15,7 +15,7 @@ class Renamer:
         if testing:
             self.logger.create_new_log_file()
 
-    def perform_renamings(self, arcs: List[Arc]):
+    def perform_renamings(self, arcs: List[Arc]) -> int:
         """
         Perform the renamings specified by the list of arcs (source path, target path), and
         log them one by one.
@@ -30,17 +30,12 @@ class Renamer:
             self.rename_and_log_all_files(arcs)
             self.logger.info(f"{n} item{'s'[:n^1]} renamed.")
             self.print_(f"{n} item{'s'[:n^1]} renamed.")
-            if n == 0:
-                return f"Nothing to rename."
-            elif n == 1:
-                return f"1 item was renamed."
-            else:
-                return f"All {n} items were renamed."
+            return n
         except Exception as e:
             self.logger.warning(f"perform_renamings: {e}")
             raise RecoverableRenamingError(f"{e}.")
 
-    def rollback_renamings(self):
+    def rollback_renamings(self) -> int:
         """
         Rollback the first renaming operations.
 
@@ -52,12 +47,7 @@ class Renamer:
         try:
             self.rename_and_log_all_files(self.arcs_to_rollback)
             self.logger.info(f"{n} renaming{'s'[:n^1]} rolled back.")
-            if n == 0:
-                return f"there was nothing to roll back."
-            elif n == 1:
-                return f"the only renaming was rolled back."
-            else:
-                return f"all {n} renamings were rolled back."
+            return n
         except Exception as e:
             self.logger.error(f"rollback_renamings: {e}")
             raise

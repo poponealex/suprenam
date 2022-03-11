@@ -41,11 +41,15 @@ def undo_renamings(context: Context):
     try:
         arcs_for_undoing = renamer.get_arcs_for_undoing(logger.previous_log_contents)
         logger.info(str(arcs_for_undoing))
-        message = renamer.perform_renamings(arcs_for_undoing)
-        print_.success(
-            f"The previous renaming session was undone. {message} "
-            "Launch Suprenam again to restore."
-        )
+        opening = "The previous renaming session was undone."
+        closing = "Launch Suprenam again to restore."
+        n = renamer.perform_renamings(arcs_for_undoing)
+        if n == 0:
+            print_.abort(f"{opening} There was no renaming to undo.")
+        elif n == 1:
+            print_.success(f"{opening} The sole renaming was undone. {closing}")
+        else:
+            print_.success(f"{opening} All {n} renamings were undone. {closing}")
     except RecoverableRenamingError:
         try:
             renamer.rollback_renamings()
@@ -133,13 +137,24 @@ def do_renamings(context: Context, **kwargs):
     logger.info("Performing the actual renamings.")
     renamer = Renamer(context)
     try:
-        message = renamer.perform_renamings(arcs)
-        return print_.success(message)
+        n = renamer.perform_renamings(arcs)
+        if n == 0:
+            print_.abort(f"Nothing was changed in the name list.")
+        elif n == 1:
+            print_.success(f"One item was renamed.")
+        else:
+            print_.success(f"All {n} items were renamed.")
     except RecoverableRenamingError:
         logger.warning("Renaming performed with a recoverable error.")
         try:
-            message = renamer.rollback_renamings()
-            return print_.abort(f"The renamings failed, but don't worry: {message}.")
+            opening = "The renamings failed, but don't worry:"
+            n = renamer.rollback_renamings()
+            if n == 0:
+                print_.abort(f"{opening} there was nothing to roll back.")
+            elif n == 1:
+                print_.abort(f"{opening} the only renaming was rolled back.")
+            else:
+                print_.abort(f"{opening} all {n} renamings were rolled back.")
         except Exception as e:
             return print_.fail(
                 f"Unrecoverable failure during rollback: {e}"
