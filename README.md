@@ -28,8 +28,6 @@ The modifications are instantly applied on the selected items.
 
 <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/success.png"></p>
 
-Well, yet another achievement for Suprenam, I guess. 🎉
-
 ----
 
 ### Clever, reliable and fool-proof
@@ -63,13 +61,9 @@ Suprenam is not as straightforward as it seems. It supports:
 
 <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/toolbar.gif"></p>
 
-#### Linux
+#### Linux and Windows
 
-No graphical launcher yet. Use the command line.
-
-#### Windows
-
-No graphical launcher yet. Use the command line.
+No graphical launcher yet. Use the command line tool.
 
 ### Installing the command line tool
 
@@ -98,7 +92,7 @@ If you are not happy with the text editor Suprenam opens your lists with, you ca
   echo "subl.exe -w" > %HOMEPATH%\"AppData\Roaming\Suprenam\FAVORITE_EDITOR
   ```
 
-A list of many such commands is provided in [editor_commands.md](build/editor_commands.md), but nothing prevents you from writing your own.
+Many such commands are provided in [editor_commands.md](/src/editor_commands.md), but nothing prevents you from writing your own.
 
 ## How it works
 
