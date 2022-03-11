@@ -3,7 +3,7 @@ from pathlib import Path
 
 from src.user_errors import *
 from src.logger import Logger
-from src.printer import ColorPrinter, PlatypusPrinter
+from src.printer import Printer
 
 
 class Context:
@@ -28,9 +28,6 @@ class Context:
             self.workspace = Path("test") / "workspace"
         else:
             raise UnsupportedOSError(f"Unsupported operating system: {self.platform}.")
-        
-        if not full:
-            return
 
         self.workspace.mkdir(
             parents=True,  # any missing parents of this path are created as needed
@@ -38,13 +35,4 @@ class Context:
         )
         self.logger = Logger(self.workspace)
 
-        self.print_ = ColorPrinter(self)
-        if Path.cwd().name == "Resources":
-            # We are in the app bundle (macOS)
-            self.print_ = PlatypusPrinter(self)  # type: ignore
-
-
-if __name__ == "__main__":
-    context = Context(full=False)
-    log_file = context.workspace / "log.txt"
-    print(int(log_file.is_file()))
+        self.print_ = Printer(self.logger)
