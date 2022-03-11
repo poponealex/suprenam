@@ -65,27 +65,11 @@ Suprenam is not as straightforward as it seems. It supports:
 
 #### Linux
 
-Coming soon.
+No graphical launcher yet. Use the command line.
 
 #### Windows
 
-Coming soon.
-
-### Setting up your favorite text editor (if needed)
-
-If you are not happy with the text editor Suprenam opens the editable file with, you can set up another one. For instance, if VS-Code is installed on your system, it will be the default choice for Suprenam. If you prefer to use Sublime Text, you can execute under a macOS or Linux terminal:
-
-```sh
-echo "subl -w" > ~/.suprenam/FAVORITE_EDITOR
-```
-
-On Windows' command prompt:
-
-```bat
-echo "subl.exe -w" > %HOMEPATH%\.suprenam\FAVORITE_EDITOR
-```
-
-A list of many such commands is provided in [editor_commands.md](build/editor_commands.md), but nothing prevents you from writing your own.
+No graphical launcher yet. Use the command line.
 
 ### Installing the command line tool
 
@@ -96,6 +80,25 @@ pip install suprenam
 ```
 
 If this fails, try `pip3` instead of `pip`.
+
+### Setting up your favorite text editor (if needed)
+
+If you are not happy with the text editor Suprenam opens your lists with, you can set up another one. For instance, if VS-Code is installed on your system, it will be the default choice for Suprenam; but if you prefer to use Sublime Text, change it at the command prompt:
+
+- macOS
+  ```sh
+  echo "subl -w" > ~/Library/Application\ Support/Suprenam/FAVORITE_EDITOR
+  ```
+- Linux
+  ```sh
+  echo "subl -w" > ~/.suprenam/FAVORITE_EDITOR
+  ```
+- Windows
+  ```bat
+  echo "subl.exe -w" > %HOMEPATH%\"AppData\Roaming\Suprenam\FAVORITE_EDITOR
+  ```
+
+A list of many such commands is provided in [editor_commands.md](build/editor_commands.md), but nothing prevents you from writing your own.
 
 ## How it works
 
