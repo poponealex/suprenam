@@ -1,9 +1,9 @@
 from pathlib import Path
 
-import context
-from src.paths_to_inodes_paths import *
-
 import pytest
+
+__import__("sys").path[0:0] = "."
+from src.paths_to_inodes_paths import *
 
 
 def test_existing_paths_to_inodes_paths():

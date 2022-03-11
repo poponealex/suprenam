@@ -1,9 +1,6 @@
-import subprocess
-import sys
 from pathlib import Path
 
-sys.path[0:0] = ["."]
-
+__import__("sys").path[0:0] = "."
 from src.goodies import rm_tree
 from src.logger import logger
 from src.suprenam import run_on_path_list

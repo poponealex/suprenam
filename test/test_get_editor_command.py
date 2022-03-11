@@ -1,6 +1,6 @@
 import pytest
 
-import context
+__import__("sys").path[0:0] = "."
 from src.get_editor_command import *
 
 

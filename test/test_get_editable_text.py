@@ -1,11 +1,9 @@
 from pathlib import Path
-from pathvalidate import ValidationError
-
-import context
-from src.get_editable_text import *
 
 import pytest
-import re
+
+__import__("sys").path[0:0] = "."
+from src.get_editable_text import *
 
 data = [  # NB: in the triple-quoted strings, inodes and names are tab-separated.
     (

@@ -1,12 +1,11 @@
+import re
 from pathlib import Path
-from pathvalidate import ValidationError
-
-import context
-from src.parse_edited_text import *
 
 import pytest
-import re
+from pathvalidate import ValidationError
 
+__import__("sys").path[0:0] = "."
+from src.parse_edited_text import *
 
 data = [
     (

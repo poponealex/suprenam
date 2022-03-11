@@ -2,7 +2,7 @@ import pytest
 
 from pathlib import Path
 
-import context
+__import__("sys").path[0:0] = "."
 from src.secure_clauses import *
 
 

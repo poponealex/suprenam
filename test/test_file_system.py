@@ -1,10 +1,10 @@
-import pytest
-
 from pathlib import Path
 
-import context
-from src.file_system import FileSystem
+import pytest
 from pathvalidate import ValidationError
+
+__import__("sys").path[0:0] = "."
+from src.file_system import FileSystem
 
 
 @pytest.fixture(scope="module")

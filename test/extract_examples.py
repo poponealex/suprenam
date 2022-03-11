@@ -1,6 +1,6 @@
-from pathlib import Path
 import re
-import context
+from pathlib import Path
+
 
 SECTION_PATTERN = r"""(?m)^### (.+)\n
 #### Example\n

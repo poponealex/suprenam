@@ -1,15 +1,16 @@
-import pytest
-
 from pathlib import Path
 
-import context
+import pytest
+
+__import__("sys").path[0:0] = "."
 import src.secure_clauses as sc
 from src.file_system import FileSystem
+
 from extract_examples import extract_examples
 from reformat_examples import main as reformat_examples
 
 EXCEPTIONS = {
-    "FileNotFoundError": __builtins__["FileNotFoundError"],
+    "FileNotFoundError": FileNotFoundError,
     "SeveralTargetsError": getattr(sc, "SeveralTargetsError"),
     "SeveralSourcesError": getattr(sc, "SeveralSourcesError"),
     "DuplicatedClauseError": getattr(sc, "DuplicatedClauseError"),

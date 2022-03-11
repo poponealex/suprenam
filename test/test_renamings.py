@@ -1,11 +1,11 @@
 from pathlib import Path
 
-import context
+import pytest
+
+__import__("sys").path[0:0] = "."
 from src.renamings import *
 from src.user_types import Arc
 from src.goodies import rm_tree
-
-import pytest
 
 
 def test_rename():
