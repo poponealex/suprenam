@@ -1,38 +1,29 @@
 import pytest
 
 __import__("sys").path[0:0] = "."
+from src.context import Context
 from src.get_editor_command import *
 
 
 def test_when_favorite_editor_is_set():
-    path = Path.home() / ".suprenam" / "MOCK_FAVORITE_EDITOR_YES"
+    context = Context("mockOS")
+    path = context.workspace / "FAVORITE_EDITOR"
     path.write_text("foo")
-    assert (
-        get_editor_command(
-            Path("bar"),
-            favorite_editor_filename="MOCK_FAVORITE_EDITOR_YES",
-            platform="mockOS",
-        )
-        == "foo bar"
-    )
-    path.unlink()
+    assert get_editor_command(context, Path("bar")) == "foo bar"
 
 
 def test_with_unsupported_platform():
     with pytest.raises(UnsupportedOSError):
-        get_editor_command(
-            Path("foobar"),
-            favorite_editor_filename="MOCK_FAVORITE_EDITOR_NO",
-            platform="MS-DOS",
-        )
+        get_editor_command(Context("MS-DOS"), Path("foobar"))
 
 
 def test_with_mock_os():
+    context = Context("mockOS")
     assert (
         get_editor_command(
+            context,
             Path("foobar"),
-            favorite_editor_filename="MOCK_FAVORITE_EDITOR_NO",
-            platform="mockOS",
+            favorite_editor_filename="NOT_EXISTING_FILE",
         )
         == "mock_command foobar"
     )

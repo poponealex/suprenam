@@ -26,7 +26,7 @@ if [ -f "$TEMP_FILE" ]; then
     $python_command suprenam.py --file "$TEMP_FILE"
     rm -f "$TEMP_FILE"
 else
-    if [ -e ~/.suprenam/log.txt ]; then
+    if [ -e ~/Library/Application\ Support/Suprenam/log.txt ]; then
         $python_command suprenam.py --undo
     else
         echo "ALERT:Usage|"`

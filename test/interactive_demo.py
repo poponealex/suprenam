@@ -2,9 +2,8 @@ from pathlib import Path
 
 __import__("sys").path[0:0] = "."
 from src.goodies import rm_tree
-from src.logger import logger
-from src.suprenam import run_on_path_list
-from src.renamings import Renamer
+from src.context import Context
+from src.suprenam import *
 
 
 playground = Path("test/playground")
@@ -37,21 +36,22 @@ for path in paths:
     if not path.exists():
         path.touch()
 
-print("Playground recreated. Now, have fun renaming some files and folders...")
-logger.create_new_log_file()
-run_on_path_list(paths)
 
-renamer = Renamer()
+print("Playground recreated. Now, have fun renaming some files and folders...")
+
+context = Context()
+context.logger.create_new_log_file()
+do_renamings(context, paths=paths)
 
 input("Press Enter to show the log file...")
-print(logger.get_contents())
+print(context.logger.get_contents())
 
 input("Press Enter to revert the previous renamings...")
-arcs_for_undoing = renamer.get_arcs_for_undoing(logger.get_contents())
-renamer.perform_renamings(arcs_for_undoing)
+context.logger.create_new_log_file()
+undo_renamings(context)
 
 input("Press Enter to show the log file...")
-print(logger.get_contents())
+print(context.logger.get_contents())
 
 input("Press Enter to erase the playground...")
 rm_tree(playground)

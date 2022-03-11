@@ -2,7 +2,6 @@ from typing import List, Optional
 
 import pathvalidate
 
-from src.printer import print_
 from src.user_errors import *
 from src.user_types import Clause, EditedText, Inode, InodesPaths, Name
 

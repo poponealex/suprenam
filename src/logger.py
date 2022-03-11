@@ -6,21 +6,14 @@ from pathlib import Path
 
 
 class Logger:
-
-    LOG_DIR = Path.home() / ".suprenam"
-    LOG_NAME = "log.txt"
-    LOGS_TO_KEEP = 10
-
-    def __init__(self, path: Path = LOG_DIR / LOG_NAME):
-        """Ensure the log directory exists."""
-        path.parent.mkdir(
-            parents=True,  # any missing parents of this path are created as needed
-            exist_ok=True,  # if the directory already exists, do not raise an exception
-        )
-        self.path = path
+    def __init__(self, workspace: Path, logs_to_keep: int = 10):
+        self.path = workspace / "log.txt"
+        self.log_dir = workspace
+        self.logs_to_keep = logs_to_keep
 
     def create_new_log_file(self):
         """Remove all handlers associated with the root logger object and create a NEW log file."""
+        self.previous_log_contents = self.get_contents()
         self.backup_current_log_file()
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
@@ -31,7 +24,7 @@ class Logger:
         Copy the current log file with a timestamp appended.
         Clean up the directory by keeping only the last copies.
         """
-        if self.LOGS_TO_KEEP == 0:
+        if self.logs_to_keep == 0:
             return
         try:
             modified = os.path.getmtime(self.path)
@@ -40,7 +33,7 @@ class Logger:
         suffix = datetime.datetime.fromtimestamp(modified).strftime("%Y-%m-%d_%H-%M-%S.%f")
         destination = f"{self.path.parent}/log_{suffix}.txt"
         shutil.copy2(self.path, destination)
-        for file in sorted(self.LOG_DIR.glob("log_*.txt"), reverse=True)[self.LOGS_TO_KEEP :]:
+        for file in sorted(self.log_dir.glob("log_*.txt"), reverse=True)[self.logs_to_keep :]:
             file.unlink()
 
     def get_contents(self):  # pragma: no cover
@@ -60,6 +53,3 @@ class Logger:
 
     def error(self, *args, **kwargs):
         logging.error(*args, **kwargs)
-
-
-logger = Logger()
