@@ -22,6 +22,7 @@ def get_editor_command(
     Raises:
         NoEditorCommandsFileError: if `editor_commands.md` is not found.
         NoEditorError: if no command-line capable editor is installed.
+        UninstalledFavoriteEditorError: if the favorite editor is not installed.
     """
     # Check whether the user has defined a favorite editor and it is installed.
     favorite_editor_path = context.workspace / favorite_editor_filename
@@ -31,10 +32,10 @@ def get_editor_command(
         if context.platform == "mockOS" or which(name):  # https://stackoverflow.com/a/34177358/173003
             return f"{command} {editable_file_path}"
         else:
-            raise UninstalledFavoriteEditor(
+            raise UninstalledFavoriteEditorError(
                 f"The editor command `{name}` is not found. "
                 "You can either install the corresponding application "
-                f"or delete the file `~/.suprenam/{favorite_editor_filename}`."
+                f"or delete the file `{favorite_editor_path}`."
             )
 
     # Retrieve a list of known editor commands.

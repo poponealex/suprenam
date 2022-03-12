@@ -127,7 +127,7 @@ def do_renamings(context: Context, **kwargs):
     except Exception as e:
         return print_.abort(str(e))
 
-    logger.info("Converting the clauses into a 'safe' sequence of renamings.")
+    logger.info("Converting the clauses into a “safe” sequence of renamings.")
     try:
         arcs = secure_clauses(FileSystem(), clauses)
         logger.info(f"Converted clauses into {len(arcs)} arcs.")
@@ -159,7 +159,7 @@ def do_renamings(context: Context, **kwargs):
             return print_.fail(
                 f"Unrecoverable failure during rollback: {e}"
                 "Some files may have been renamed, some not."
-                "Please check the log file at `~/.suprenam/log.txt`."
+                f"Please check the log file at `{logger.path}`."
             )
 
 

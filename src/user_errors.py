@@ -10,7 +10,7 @@ class NoEditorCommandsFileError(Exception):
     pass
 
 
-class UninstalledFavoriteEditor(Exception):
+class UninstalledFavoriteEditorError(Exception):
     pass
 
 
