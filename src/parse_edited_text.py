@@ -15,9 +15,9 @@ def parse_edited_text(
     Parse the text in which the user has modified some filenames to specify a renaming.
 
     Args:
-        text: the text with the effective renamings.
-        inodes_paths: dict containing each path (value) with its inode (key).
-        platform: OS on which the renamings will be performed. Without a value `path_validate` will
+        text: the text with the desired renamings.
+        inodes_paths: dict associating each inode to its path.
+        platform: OS on which the renamings will be performed. Without a value, `path_validate` will
             detect the platform automatically.
 
     Raises:

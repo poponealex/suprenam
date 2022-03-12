@@ -7,13 +7,13 @@ from pathlib import Path
 
 class Logger:
     def __init__(self, workspace: Path, logs_to_keep: int = 10):
-        self.path = workspace / "log.txt"
         self.log_dir = workspace
+        self.path = workspace / "log.txt"
         self.logs_to_keep = logs_to_keep
 
     def create_new_log_file(self):
         """Remove all handlers associated with the root logger object and create a NEW log file."""
-        self.previous_log_contents = self.get_contents()
+        self.previous_log_contents = self.get_contents() # used by `get_arcs_for_undoing()`
         self.backup_current_log_file()
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
@@ -22,7 +22,7 @@ class Logger:
     def backup_current_log_file(self):
         """
         Copy the current log file with a timestamp appended.
-        Clean up the directory by keeping only the last copies.
+        Clean up the directory by keeping only the last self.logs_to_keep copies.
         """
         if self.logs_to_keep == 0:
             return
@@ -41,9 +41,6 @@ class Logger:
             return self.path.read_text().strip()
         else:
             return ""
-
-    def erase_contents(self):
-        self.path.write_text("")
 
     def warning(self, *args, **kwargs):
         logging.warning(*args, **kwargs)

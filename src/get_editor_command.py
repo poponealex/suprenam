@@ -47,7 +47,7 @@ def get_editor_command(
     else:
         raise NoEditorCommandsFileError(f"The file 'editor_commands.md' is not found.")
 
-    # Among the commands known to work on the context, return the first one that is installed.
+    # Among the commands known to work on the current platform, return the first one that is installed.
     supported_commands = r"(?m)- \*\*.+\*\* \(.*?%s.*?\): `(.+?)`" % context.platform
     for command in re.findall(supported_commands, text):
         name = str(command).partition(" ")[0]  # make mypy happy
@@ -55,4 +55,4 @@ def get_editor_command(
             return f"{command} {editable_file_path}"
 
     # If no known command is installed, raise an error.
-    raise NoEditorError(f"No text editor found for the context {context.platform}.")
+    raise NoEditorError(f"No text editor found for the platform {context.platform}.")

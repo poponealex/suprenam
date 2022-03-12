@@ -30,7 +30,6 @@ def get_editable_text(inodes_paths: InodesPaths) -> EditableText:
                 ...
 
                 ...
-
     """
     # Calculate the number of digits in the largest inode (base 10), or 0 if there are no inodes
     inode_size = len(str(max(inodes_paths.keys(), default=0)))

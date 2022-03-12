@@ -14,7 +14,7 @@ class Context:
         Args:
             platform: the current OS, only provided during testing.
         Raises:
-            UnsupportedOSError: if the OS is not in self.SUPPORTED_OS.
+            UnsupportedOSError: if the current OS is not supported.
         """
         self.platform = platform_name or get_platform_long_string().partition("-")[0]
 
