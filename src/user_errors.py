@@ -14,6 +14,12 @@ class UninstalledFavoriteEditorError(Exception):
     pass
 
 
+class NoItemToRenameError(Exception):
+    """
+    A single text file was passed as an argument, and it is empty.
+    """
+
+
 class UnknownInodeError(ValueError):
     """
     The edited text contains an inode absent from the source text.
