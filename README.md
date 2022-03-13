@@ -95,6 +95,8 @@ There, it will put the logs (`"log.txt"` + some backups) and a configuration fil
 
 Many such commands are provided in [editor_commands.md](/src/editor_commands.md), and nothing prevents you from writing your own in the configuration file.
 
+----
+
 ## How it works
 
 - Suprenam starts by determining the items to rename. They can be provided:
@@ -115,11 +117,11 @@ Many such commands are provided in [editor_commands.md](/src/editor_commands.md)
   
   Below, for instance, `"c"` has two “target“ names, which will cause Suprenam to abort…
 
-<p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_nope.png"></p>
+  <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_nope.png"></p>
 
   However, some desired bindings can be resolved along a “safe” path of renamings. For instance, the following renamings (from left to right: null, swapping, shifting, rolling) can always be obtained with careful intermediate renamings.
 
-<p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_ok.png"></p>
+  <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_ok.png"></p>
 
   A handful of accepted and rejected renaming schemes are documented (and tested) [here](test/examples.md).  
 - So, whenever possible, the desired bindings have been silently converted into a “safe” sequence. The new bindings are then processed in order, and the corresponding renaming commands executed. At this stage, the only remaining possible errors should result from hardware failures or from modifications that have occurred in the file tree during the edition stage. Should such rare cases arise, all the completed renaming commands will be readily rolled back.
