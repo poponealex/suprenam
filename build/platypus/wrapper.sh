@@ -17,20 +17,14 @@ if [[ `$python_command -c "import sys; print('{0[0]:02}{0[1]:02}'.format(sys.ver
     exit 2
 fi
 
-while [ $# -gt 0 ]; do
-    echo $1 >> "$TEMP_FILE"
-    shift
-done
-
-if [ -f "$TEMP_FILE" ]; then
-    $python_command suprenam.py --file "$TEMP_FILE"
-    rm -f "$TEMP_FILE"
+if [ $# -gt 0 ]; then
+    $python_command suprenam.py "$@"
 else
     if [ -e ~/Library/Application\ Support/Suprenam/log.txt ]; then
-        $python_command suprenam.py --undo
+        $python_command suprenam.py
     else
         echo "ALERT:Usage|"`
-            `"Drag and drop onto the Suprenam's icon a bunch of files you want to rename. "`
+            `"Drag and drop onto the Suprenam's icon a bunch of items you want to rename. "`
             `"Clicking the icon will be used to undo the previous renaming session (if any)."
         exit 2
     fi

@@ -26,10 +26,10 @@ def main():
     context.logger.info("Parsing arguments.")
     kwargs = cli_arguments()
     context.logger.info("Parsing arguments done.")
-    if kwargs["undo"]:
-        undo_renamings(context)
-    else:
+    if kwargs["paths"]:
         do_renamings(context, **kwargs)
+    else:
+        undo_renamings(context)
     context.logger.info("Exiting the program.")
 
 
@@ -66,16 +66,23 @@ def do_renamings(context: Context, **kwargs):
     logger.info("Constructing the list of items to rename.")
 
     paths: List[Path] = []
-    if kwargs.get("paths"):
-        logger.info("A list of items to rename was provided.")
+    if len(kwargs["paths"]) > 1:
+        logger.info("The paths of several items to rename are provided.")
         paths.extend(map(Path, kwargs["paths"]))
-    if kwargs.get("file"):
-        logger.info("A file containing the paths to rename was provided.")
-        paths.extend(Path(path) for path in Path(kwargs["file"]).read_text().split("\n") if path)
-
-    if not paths:
-        logger.info("No paths to rename were provided.")
-        return print_.abort("Please provide at least one file to rename.")
+    else:  # `do_renamings` cannot be called without at least one path. So there is exactly one.
+        single_path = Path(kwargs["paths"][0])
+        logger.info(f"A single path is provided: {single_path}.")
+        if single_path.is_dir():
+            logger.info(f"It is a directory: it and its children are to be renamed.")
+            paths.append(single_path)
+            paths.extend(single_path.iterdir())
+        elif single_path.is_file() and single_path.suffix == ".txt":
+            logger.info(f"It is a text file containing the paths of the items to rename.")
+            paths.extend(map(Path, filter(None, single_path.read_text().splitlines())))
+        else:
+            logger.info(f"It is either a missing or a non-text file: default to rename it.")
+            paths.append(single_path)
+            # The case of a missing single file will be catched by `paths_to_inodes_paths()`.
 
     logger.info("Creating a mapping from inodes to paths.")
     try:
@@ -167,36 +174,19 @@ def cli_arguments() -> Dict[str, Any]:
     CLI argument parser.
 
     Returns:
-        `parser.parse_args()` dict containing the parsed arguments.
+        A dictionary containing the parsed arguments.
     """
-    parser = ArgumentParser(
-        formatter_class=RawDescriptionHelpFormatter,
-        usage=f"\n{Path(__file__).name} [-p paths] [-f file] [-h help]",
-        description=f"\nFILE RENAMER",
-    )
-
+    parser = ArgumentParser(description="Easily rename items via your favorite text editor.")
     parser.add_argument(
-        "-p",
-        "--paths",
-        nargs="+",
-        help=f"The paths to rename.",
-        action="store",
+        "paths",
+        type=str,
+        nargs="*",
+        help=(
+            "either several items to rename, "
+            "or a text file enumerating the items to rename, "
+            "or a directory whose children are to be renamed"
+        ),
     )
-
-    parser.add_argument(
-        "-f",
-        "--file",
-        help=f"Parse paths stored in a file (newline separated).",
-        action="store",
-    )
-
-    parser.add_argument(
-        "-u",
-        "--undo",
-        help=f"Undo completed renamings from the previous session.",
-        action="store_true",
-    )
-
     return vars(parser.parse_args())
 
 

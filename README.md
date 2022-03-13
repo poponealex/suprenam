@@ -97,15 +97,19 @@ Many such commands are provided in [editor_commands.md](/src/editor_commands.md)
 
 ## How it works
 
-- Being given a list of files and folders, Suprenam begins by retrieving their [**inodes**](https://en.wikipedia.org/wiki/Inode). These unique numeric identifiers will serve as an invariant throughout the renaming process.
+- Suprenam starts by determining the items to rename. They can be provided:
+  - directly, as a batch of **several files of folders**;
+  - semi-directly, as a **single folder**: this folder will be renamed, along with all its children (both visible and hidden);
+  - indirectly, as a **single text file** (mandatory suffix: `.txt`) containing the items to rename (one path by line). Note that a single non-text file will be treated as in the first case.
+- Suprenam retrieves the [**inodes**](https://en.wikipedia.org/wiki/Inode) of the items to be renamed. These unique numeric identifiers will serve as an invariant throughout the renaming process.
 - It creates a temporary TSV file associating each inode with its name. In case all items are siblings (i.e., have the same parent), the list is flat ; otherwise, a group is created for each parent.
 - Note that the list is sorted in “natural order” (e.g., _foobar9_ before _foobar10_, and _[cote, coteau, crottez, crotté, côte, côté]_ as _[cote, côte, côté, coteau, crotté, crottez]_).
 - Suprenam opens this file by invoking the editor command found in the [configuration file](#configuring-suprenam). If none is specified, it parses [`editor_commands.md`](/src/editor_commands.md) and defaults to the first one that happens to work on your system.
 - Once the TSV file is opened, Suprenam waits for you to make the desired changes.
-- When the temporary file is closed, its content is parsed.
-  - Suprenam ignores any change or deletion to non-inodes lines.
-  - It  tolerates the deletion of one, several or even all of the inodes.
-  - However, any inode creation or duplication is considered as a typo, and makes it to abort.
+- When it is closed, its content is parsed.
+  - Any deletion or change to non-inodes lines is ignored.
+  - The deletion of one, several or even all of the inodes is tolerated.
+  - However, any inode creation or duplication is considered as a typo, and makes the program to abort without renaming anything.
 - The new names are checked for validity with respect to the actual file system.
 - This results in a list of bindings between existing inodes and modified names. These bindings cannot be directly translated into renaming commands, as they may lead to name clashes.
   
