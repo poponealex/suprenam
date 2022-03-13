@@ -62,4 +62,4 @@ Source: _What are the default text editors in different flavours of Ubuntu?_ [St
 
 ## Mock editor for testing
 
-- **Mock editor** (mockOS): `mock_command`
+- **Mock editor** (mockOS): `mock_default_command`

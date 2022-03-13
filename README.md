@@ -75,32 +75,32 @@ pip install suprenam
 
 If this fails, try `pip3` instead of `pip`.
 
-### Setting up your favorite text editor (if needed)
+### Configuring Suprenam
 
-If you are not happy with the text editor Suprenam opens your lists with, you can set up another one. For instance, if VS-Code is installed on your system, it will be the default choice for Suprenam; but if you prefer to use Sublime Text, change it at the command prompt:
+On first launch, Suprenam creates a workspace at:
+- `~/Library/Application Support/Suprenam/` (MacOS)
+- `~/.config/suprenam/` (Linux)
+- `%HOMEPATH%\"AppData\Roaming\Suprenam\` (Windows)
 
-- macOS
-  ```sh
-  echo "subl -w" > ~/Library/Application\ Support/Suprenam/FAVORITE_EDITOR
-  ```
-- Linux
-  ```sh
-  echo "subl -w" > ~/.suprenam/FAVORITE_EDITOR
+There, it will put the logs (`"log.txt"` + some backups) and a configuration file (`"config.json"`) in which you can specify the text editor to use. For instance, VS-Code is the default when the command `code` is installed in your PATH; if you prefer Sublime Text, just replace the corresponding line by:
+
+- macOS and Linux:
+  ```json
+    "editor_command": "subl -w",
   ```
 - Windows
-  ```bat
-  echo "subl.exe -w" > %HOMEPATH%\"AppData\Roaming\Suprenam\FAVORITE_EDITOR
+  ```json
+    "editor_command": "subl.exe -w",
   ```
 
-Many such commands are provided in [editor_commands.md](/src/editor_commands.md), but nothing prevents you from writing your own.
+Many such commands are provided in [editor_commands.md](/src/editor_commands.md), and nothing prevents you from writing your own in the configuration file.
 
 ## How it works
 
 - Being given a list of files and folders, Suprenam begins by retrieving their [**inodes**](https://en.wikipedia.org/wiki/Inode). These unique numeric identifiers will serve as an invariant throughout the renaming process.
-- It creates a temporary text file associating each inode with its name. In case all items are siblings (i.e., have the same parent), the list is flat ; otherwise, a section is created for each parent. The list should be sorted in “natural order” (e.g., _foobar9_ before _foobar10_, and _[cote, coteau, crottez, crotté, côte, côté]_ as _[cote, côte, côté, coteau, crotté, crottez]_).
-- To find out how to open this file, Suprenam will use the following heuristics:
-  - If a command opening a text editor is defined in [`FAVORITE_EDITOR`](#setting-up-your-favorite-text-editor-if-needed), it will be used.
-  - Otherwise, Suprenam will parse the list defined in [`editor_commands.md`](/src/editor_commands.md) (which is sorted by decreasing popularity), and use the first one that works on your system.
+- It creates a temporary TSV file associating each inode with its name. In case all items are siblings (i.e., have the same parent), the list is flat ; otherwise, a group is created for each parent.
+- Note that the list is sorted in “natural order” (e.g., _foobar9_ before _foobar10_, and _[cote, coteau, crottez, crotté, côte, côté]_ as _[cote, côte, côté, coteau, crotté, crottez]_).
+- Suprenam opens this file by invoking the editor command found in the [configuration file](#configuring-suprenam). If none is specified, it parses [`editor_commands.md`](/src/editor_commands.md) and defaults to the first one that happens to work on your system.
 - Once the TSV file is opened, Suprenam waits for you to make the desired changes.
 - When the temporary file is closed, its content is parsed.
   - Suprenam ignores any change or deletion to non-inodes lines.

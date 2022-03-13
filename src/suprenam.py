@@ -40,7 +40,6 @@ def undo_renamings(context: Context):
     renamer = Renamer(context)
     try:
         arcs_for_undoing = renamer.get_arcs_for_undoing(logger.previous_log_contents)
-        logger.info(str(arcs_for_undoing))
         opening = "The previous renaming session was undone."
         closing = "Launch Suprenam again to restore."
         n = renamer.perform_renamings(arcs_for_undoing)
@@ -111,7 +110,7 @@ def do_renamings(context: Context, **kwargs):
         subprocess.run(editor_command, shell=True, check=True)
         logger.info("Command executed without process error.")
     except subprocess.CalledProcessError:
-        return print_.abort(f"The command `{editor_command}` failed.")
+        return print_.abort(f"The command '{editor_command}' failed.")
 
     logger.info("Retrieving the content of the edited text file.")
     try:
@@ -159,7 +158,7 @@ def do_renamings(context: Context, **kwargs):
             return print_.fail(
                 f"Unrecoverable failure during rollback: {e}"
                 "Some files may have been renamed, some not."
-                f"Please check the log file at `{logger.path}`."
+                f"Please check the log file at '{logger.path}'."
             )
 
 

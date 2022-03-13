@@ -1,5 +1,6 @@
 from platform import platform as get_platform_long_string
 from pathlib import Path
+import json
 
 from src.user_errors import *
 from src.logger import Logger
@@ -7,6 +8,12 @@ from src.printer import Printer
 
 
 class Context:
+
+    DEFAULT_CONFIG = {
+        "editor_command": "",
+        "logs_to_keep": 10,
+    }
+
     def __init__(self, platform_name: str = "", full=True):
         """
         Set up the platform and, if needed, create the Suprenam's data folder.
@@ -33,6 +40,12 @@ class Context:
             parents=True,  # any missing parents of this path are created as needed
             exist_ok=True,  # if the directory already exists, do not raise an exception
         )
-        self.logger = Logger(self.workspace)
 
-        self.print_ = Printer(self.logger)
+        config_path = self.workspace / "config.json"
+        if not config_path.is_file():
+            config_path.write_text(json.dumps(self.DEFAULT_CONFIG, indent=4))
+        self.config = json.loads(config_path.read_text())
+
+        self.logger = Logger(self)
+
+        self.print_ = Printer(self)

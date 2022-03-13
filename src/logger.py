@@ -2,14 +2,13 @@ import datetime
 import logging
 import os
 import shutil
-from pathlib import Path
 
 
 class Logger:
-    def __init__(self, workspace: Path, logs_to_keep: int = 10):
-        self.log_dir = workspace
-        self.path = workspace / "log.txt"
-        self.logs_to_keep = logs_to_keep
+    def __init__(self, context):
+        self.log_dir = context.workspace
+        self.path = self.log_dir / "log.txt"
+        self.logs_to_keep = context.config.get("logs_to_keep", 10)
 
     def create_new_log_file(self):
         """Remove all handlers associated with the root logger object and create a NEW log file."""

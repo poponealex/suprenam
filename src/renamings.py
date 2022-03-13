@@ -39,7 +39,7 @@ class Renamer:
         """
         Rollback the first renaming operations.
 
-        The inverse renaming are appended to the log file.
+        Note: the inverse renamings are appended to the log file.
         """
         n = len(self.arcs_to_rollback)
         self.print_(f"Rolling back the first {n} renaming{'s'[:n^1]}...")

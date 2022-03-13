@@ -1,13 +1,11 @@
 import sys
 from pathlib import Path
 
-from src.logger import Logger
-
 
 class Printer:
 
-    def __init__(self, logger: Logger):
-        self.logger = logger
+    def __init__(self, context):
+        self.logger = context.logger
         if Path.cwd().name == "Resources": # We are in the app bundle (macOS)
             # Print uncolorized messages in Platypus' alert.
             def print_to_platypus(title, text):
