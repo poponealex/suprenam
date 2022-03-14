@@ -245,7 +245,7 @@ data = [
     (
         "Parse a file which is missing a name.",
         ["universal"],
-        ValidationError,
+        EmptyNameError,
         {
             123: Path("/home/foo"),
         },

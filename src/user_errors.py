@@ -33,10 +33,15 @@ class TabulationError(ValueError):
     """
 
 
+class EmptyNameError(ValueError):
+    """
+    A new name is empty.
+    """
+
+
 class ValidationError(ValueError):
     """
-    A new name includes invalid character(s) for a filename
-    (depends on the target platform).
+    A new name is invalid (depends on the target platform).
     """
 
 
