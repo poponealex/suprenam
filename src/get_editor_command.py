@@ -45,7 +45,7 @@ def get_editor_command(
         raise NoEditorCommandsFileError(f"The file 'editor_commands.md' is not found.")
 
     # Among the commands known to work on the current platform, return the first one that is installed.
-    supported_commands = r"(?m)- \*\*.+\*\* \(.*?%s.*?\): `(.+?)`" % context.platform
+    supported_commands = r"(?m)^\|.+?\|.*?%s.*?\| *`(.+?)` *\|" % context.platform
     for command in re.findall(supported_commands, text):
         name = str(command).partition(" ")[0]  # make mypy happy
         if context.platform == "mockOS" or which(name):  # https://stackoverflow.com/a/34177358/173003
