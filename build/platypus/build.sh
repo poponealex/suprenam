@@ -52,7 +52,6 @@ fi
 mkdir "$BUNDLE" "$BUNDLE"/{src,lib}
 
 cp -Rf "$PYTHON_SITE_PACKAGES/pathvalidate" "$BUNDLE/lib"
-cp -Rf "$PYTHON_SITE_PACKAGES/natsort" "$BUNDLE/lib"
 
 for file in $(ls $SRC/*.py); do
     file=$(basename $file)
@@ -61,6 +60,7 @@ for file in $(ls $SRC/*.py); do
     fi
 done
 
+cp -f "$SRC"/editor_commands.md "$BUNDLE/src"
 cp -f "$SRC"/{suprenam.py,__init__.py} "LICENSE" "$BUNDLE"
 
 for file in $(ls $BUNDLE); do

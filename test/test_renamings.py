@@ -1,16 +1,19 @@
 from pathlib import Path
 
-import context
+import pytest
+
+__import__("sys").path[0:0] = "."
+from src.context import Context
 from src.renamings import *
 from src.user_types import Arc
 from src.goodies import rm_tree
 
-import pytest
-
+context = Context("mockOS")
+logger = context.logger
 
 def test_rename():
     """All renamings succeed."""
-    renamer = Renamer(testing=True)
+    renamer = Renamer(context, testing=True)
     base = Path("test") / "happy_path"
     rm_tree(base)
     base.mkdir()
@@ -36,7 +39,7 @@ def test_rename():
 
 def test_rename_and_undo():
     """All renamings succeed, then are successfully undone."""
-    renamer = Renamer(testing=True)
+    renamer = Renamer(context, testing=True)
     base = Path("test") / "happy_path"
     rm_tree(base)
     base.mkdir()
@@ -69,7 +72,7 @@ def test_rename_and_undo():
 
 def test_rename_and_undo_fail_after_target_deletion():
     """All renamings succeed, but undo them fails."""
-    renamer = Renamer(testing=True)
+    renamer = Renamer(context, testing=True)
     base = Path("test") / "happy_path"
     rm_tree(base)
     base.mkdir()
@@ -115,7 +118,7 @@ def test_rename_and_undo_fail_after_target_deletion():
 
 def test_rename_and_undo_fail_after_log_file_deletion():
     """All renamings succeed, but undo them fails."""
-    renamer = Renamer(testing=True)
+    renamer = Renamer(context, testing=True)
     base = Path("test") / "happy_path"
     rm_tree(base)
     base.mkdir()
@@ -137,7 +140,7 @@ def test_rename_and_undo_fail_after_log_file_deletion():
 
 def test_rename_fail_and_rollback():
     """One renaming fails, but the previous ones are successfully rolled back."""
-    renamer = Renamer(testing=True)
+    renamer = Renamer(context, testing=True)
     base = Path("test") / "rollback_path"
     rm_tree(base)
     base.mkdir()
@@ -174,7 +177,7 @@ def test_rename_fail_and_rollback():
 
 def test_rename_fail_and_rollback_and_undo():
     """Undoing a successful rollback is possible, but has no effect."""
-    renamer = Renamer(testing=True)
+    renamer = Renamer(context, testing=True)
     base = Path("test") / "rollback_path"
     rm_tree(base)
     base.mkdir()
@@ -219,7 +222,7 @@ def test_rename_fail_and_rollback_and_undo():
 
 def test_rename_fail_and_rollback_fail():
     """One renaming fails, and the previous ones fail to be rolled back."""
-    renamer = Renamer(testing=True)
+    renamer = Renamer(context, testing=True)
     base = Path("test") / "rollback_path"
     rm_tree(base)
     base.mkdir()
@@ -252,7 +255,7 @@ def test_rename_fail_and_rollback_fail():
 
 
 def test_undo_with_empty_log_file():
-    renamer = Renamer(testing=True)
+    renamer = Renamer(context, testing=True)
     arcs_for_undoing = renamer.get_arcs_for_undoing(logger.get_contents()) # doesn't raise an exception
     assert arcs_for_undoing == []
 

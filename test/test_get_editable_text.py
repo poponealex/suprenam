@@ -1,11 +1,9 @@
 from pathlib import Path
-from pathvalidate import ValidationError
-
-import context
-from src.get_editable_text import *
 
 import pytest
-import re
+
+__import__("sys").path[0:0] = "."
+from src.get_editable_text import *
 
 data = [  # NB: in the triple-quoted strings, inodes and names are tab-separated.
     (
@@ -107,7 +105,8 @@ data = [  # NB: in the triple-quoted strings, inodes and names are tab-separated
             2784148792: Path("/usr/lib/apple15"),
             1482466380: Path("/usr/lib/Banana_b"),
             3263123972: Path("/usr/lib/banana_a"),
-            1482466386: Path("/usr/lib/banana_c"),
+            1482466386: Path("/usr/lib/banana_d"),
+            1482466387: Path("/usr/lib/bâñáñà_c"),
             549534358: Path("/usr/lib/version-1.10"),
             1582956841: Path("/usr/lib/version-1.11"),
             1981263235: Path("/usr/lib/version-1.9"),
@@ -119,7 +118,8 @@ data = [  # NB: in the triple-quoted strings, inodes and names are tab-separated
             2784148792	apple15
             3263123972	banana_a
             1482466380	Banana_b
-            1482466386	banana_c
+            1482466387	bâñáñà_c
+            1482466386	banana_d
             1981263235	version-1.9
             0549534358	version-1.10
             1582956841	version-1.11

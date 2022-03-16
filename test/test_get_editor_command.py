@@ -1,29 +1,28 @@
 import pytest
 
-import context
+__import__("sys").path[0:0] = "."
+from src.context import Context
 from src.get_editor_command import *
 
 
-def test_get_editor_command_with_explicit_current_platform():
-    platform = get_platform_long_string().partition("-")[0]
-    command = get_editor_command(Path("foobar"), platform)
-    assert command[0] in ["code", "subl", "open"]
+def test_when_favorite_editor_is_set():
+    config_path = Path("test") / "workspace" / "config.json"
+    config_path.write_text('{"editor_command": "mock_favorite_command"}')
+    context = Context("mockOS")
+    assert get_editor_command(context, Path("foobar")) == "mock_favorite_command foobar"
 
 
-def test_get_editor_command_with_detected_current_platform():
-    command = get_editor_command(Path("foobar"))
-    assert command[0] in ["code", "subl", "open"]
-
-
-def test_get_editor_command_with_explicit_not_supported_platform():
+def test_with_unsupported_platform():
     with pytest.raises(UnsupportedOSError):
-        get_editor_command(Path("foobar"), "Windows")
+        get_editor_command(Context("MS-DOS"), Path("foobar"))
 
 
-def test_get_editor_command_with_explicit_wrong_platform():
-    platform = get_platform_long_string().partition("-")[0]
-    with pytest.raises(Exception):
-        get_editor_command(Path("foobar"), "macOS" if platform == "Linux" else "Linux")
+def test_with_mock_os():
+    config_path = Path("test") / "workspace" / "config.json"
+    if config_path.exists():
+        config_path.unlink()  # Python 3.8 and newer: use `missing_ok`` parameter.
+    context = Context("mockOS")
+    assert get_editor_command(context, Path("foobar")) == "mock_default_command foobar"
 
 
 if __name__ == "__main__":  # pragma: no cover

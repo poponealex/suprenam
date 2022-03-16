@@ -51,6 +51,9 @@ class FileSystem(set):
 
         Returns:
             Path: the path to be temporarily used for an intermediate renaming.
+        
+        Examples:
+            "foobar.txt" -> "MZXW6YTBOIXHI6DU-0"
 
         Notes:
             - A previous version relied on `Path.with_stem`, which requires Python 3.9. In the
@@ -81,7 +84,7 @@ class FileSystem(set):
 
         Notes:
             - The renaming is virtual only. The ultimate goal is to produce a sequence of "safe"
-                clauses (or arcs) for an ulterior actual renaming.
+                clauses (namely, arcs) for an ulterior actual renaming.
                 Nevertheless, all the consequences of a renaming (specifically, of a folder) are
                 simulated to ensure testability.
             - In a virtual file system, renaming a node before its parent is not mandatory.

@@ -3,74 +3,86 @@ import sys
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import List
+from typing import List, Dict, Any
 
 sys.path[0:0] = ["."]
 
 from src.file_system import FileSystem
 from src.get_editable_text import get_editable_text
 from src.get_editor_command import get_editor_command
-from src.logger import logger
+from src.context import Context
 from src.parse_edited_text import parse_edited_text
 from src.paths_to_inodes_paths import paths_to_inodes_paths
-from src.printer import print_
 from src.renamings import Renamer
 from src.secure_clauses import secure_clauses
 from src.user_errors import *
 from src.user_types import EditedText
 
 
-def main_wrapper():
-    previous_log_text = logger.get_contents()
-    logger.create_new_log_file()
-    logger.info("Starting the program.")
-    main(previous_log_text)
-    logger.info("Exiting the program.")
-
-
-def main(previous_log_text: str):
-    logger.info("Parsing arguments.")
-    args = cli_arguments()
-    logger.info("Parsing arguments done.")
-
-    if not args.undo:
-        logger.info("Constructing the list of items to rename.")
-        paths: List[Path] = []
-        if args.paths:
-            logger.info("A list of items to rename was provided.")
-            paths.extend(map(Path, args.paths))
-        if args.file:
-            logger.info("A file containing the paths to rename was provided.")
-            paths.extend(Path(path) for path in Path(args.file).read_text().split("\n") if path)
-        if not paths:
-            logger.info("No paths to rename were provided.")
-            return print_.abort("Please provide at least one file to rename.")
-        logger.info("Running on path list.")
-        run_on_path_list(paths)
-        logger.info("Running on path list done.")
+def main():
+    context = Context()
+    context.logger.create_new_log_file()
+    context.logger.info("Starting the program.")
+    context.logger.info("Parsing arguments.")
+    kwargs = cli_arguments()
+    context.logger.info("Parsing arguments done.")
+    if kwargs["paths"]:
+        do_renamings(context, **kwargs)
     else:
-        logger.info("Undoing renamings.")
-        renamer = Renamer()
+        undo_renamings(context)
+    context.logger.info("Exiting the program.")
+
+
+def undo_renamings(context: Context):
+    logger = context.logger
+    print_ = context.print_
+    logger.info("Undoing renamings.")
+    renamer = Renamer(context)
+    try:
+        arcs_for_undoing = renamer.get_arcs_for_undoing(logger.previous_log_contents)
+        opening = "The previous renaming session was undone."
+        closing = "Launch Suprenam again to restore."
+        n = renamer.perform_renamings(arcs_for_undoing)
+        if n == 0:
+            print_.abort(f"{opening} There was no renaming to undo.")
+        elif n == 1:
+            print_.success(f"{opening} The sole renaming was undone. {closing}")
+        else:
+            print_.success(f"{opening} All {n} renamings were undone. {closing}")
+    except RecoverableRenamingError:
         try:
-            arcs_for_undoing = renamer.get_arcs_for_undoing(previous_log_text)
-            logger.info(str(arcs_for_undoing))
-            message = renamer.perform_renamings(arcs_for_undoing)
-            print_.success(
-                f"The previous renaming session was undone. {message} "
-                "Launch Suprenam again to restore."
-            )
-        except RecoverableRenamingError:
-            try:
-                renamer.rollback_renamings()
-                print_.abort("The renamings failed, but were successfully rolled back.")
-            except Exception as e:
-                return print_.fail(f"Unrecoverable failure during rollback: {e}")
-        except Exception as e:  # Unknown problem with the log file, e.g. not found
-            return print_.fail(f"Unrecoverable failure during undo: {e}")
-        logger.info("Undoing renamings done.")
+            renamer.rollback_renamings()
+            print_.abort("The renamings failed, but were successfully rolled back.")
+        except Exception as e:
+            return print_.fail(f"Unrecoverable failure during rollback: {e}")
+    except Exception as e:  # Unknown problem with the log file, e.g. not found
+        return print_.fail(f"Unrecoverable failure during undo: {e}")
+    logger.info("Undoing renamings done.")
 
 
-def run_on_path_list(paths: List[Path]):
+def do_renamings(context: Context, **kwargs):
+    logger = context.logger
+    print_ = context.print_
+    logger.info("Constructing the list of items to rename.")
+
+    paths: List[Path] = []
+    if len(kwargs["paths"]) > 1:
+        logger.info("The paths of several items to rename are provided.")
+        paths.extend(map(Path, kwargs["paths"]))
+    else:  # `do_renamings` cannot be called without at least one path. So there is exactly one.
+        single_path = Path(kwargs["paths"][0])
+        logger.info(f"A single path is provided: {single_path}.")
+        if single_path.is_dir():
+            logger.info(f"It is a directory: it and its children are to be renamed.")
+            paths.append(single_path)
+            paths.extend(single_path.iterdir())
+        elif single_path.is_file() and single_path.suffix == ".txt":
+            logger.info(f"It is a text file containing the paths of the items to rename.")
+            paths.extend(map(Path, filter(None, single_path.read_text().splitlines())))
+        else:
+            logger.info(f"It is either a missing or a non-text file: default to rename it.")
+            paths.append(single_path)
+            # The case of a missing single file will be catched by `paths_to_inodes_paths()`.
 
     logger.info("Creating a mapping from inodes to paths.")
     try:
@@ -95,17 +107,17 @@ def run_on_path_list(paths: List[Path]):
 
     logger.info("Retrieving a command to edit the temporary text file.")
     try:
-        editor_command = get_editor_command(editable_file_path)
-        logger.info(f"The command is {' '.join(editor_command)}.")
-    except UnsupportedOSError:
-        return
+        editor_command = get_editor_command(context, editable_file_path)
+        logger.info(f"The command is {editor_command}.")
+    except Exception as e:
+        return print_.abort(str(e))
 
     logger.info("Opening the editable text file in the editor and waiting it to be closed.")
     try:
-        subprocess.run(editor_command, check=True)
+        subprocess.run(editor_command, shell=True, check=True)
         logger.info("Command executed without process error.")
     except subprocess.CalledProcessError:
-        return print_.abort(f"The command {' '.join(editor_command)} failed.")
+        return print_.abort(f"The command '{editor_command}' failed.")
 
     logger.info("Retrieving the content of the edited text file.")
     try:
@@ -121,7 +133,7 @@ def run_on_path_list(paths: List[Path]):
     except Exception as e:
         return print_.abort(str(e))
 
-    logger.info("Converting the clauses into a 'safe' sequence of renamings.")
+    logger.info("Converting the clauses into a “safe” sequence of renamings.")
     try:
         arcs = secure_clauses(FileSystem(), clauses)
         logger.info(f"Converted clauses into {len(arcs)} arcs.")
@@ -129,60 +141,54 @@ def run_on_path_list(paths: List[Path]):
         return print_.abort(str(e))
 
     logger.info("Performing the actual renamings.")
-    renamer = Renamer()
+    renamer = Renamer(context)
     try:
-        message = renamer.perform_renamings(arcs)
-        return print_.success(message)
+        n = renamer.perform_renamings(arcs)
+        if n == 0:
+            print_.abort(f"Nothing was changed in the name list.")
+        elif n == 1:
+            print_.success(f"One item was renamed.")
+        else:
+            print_.success(f"All {n} items were renamed.")
     except RecoverableRenamingError:
         logger.warning("Renaming performed with a recoverable error.")
         try:
-            message = renamer.rollback_renamings()
-            return print_.abort(f"The renamings failed, but don't worry: {message}.")
+            opening = "The renamings failed, but don't worry:"
+            n = renamer.rollback_renamings()
+            if n == 0:
+                print_.abort(f"{opening} there was nothing to roll back.")
+            elif n == 1:
+                print_.abort(f"{opening} the only renaming was rolled back.")
+            else:
+                print_.abort(f"{opening} all {n} renamings were rolled back.")
         except Exception as e:
             return print_.fail(
                 f"Unrecoverable failure during rollback: {e}"
                 "Some files may have been renamed, some not."
-                "Please check the log file at `~/.suprenam/log.txt`."
+                f"Please check the log file at '{logger.path}'."
             )
 
 
-def cli_arguments():
+def cli_arguments() -> Dict[str, Any]:
     """
     CLI argument parser.
 
     Returns:
-        `parser.parse_args()` dict containing the parsed arguments.
+        A dictionary containing the parsed arguments.
     """
-    parser = ArgumentParser(
-        formatter_class=RawDescriptionHelpFormatter,
-        usage=f"\n{Path(__file__).name} [-p paths] [-f file] [-h help]",
-        description=f"\nFILE RENAMER",
-    )
-
+    parser = ArgumentParser(description="Easily rename items via your favorite text editor.")
     parser.add_argument(
-        "-p",
-        "--paths",
-        nargs="+",
-        help=f"The paths to rename.",
-        action="store",
+        "paths",
+        type=str,
+        nargs="*",
+        help=(
+            "either several items to rename, "
+            "or a text file enumerating the items to rename, "
+            "or a directory whose children are to be renamed"
+        ),
     )
-
-    parser.add_argument(
-        "-f",
-        "--file",
-        help=f"Parse paths stored in a file (newline separated).",
-        action="store",
-    )
-
-    parser.add_argument(
-        "-u",
-        "--undo",
-        help=f"Undo completed renamings from the previous session.",
-        action="store_true",
-    )
-
-    return parser.parse_args()
+    return vars(parser.parse_args())
 
 
 if __name__ == "__main__":  # pragma: no cover
-    main_wrapper()
+    main()

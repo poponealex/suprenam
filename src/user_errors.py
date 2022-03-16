@@ -2,6 +2,24 @@ class UnsupportedOSError(Exception):
     pass
 
 
+class NoEditorError(Exception):
+    pass
+
+
+class NoEditorCommandsFileError(Exception):
+    pass
+
+
+class UninstalledFavoriteEditorError(Exception):
+    pass
+
+
+class NoItemToRenameError(Exception):
+    """
+    A single text file was passed as an argument, and it is empty.
+    """
+
+
 class UnknownInodeError(ValueError):
     """
     The edited text contains an inode absent from the source text.
@@ -15,10 +33,15 @@ class TabulationError(ValueError):
     """
 
 
+class EmptyNameError(ValueError):
+    """
+    A new name is empty.
+    """
+
+
 class ValidationError(ValueError):
     """
-    A new name includes invalid character(s) for a filename
-    (depends on the target platform).
+    A new name is invalid (depends on the target platform).
     """
 
 
@@ -45,6 +68,7 @@ class RecoverableRenamingError(Exception):
     """
     Raised after a failed renaming, with the goal of triggering a rollback.
     """
+
 
 class RetrieveDefaultsError(Exception):
     """

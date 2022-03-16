@@ -1,12 +1,9 @@
-import subprocess
-import sys
 from pathlib import Path
 
-sys.path[0:0] = ["."]
-
+__import__("sys").path[0:0] = "."
 from src.goodies import rm_tree
-from src.suprenam import run_on_path_list
-from src.renamings import Renamer
+from src.context import Context
+from src.suprenam import *
 
 
 playground = Path("test/playground")
@@ -39,22 +36,22 @@ for path in paths:
     if not path.exists():
         path.touch()
 
-print("Playground recreated. Now, have fun renaming some files and folders...")
-try:
-    run_on_path_list(paths)
-except Exception as e:
-    print(f"Something else went wrong: {e}.")
 
-renamer = Renamer()
+print("Playground recreated. Now, have fun renaming some files and folders...")
+
+context = Context()
+context.logger.create_new_log_file()
+do_renamings(context, paths=paths)
 
 input("Press Enter to show the log file...")
-print(renamer.get_log_contents())
+print(context.logger.get_contents())
 
 input("Press Enter to revert the previous renamings...")
-renamer.undo_renamings()
+context.logger.create_new_log_file()
+undo_renamings(context)
 
 input("Press Enter to show the log file...")
-print(renamer.get_log_contents())
+print(context.logger.get_contents())
 
 input("Press Enter to erase the playground...")
 rm_tree(playground)

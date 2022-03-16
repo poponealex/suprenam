@@ -1,12 +1,11 @@
+import re
 from pathlib import Path
-from pathvalidate import ValidationError
-
-import context
-from src.parse_edited_text import *
 
 import pytest
-import re
+from pathvalidate import ValidationError
 
+__import__("sys").path[0:0] = "."
+from src.parse_edited_text import *
 
 data = [
     (
@@ -246,7 +245,7 @@ data = [
     (
         "Parse a file which is missing a name.",
         ["universal"],
-        ValidationError,
+        EmptyNameError,
         {
             123: Path("/home/foo"),
         },

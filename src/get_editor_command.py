@@ -1,124 +1,55 @@
 import re
-import subprocess
 from pathlib import Path
-from platform import platform as get_platform_long_string
 from shutil import which
-from typing import Optional
 
 from src.user_errors import *
-
-# NB: The sub-dictionary CUSTOM_EDITOR_COMMAND should be ordered by IDE decreasing popularity:
-#
-#  1:  Visual Studio Code
-#  2:  Visual Studio
-#  3:  IntelliJ
-#  4:  Notepad++
-#  5:  Vim
-#  6:  Android Studio
-#  7:  Sublime Text
-#  8:  PyCharm
-#  9:  Eclipse
-# 10:  Xcode
-# 11:  Atom
-# 12:  IPython/Jupyter
-# 13:  Webstorm
-# 14:  PHPStorm
-# 15:  NetBeans
-# 16:  Emacs
-# 17:  Neovim
-# 18:  Rider
-# 19:  RStudio
-# 20:  RubyMine
-# 21:  TextMate
-#
-# Source: https://insights.stackoverflow.com/survey/2021
+from src.context import Context
 
 
-OS = {
-    "macOS": {
-        "QUERY_ALL_DEFAULTS_COMMAND": "defaults read com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers",
-        "EXTRACT_EDITOR": r'(?ms)\s*\{\s*LSHandlerContentType = "public\.tab-separated-values-text";\s*LSHandlerPreferredVersions =\s*\{\s*LSHandlerRoleAll = "-";\s*\};\s*LSHandlerRoleAll = "([\w.]+)";',
-        # The keys of the following dictionary can be retrieved with AppleScript.
-        # For instance:    osascript -e 'id of app "MacVim"'
-        "CUSTOM_EDITOR_COMMAND": {
-            "com.microsoft.vscode": ["code", "-w"],
-            "org.vim.MacVim": ["/Applications/MacVim.app/Contents/bin/mvim", "-f", "-g"],
-            "com.sublimetext.4": ["subl", "-w"],
-            "com.sublimetext.3": ["subl", "-w"],
-            "com.jetbrains.pycharm": ["open", "-a", "PyCharm CE.app", "--wait"],
-            "com.macromates.textmate": ["mate", "-w"],
-            "com.apple.TextEdit": ["open", "-neW"], # open a new instance of TextEdit
-        },
-        "FALLBACK_EDITOR_COMMAND": [
-            "open",
-            "-n",  # open a new instance of the application even if one is already running
-            "-e",  # open with TextEdit
-            "-W",  # block until the **application** is closed (even if it was already running).
-            #        This is far from ideal, but there is currently no per-window way to check
-        ],
-    },
-    "Linux": {
-        "QUERY_ALL_DEFAULTS_COMMAND": "xdg-mime query default text/tab-separated-values",
-        "EXTRACT_EDITOR": r"^(.*)\.desktop$",
-        "CUSTOM_EDITOR_COMMAND": {
-            "code": ["code", "-w"],
-            "sublime_text": ["subl", "-w"],
-        },
-        "FALLBACK_EDITOR_COMMAND": ["open", "-w"],
-    },
-    # TODO: add Windows
-}
-
-
-def is_tool(name):  # https://stackoverflow.com/a/34177358/173003
-    """Check whether `name` is on PATH and marked as executable."""
-    return which(name) is not None
-
-
-def get_editor_command(path: Path, platform: Optional[str] = None) -> list:
+def get_editor_command(
+    context: Context,
+    editable_file_path: Path,
+) -> str:
     """
     Retrieve a command launching a text editor on a given text file.
     Args:
-        path: the path to the text file to edit.
+        context: all data relative to the current execution context (platform, logger, etc.).
+        editable_file_path: the path to the text file to edit.
     Returns:
-        A list of strings representing the command to launch the system's default text editor
-        on the given text file. If no default text editor is defined, a suitable fallback command
-        is returned.
+        A string representing the complete command to open this file in a text editor.
     Raises:
-        UnsupportedOSError: if the OS dictionary defines no key for the given operating system name.
+        NoEditorCommandsFileError: if `editor_commands.md` is not found.
+        NoEditorError: if no command-line capable editor is installed.
+        UninstalledFavoriteEditorError: if the favorite editor is not installed.
     """
-    platform = platform or get_platform_long_string().partition("-")[0]
-    os_dict = OS.get(platform)
-    if not os_dict:
-        raise UnsupportedOSError(
-            f"Unsupported operating system: {platform}. "
-            f"Supported operating systems are: {', '.join(OS.keys())}."
-        )
+    # Check whether the user has defined a favorite editor and it is installed.
+    command = context.config.get("editor_command")
+    if command:
+        name = str(command).partition(" ")[0]  # make mypy happy
+        if context.platform == "mockOS" or which(name):  # https://stackoverflow.com/a/34177358/173003
+            return f"{command} {editable_file_path}"
+        else:
+            raise UninstalledFavoriteEditorError(
+                f"The command '{name}' is not found. "
+                "You can either install the corresponding editor "
+                f"or modify it in '{context.workspace / 'config.json'}'."
+            )
 
-    try:
-        output = subprocess.run(
-            str(os_dict["QUERY_ALL_DEFAULTS_COMMAND"]).split(),  # make mypy happy
-            encoding="utf-8",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=True,
-        ).stdout
-    except Exception as e:
-        raise RetrieveDefaultsError(f"Failed to retrieve the defaults: {e}.")
+    # Retrieve a list of known editor commands.
+    for editor_commands_folder in (".", "src"):
+        editor_commands_path = Path(editor_commands_folder) / "editor_commands.md"
+        if editor_commands_path.is_file():
+            text = editor_commands_path.read_text()
+            break
+    else:
+        raise NoEditorCommandsFileError(f"The file 'editor_commands.md' is not found.")
 
-    match = re.search(str(os_dict["EXTRACT_EDITOR"]), output)  # make mypy happy
-    custom_editor_handler = match.group(1) if match else ""
+    # Among the commands known to work on the current platform, return the first one that is installed.
+    supported_commands = r"(?m)^\|.+?\|.*?%s.*?\| *`(.+?)` *\|" % context.platform
+    for command in re.findall(supported_commands, text):
+        name = str(command).partition(" ")[0]  # make mypy happy
+        if context.platform == "mockOS" or which(name):  # https://stackoverflow.com/a/34177358/173003
+            return f"{command} {editable_file_path}"
 
-    # Check whether the user has defined a custom editor
-    command = os_dict["CUSTOM_EDITOR_COMMAND"].get(custom_editor_handler)  # type: ignore
-    if command and is_tool(command[0]):  # is the command both known and installed on the system?
-        return command + [str(path)]
-
-    # Otherwise, try to find another editor which is both known and installed on the system
-    for command in os_dict["CUSTOM_EDITOR_COMMAND"].values():  # type: ignore
-        if is_tool(command[0]):
-            return command + [str(path)]
-
-    # Otherwise, return the fallback command defined by the system
-    # (on macOS, this is TextEdit, which lacks an option to wait for the file to be closed)
-    return list(os_dict["FALLBACK_EDITOR_COMMAND"]) + [str(path)]  # make mypy happy
+    # If no known command is installed, raise an error.
+    raise NoEditorError(f"No text editor found for the platform {context.platform}.")

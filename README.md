@@ -28,8 +28,6 @@ The modifications are instantly applied on the selected items.
 
 <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/success.png"></p>
 
-Well, yet another achievement for Suprenam, I guess. 🎉
-
 ----
 
 ### Clever, reliable and fool-proof
@@ -63,19 +61,9 @@ Suprenam is not as straightforward as it seems. It supports:
 
 <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/toolbar.gif"></p>
 
-##### Setting up your text editor (if needed)
+#### Linux and Windows
 
-If Suprenam insists to make you edit the names in TextEdit, don't let it ruin your life! Indeed, the TextEdit's associated command is currently unable to return when the file is closed, forcing you to quit it to proceed. This is a real pain in the OS, and we urge you to install and/or set as default a more capable text editor, for instance [Visual Studio Code](https://code.visualstudio.com/download). Assuming Suprenam knows how to deal with it, right-click on a `.tsv` file, press <kbd>alt</kbd>, and select it in `Always Open With`.
-
-<p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/mac_set_default_text_editor.png"></p>
-
-#### Linux
-
-Coming soon.
-
-#### Windows
-
-Coming soon.
+No graphical launcher yet. Use the command line tool.
 
 ### Installing the command line tool
 
@@ -87,29 +75,53 @@ pip install suprenam
 
 If this fails, try `pip3` instead of `pip`.
 
+### Configuring Suprenam
+
+On first launch, Suprenam creates a workspace at:
+- `~/Library/Application Support/Suprenam/` (MacOS)
+- `~/.config/suprenam/` (Linux)
+- `%HOMEPATH%\"AppData\Roaming\Suprenam\` (Windows)
+
+There, it will put the logs (`"log.txt"` + some backups) and a configuration file (`"config.json"`) in which you can specify the text editor to use. For instance, VS-Code is the default when the command `code` is installed in your PATH; if you prefer Sublime Text, just replace the corresponding line by:
+
+- macOS and Linux:
+  ```json
+    "editor_command": "subl -w",
+  ```
+- Windows
+  ```json
+    "editor_command": "subl.exe -w",
+  ```
+
+Many such commands are provided in [editor_commands.md](/src/editor_commands.md), and nothing prevents you from writing your own in the configuration file.
+
+----
+
 ## How it works
 
-- Being given a list of files and folders, Suprenam begins by retrieving their [**inodes**](https://en.wikipedia.org/wiki/Inode). These unique numeric identifiers will serve as an invariant throughout the renaming process.
-- It creates a temporary text file associating each inode with its name. In case all items are siblings (i.e., have the same parent), the list is flat ; otherwise, a section is created for each parent.
-- To find out how to open this file, Suprenam will use the following heuristics:
-  - Retrieve the text editor that you have set as the default for opening TSV files.
-  - If there is none, or Suprenam doesn't know the associated command, check for the presence of the ones that it actually supports, starting with VS-Code.
-  - If this fails too, fall back to the default text editor of your operating system.
-- Once the TSV file is opened, Suprenam waits for you to carry your modifications out.
-- When the temporary file is closed, its content is parsed.
-  - Suprenam ignores any change or deletion to non-inodes lines.
-  - It  tolerates the deletion of one, several or even all of the inodes.
-  - However, any inode creation or duplication is considered as a typo, and makes it to abort.
+- Suprenam starts by determining the items to rename. They can be provided:
+  - directly, as a batch of **several files of folders**;
+  - semi-directly, as a **single folder**: this folder will be renamed, along with all its children (both visible and hidden);
+  - indirectly, as a **single text file** (mandatory suffix: `.txt`) containing the items to rename (one path by line). Note that a single non-text file will be treated as in the first case.
+- Suprenam retrieves the [**inodes**](https://en.wikipedia.org/wiki/Inode) of the items to be renamed. These unique numeric identifiers will serve as an invariant throughout the renaming process.
+- It creates a temporary TSV file associating each inode with its name. In case all items are siblings (i.e., have the same parent), the list is flat ; otherwise, a group is created for each parent.
+- Note that the list is sorted in “natural order” (e.g., _foobar9_ before _foobar10_, and _[cote, coteau, crottez, crotté, côte, côté]_ as _[cote, côte, côté, coteau, crotté, crottez]_).
+- Suprenam opens this file by invoking the editor command found in the [configuration file](#configuring-suprenam). If none is specified, it parses [`editor_commands.md`](/src/editor_commands.md) and defaults to the first one that happens to work on your system.
+- Once the TSV file is opened, Suprenam waits for you to make the desired changes.
+- When it is closed, its content is parsed.
+  - Any deletion or change to non-inodes lines is ignored.
+  - The deletion of one, several or even all of the inodes is tolerated.
+  - However, any inode creation or duplication is considered as a typo, and makes the program to abort without renaming anything.
 - The new names are checked for validity with respect to the actual file system.
 - This results in a list of bindings between existing inodes and modified names. These bindings cannot be directly translated into renaming commands, as they may lead to name clashes.
   
   Below, for instance, `"c"` has two “target“ names, which will cause Suprenam to abort…
 
-<p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_nope.png"></p>
+  <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_nope.png"></p>
 
   However, some desired bindings can be resolved along a “safe” path of renamings. For instance, the following renamings (from left to right: null, swapping, shifting, rolling) can always be obtained with careful intermediate renamings.
 
-<p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_ok.png"></p>
+  <p align="center"><img src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/cycles_ok.png"></p>
 
   A handful of accepted and rejected renaming schemes are documented (and tested) [here](test/examples.md).  
 - So, whenever possible, the desired bindings have been silently converted into a “safe” sequence. The new bindings are then processed in order, and the corresponding renaming commands executed. At this stage, the only remaining possible errors should result from hardware failures or from modifications that have occurred in the file tree during the edition stage. Should such rare cases arise, all the completed renaming commands will be readily rolled back.
@@ -121,4 +133,3 @@ If this fails, try `pip3` instead of `pip`.
 - Authors: Aristide Grange and Alexandre Perlmutter.
 - macOS GUI: [Platypus](https://github.com/sveinbjornt/Platypus), by Sveinbjorn Thordarson.
 - Cross-plaform filename check: Python library [`pathvalidate`](https://github.com/thombashi/pathvalidate), by Tsuyoshi Hombashi.
-- Natural sorting: Python library [`natsort`](https://github.com/SethMMorton/natsort), by Seth M. Morton.
