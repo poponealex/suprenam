@@ -13,17 +13,17 @@ Most of the following commands come from the [Pro Git Book](https://git-scm.com/
 ## Text editors and IDEs (ordered by decreasing popularity)
 
 | Editor | Platform | Command |
-|--------|-----------|---------|
+|:-------|:---------|:--------|
 | Visual Studio Code | macOS, Linux, Windows | `code --wait` |
 | Visual Studio | Windows | |
 | IntelliJ | macOS, Linux, Windows | `idea --wait` |
-| Notepad++ | Windows | | `'C:\Program Files\Notepad\notepad.exe' -multiInst -notabbar -nosession -noPlugin` |
+| Notepad++ | Windows | `'C:\Program Files\Notepad\notepad.exe' -multiInst -notabbar -nosession -noPlugin` |
 | Vim | macOS | `/Applications/MacVim.app/Contents/bin/mvim -g --nofork` |
 | Vim | Linux |  `vim --nofork` |
 | Gvim | Windows | `'C:\Program Files\Vim\vim72\gvim.exe' --nofork '%*'` |
 | Android Studio | | |
 | Sublime Text | macOS, Linux | `subl --new-window --wait` |
-| Sublime Text | Windows | |  `'C:\Program Files\Sublime Text 3\sublime_text.exe' -w` |
+| Sublime Text | Windows | `'C:\Program Files\Sublime Text 3\sublime_text.exe' -w` |
 | PyCharm | macOS | `open -a PyCharm.app --wait` |
 | PyCharm CE | macOS | `open -a "PyCharm CE.app" --wait` |
 | Eclipse | | |
@@ -43,24 +43,26 @@ Most of the following commands come from the [Pro Git Book](https://git-scm.com/
 ## Niche text editors (by alphabetic order)
 
 | Editor | Platform | Command |
-|--------|-----------|---------|
-| BBEdit | macOS | `bbedit -w` |
+|:-------|:---------|:--------|
+| BBEdit | macOS | `bbedit --wait` |
 | Gedit | Linux | `gedit --wait --new-window` |
 | Kate | Linux | `kate` |
 | Leadpad | Linux | `leadpad` |
 | Mousepad | Linux | `mousepad` |
+| Nova | macOS | `nova --wait` |
 | Pluma | Linux | `pluma` |
 | Scratch | Linux | `scratch-text-editor` |
 | Textpad | Windows | `'C:\Program Files\TextPad 5\TextPad.exe' -m` |
+| TextWrangler | macOS | `edit --wait` |
 | UltraEdit | Windows | `Uedit32` |
 | VSCodium | macOS, Linux, Windows |  `codium --wait` |
 | WordPad | Windows | `'C:\Program Files\Windows NT\Accessories\wordpad.exe'` |
 | Xi | macOS, Linux, Windows |  `xi --wait` |
 
-## Preinstalled fallbacks (one per platform)
+## Pre-installed fallbacks (one per platform)
 
 | Editor | Platform | Command |
-|--------|-----------|---------|
+|:-------|:---------|:--------|
 | TextEdit | macOS | `open -e --new --wait-apps` |
 | Nano | Linux | `nano -w` |
 | Notepad | Windows | `notepad.exe` |
