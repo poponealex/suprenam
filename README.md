@@ -35,6 +35,7 @@ The modifications are instantly applied on the selected items.
 Suprenam is not as straightforward as it seems. It supports:
 
 - **Complex renamings.** As long as the desired final state is possible (e.g. no name clash), Suprenam will abide. Under the hood, this may require it to go through intermediate names (e.g. for swapping `"foo.pdf"` and `"bar.pdf"`).
+  <img align="right" src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/thank_you.png">
 - **Versioning.** When an item is tracked by git, Suprenam will use `git mv` to keep it under version control.
   <img align="right" src="https://raw.githubusercontent.com/poponealex/suprenam/master/img/thank_you.png">
 - **Rollback.** If something goes wrong during the actual process (e.g. a file is moved), don't worry: the work already completed will automatically be rolled back to the initial state.
