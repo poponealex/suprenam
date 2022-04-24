@@ -81,7 +81,7 @@ class Renamer:
                     check=True,
                     stderr=subprocess.DEVNULL,
                 )
-            except subprocess.CalledProcessError:
+            except (subprocess.CalledProcessError, FileNotFoundError): # FileNotFoundError if git is not installed on Windows.
                 source.rename(target)
             self.arcs_to_rollback.insert(0, Arc(target, source))
             self.logger.info(f"SOURCE:{source}\tTARGET:{target}")
