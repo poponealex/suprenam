@@ -71,9 +71,9 @@ class Renamer:
             try:
                 subprocess.run(
                     [
-                        "git",  # git fails when launched from a non-versioned directory.
-                        "-C",  # This option runs git as if it was started...
-                        source.parent,  #  ... in the source's parent directory.
+                        "git",
+                        "-C",  # Run git as if it was started...
+                        source.parent,  #  ... from the source's parent directory.
                         "mv",
                         source.name,
                         target.name,
@@ -81,7 +81,9 @@ class Renamer:
                     check=True,
                     stderr=subprocess.DEVNULL,
                 )
-            except (subprocess.CalledProcessError, FileNotFoundError): # FileNotFoundError if git is not installed on Windows.
+            except FileNotFoundError:  # git is not installed
+                source.rename(target)
+            except subprocess.CalledProcessError:  # the directory is not versioned under git
                 source.rename(target)
             self.arcs_to_rollback.insert(0, Arc(target, source))
             self.logger.info(f"SOURCE:{source}\tTARGET:{target}")
