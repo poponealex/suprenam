@@ -291,5 +291,25 @@ def test_rename_when_git_is_not_installed():
     rm_tree(base)
 
 
+def test_rename_files_under_version_control():
+    """Swap to files under version control."""
+    renamer = Renamer(context, testing=True)
+    base = Path("test")
+    arcs = [
+        Arc(base / "test_renamings_data_1.md", base / "test_renamings_data_aux.md"),
+        Arc(base / "test_renamings_data_2.md", base / "test_renamings_data_1.md"),
+        Arc(base / "test_renamings_data_aux.md", base / "test_renamings_data_2.md"),
+    ]
+    renamer.perform_renamings(arcs)
+    print(logger.get_contents())
+    assert logger.get_contents() == "\n".join([
+        "INFO:root:3 items to rename.",
+        "INFO:root:git:SOURCE:test/test_renamings_data_1.md\tTARGET:test/test_renamings_data_aux.md",
+        "INFO:root:git:SOURCE:test/test_renamings_data_2.md\tTARGET:test/test_renamings_data_1.md",
+        "INFO:root:git:SOURCE:test/test_renamings_data_aux.md\tTARGET:test/test_renamings_data_2.md",
+        "INFO:root:3 items renamed.",
+    ])
+
+
 if __name__ == "__main__":  # pragma: no cover
     pytest.main(["-qq", __import__("sys").argv[0]])
