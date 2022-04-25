@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import os
 import pytest
 
 __import__("sys").path[0:0] = "."
@@ -258,6 +259,37 @@ def test_undo_with_empty_log_file():
     renamer = Renamer(context, testing=True)
     arcs_for_undoing = renamer.get_arcs_for_undoing(logger.get_contents()) # doesn't raise an exception
     assert arcs_for_undoing == []
+
+
+def test_rename_when_git_is_not_installed():
+    """All renamings succeed."""
+    renamer = Renamer(context, testing=True)
+    base = Path("test") / "happy_path"
+    rm_tree(base)
+    base.mkdir()
+    arcs = [
+        Arc(base / "source_0", base / "target_0"),
+        Arc(base / "source_1", base / "target_1"),
+        Arc(base / "source_2", base / "target_2"),
+    ]
+    for arc in arcs:
+        arc.source.touch()
+    path_backup = os.environ["PATH"]
+    os.environ["PATH"] = ""  # make git unavailable
+    renamer.perform_renamings(arcs)
+    os.environ["PATH"] = path_backup
+    assert set(base.iterdir()) == set(arc.target for arc in arcs)
+    print(logger.get_contents())
+    assert logger.get_contents() == "\n".join([
+        "INFO:root:3 items to rename.",
+        "WARNING:root:Git is not installed. Falling back to a non-git strategy.",
+        "INFO:root:SOURCE:test/happy_path/source_0\tTARGET:test/happy_path/target_0",
+        "INFO:root:SOURCE:test/happy_path/source_1\tTARGET:test/happy_path/target_1",
+        "INFO:root:SOURCE:test/happy_path/source_2\tTARGET:test/happy_path/target_2",
+        "INFO:root:3 items renamed.",
+    ])
+    rm_tree(base)
+
 
 if __name__ == "__main__":  # pragma: no cover
     pytest.main(["-qq", __import__("sys").argv[0]])

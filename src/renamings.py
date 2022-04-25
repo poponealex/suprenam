@@ -12,6 +12,7 @@ class Renamer:
     def __init__(self, context: Context, testing: bool = False):
         self.logger = context.logger
         self.print_ = context.print_
+        self.rename_one_file = self._rename_one_file_with_git  # set the default renaming strategy
         if testing:
             self.logger.create_new_log_file()
 
@@ -68,27 +69,50 @@ class Renamer:
     def rename_and_log_all_files(self, arcs: List[Arc]):
         self.arcs_to_rollback: List[Arc] = []
         for (source, target) in arcs:
-            try:
-                subprocess.run(
-                    [
-                        "git",
-                        "-C",  # Run git as if it was started...
-                        source.parent,  #  ... from the source's parent directory.
-                        "mv",
-                        source.name,
-                        target.name,
-                    ],
-                    check=True,
-                    stderr=subprocess.DEVNULL,
-                )
-            except FileNotFoundError:  # git is not installed
-                source.rename(target)
-            except subprocess.CalledProcessError:  # the directory is not versioned under git
-                source.rename(target)
+            git_flag = self.rename_one_file(source, target)
+            self.logger.info(f"{'git:' if git_flag else ''}SOURCE:{source}\tTARGET:{target}")
             self.arcs_to_rollback.insert(0, Arc(target, source))
-            self.logger.info(f"SOURCE:{source}\tTARGET:{target}")
         self.print_arcs(arcs)
         self.print_.newline()
+
+    def _rename_one_file_with_git(self, source: Path, target: Path) -> bool:
+        """Try to use git to operate a renaming (default strategy for `rename_one_file()`).
+
+        Args:
+            source (Path): the path to the file to rename
+            target (Path): the new path to the file
+
+        Returns:
+            bool: `True` if the renaming was done using git, `False` otherwise. In the latter case,
+                the renaming is done without git, as well as all the subsequent ones.
+        """
+        try:
+            subprocess.run(
+                [
+                    "git",
+                    "-C",  # Run git as if it was started...
+                    source.parent,  #  ... from the source's parent directory.
+                    "mv",
+                    source.name,
+                    target.name,
+                ],
+                check=True,
+                stderr=subprocess.DEVNULL,
+            )
+            return True
+        except FileNotFoundError:
+            self.rename_one_file = self._rename_one_file
+            self.logger.warning(f"Git is not installed. Falling back to a non-git strategy.")
+        except subprocess.CalledProcessError:
+            pass
+        except Exception as e:
+            self.logger.warning(f"Error while git-renaming '{source}' to '{target}': {e}.")
+        return self._rename_one_file(source, target)
+
+    def _rename_one_file(self, source: Path, target: Path) -> bool:
+        """Fallback strategy as soon as a git-renaming has found that git was not installed."""
+        source.rename(target)
+        return False
 
     def print_arcs(self, arcs: List[Arc]):
         previous_parent = Path()
